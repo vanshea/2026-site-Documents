@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="theme2">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Van Shea Sedita | Design Portfolio</title>
+    <meta
+      name="description"
+      content="A simple design portfolio showcasing branding, web, and illustration projects."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <header class="site-header">
+      <a href="#top" class="brand" aria-label="Back to top">
+        <picture>
+          <source
+            id="brandLogoDarkSource"
+            srcset="assets/web_logomark_240_white.png"
+            media="(prefers-color-scheme: dark)"
+          />
+          <img
+            id="brandLogoLightImage"
+            class="brand-logo"
+            src="assets/web_logomark_240_dark.png"
+            alt="VSS logo"
+          />
+        </picture>
+        <span class="brand-name">Van Shea Creative</span>
+      </a>
+      <nav class="nav">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero reveal">
+        <p class="eyebrow">Independent designer · Delaware</p>
+        <h1>Building playful visual systems for digital products.</h1>
+        <p class="lead">
+          I design brand identities, websites, and product graphics with a
+          focus on clarity and character.
+        </p>
+        <a class="btn" href="#work">See Projects</a>
+      </section>
+
+      <section id="work" class="work reveal">
+        <div class="section-head">
+          <h2>Selected Work</h2>
+          <div class="filters" role="tablist" aria-label="Project filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="branding">Branding</button>
+            <button class="filter-btn" data-filter="web">Web</button>
+            <button class="filter-btn" data-filter="illustration">
+              Illustration
+            </button>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card reveal" data-category="branding">
+            <a
+              class="work-link"
+              data-project-id="northline"
+              href="assets/fpo-large-northline-1900x1600.svg"
+              data-lightbox-src="assets/fpo-large-northline-1900x1600.svg"
+              data-fullscreen-src="assets/fpo-large-northline-1900x1600.svg"
+              data-lightbox-title="Northline Coffee"
+            >
+              <img
+                class="card-image"
+                src="assets/fpo-thumb-760x570.svg"
+                alt="FPO preview image for Northline Coffee"
+                loading="lazy"
+              />
+              <h3>Northline Coffee</h3>
+              <p>Identity refresh with packaging and social templates.</p>
+            </a>
+            <button
+              class="card-fullscreen"
+              type="button"
+              aria-label="View Northline Coffee in fullscreen"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          </article>
+          <article class="card reveal" data-category="web">
+            <a
+              class="work-link"
+              data-project-id="atlas"
+              href="assets/fpo-large-atlas-1900x1600.svg"
+              data-lightbox-src="assets/fpo-large-atlas-1900x1600.svg"
+              data-fullscreen-src="assets/fpo-large-atlas-1900x1600.svg"
+              data-lightbox-title="Atlas Wellness"
+            >
+              <img
+                class="card-image"
+                src="assets/fpo-thumb-760x570.svg"
+                alt="FPO preview image for Atlas Wellness"
+                loading="lazy"
+              />
+              <h3>Atlas Wellness</h3>
+              <p>Conversion-focused landing pages and icon style.</p>
+            </a>
+            <button
+              class="card-fullscreen"
+              type="button"
+              aria-label="View Atlas Wellness in fullscreen"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          </article>
+          <article class="card reveal" data-category="illustration">
+            <a
+              class="work-link"
+              data-project-id="city_transit"
+              href="assets/fpo-large-city-transit-1900x1600.svg"
+              data-lightbox-src="assets/fpo-large-city-transit-1900x1600.svg"
+              data-fullscreen-src="assets/fpo-large-city-transit-1900x1600.svg"
+              data-lightbox-title="City Transit Posters"
+            >
+              <img
+                class="card-image"
+                src="assets/fpo-thumb-760x570.svg"
+                alt="FPO preview image for City Transit Posters"
+                loading="lazy"
+              />
+              <h3>City Transit Posters</h3>
+              <p>Series of modular illustrations for campaign posters.</p>
+            </a>
+            <button
+              class="card-fullscreen"
+              type="button"
+              aria-label="View City Transit Posters in fullscreen"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          </article>
+          <article class="card reveal" data-category="web">
+            <a
+              class="work-link"
+              data-project-id="wren"
+              href="assets/fpo-large-wren-1900x1600.svg"
+              data-lightbox-src="assets/fpo-large-wren-1900x1600.svg"
+              data-fullscreen-src="assets/fpo-large-wren-1900x1600.svg"
+              data-lightbox-title="Wren Studio"
+            >
+              <img
+                class="card-image"
+                src="assets/fpo-thumb-760x570.svg"
+                alt="FPO preview image for Wren Studio"
+                loading="lazy"
+              />
+              <h3>Wren Studio</h3>
+              <p>Portfolio website with motion system and CMS handoff.</p>
+            </a>
+            <button
+              class="card-fullscreen"
+              type="button"
+              aria-label="View Wren Studio in fullscreen"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          </article>
+          <article class="card reveal" data-category="branding">
+            <a
+              class="work-link"
+              data-project-id="hollow_creek"
+              href="assets/fpo-large-hollow-creek-1900x1600.svg"
+              data-lightbox-src="assets/fpo-large-hollow-creek-1900x1600.svg"
+              data-fullscreen-src="assets/fpo-large-hollow-creek-1900x1600.svg"
+              data-lightbox-title="Hollow Creek Cider"
+            >
+              <img
+                class="card-image"
+                src="assets/fpo-thumb-760x570.svg"
+                alt="FPO preview image for Hollow Creek Cider"
+                loading="lazy"
+              />
+              <h3>Hollow Creek Cider</h3>
+              <p>Can label lineup and tasting room visual direction.</p>
+            </a>
+            <button
+              class="card-fullscreen"
+              type="button"
+              aria-label="View Hollow Creek Cider in fullscreen"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          </article>
+          <article class="card reveal" data-category="illustration">
+            <a
+              class="work-link"
+              data-project-id="field_notes"
+              href="assets/fpo-large-field-notes-1900x1600.svg"
+              data-lightbox-src="assets/fpo-large-field-notes-1900x1600.svg"
+              data-fullscreen-src="assets/fpo-large-field-notes-1900x1600.svg"
+              data-lightbox-title="Field Notes Covers"
+            >
+              <img
+                class="card-image"
+                src="assets/fpo-thumb-760x570.svg"
+                alt="FPO preview image for Field Notes Covers"
+                loading="lazy"
+              />
+              <h3>Field Notes Covers</h3>
+              <p>Seasonal illustrated covers for limited print run.</p>
+            </a>
+            <button
+              class="card-fullscreen"
+              type="button"
+              aria-label="View Field Notes Covers in fullscreen"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section id="about" class="about reveal">
+        <h2>About</h2>
+        <p>
+          I partner with startups and small teams that need design that feels
+          warm, useful, and memorable. Over the last 6 years, I have shipped
+          identity systems, websites, and campaign visuals across food, health,
+          and culture spaces.
+        </p>
+      </section>
+
+      <section id="contact" class="contact reveal">
+        <div class="contact-shell">
+          <p class="contact-kicker">Let&apos;s Build Something Useful</p>
+          <h2>Project Inquiry</h2>
+          <p class="contact-intro">
+            Share your goals, scope, and timeline in the form below. I review
+            every submission personally.
+          </p>
+          <div class="form-embed-slot" aria-label="Project inquiry form area">
+            <form
+              id="projectInquiryForm"
+              class="project-inquiry-form"
+              data-google-form-action="https://docs.google.com/forms/d/e/1FAIpQLScVOIMpFAFvqvonZWWH-2HJws0vDJyuCAajoaRgLwCDRF_3Aw/formResponse"
+              data-google-form-link="https://docs.google.com/forms/d/e/1FAIpQLScVOIMpFAFvqvonZWWH-2HJws0vDJyuCAajoaRgLwCDRF_3Aw/viewform"
+              data-google-prefill-url=""
+              data-google-entry-name="entry.811253843"
+              data-google-entry-email="entry.76883097"
+              data-google-entry-brief="entry.1676585977"
+              novalidate
+            >
+              <label for="inquiryName">Name</label>
+              <input
+                id="inquiryName"
+                name="name"
+                type="text"
+                required
+                autocomplete="name"
+                placeholder="Your name"
+              />
+
+              <label for="inquiryEmail">Email</label>
+              <input
+                id="inquiryEmail"
+                name="email"
+                type="email"
+                required
+                autocomplete="email"
+                placeholder="you@example.com"
+              />
+
+              <label for="inquiryBrief">Project Brief</label>
+              <textarea
+                id="inquiryBrief"
+                name="brief"
+                rows="6"
+                required
+                placeholder="Tell me about your project goals, timeline, and scope."
+              ></textarea>
+
+              <div class="project-inquiry-actions">
+                <button class="btn" id="projectInquirySubmit" type="submit">
+                  Send Inquiry
+                </button>
+                <p
+                  class="project-inquiry-status"
+                  id="projectInquiryStatus"
+                  role="status"
+                  aria-live="polite"
+                ></p>
+              </div>
+            </form>
+
+            <p class="google-form-fallback">
+              Prefer the original form?
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLScVOIMpFAFvqvonZWWH-2HJws0vDJyuCAajoaRgLwCDRF_3Aw/viewform"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open Google Form
+              </a>.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <p><span id="year"></span> Van Shea Sedita. All rights reserved.</p>
+        <div class="theme-switcher" role="group" aria-label="Choose site theme">
+          <span class="theme-switcher-label">Themes</span>
+          <button
+            class="theme-link"
+            type="button"
+            data-theme="theme1"
+            aria-pressed="false"
+          >
+            Theme 1
+          </button>
+          <button
+            class="theme-link is-active"
+            type="button"
+            data-theme="theme2"
+            aria-pressed="true"
+          >
+            Theme 2
+          </button>
+          <button
+            class="theme-link"
+            type="button"
+            data-theme="theme3"
+            aria-pressed="false"
+          >
+            Theme 3
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close image">
+        x
+      </button>
+      <button
+        class="lightbox-nav lightbox-prev"
+        id="lightboxPrev"
+        aria-label="Previous image"
+      >
+        <span aria-hidden="true"><</span>
+      </button>
+      <button
+        class="lightbox-nav lightbox-next"
+        id="lightboxNext"
+        aria-label="Next image"
+      >
+        <span aria-hidden="true">></span>
+      </button>
+      <figure class="lightbox-figure">
+        <img
+          id="lightboxImage"
+          src=""
+          alt=""
+          width="1900"
+          height="1600"
+          decoding="async"
+        />
+        <figcaption id="lightboxCaption"></figcaption>
+      </figure>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

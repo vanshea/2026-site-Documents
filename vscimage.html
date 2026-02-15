@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VSCimage | Image Admin</title>
+    <meta
+      name="description"
+      content="VSCimage admin to upload, generate, and assign site image assets."
+    />
+    <link rel="stylesheet" href="vscimage.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="app-header">
+        <div>
+          <p class="kicker">Van Shea Sedita</p>
+          <h1>VSCimage</h1>
+          <p class="subhead">
+            Upload any source image, generate required formats, and assign
+            assets to website slots.
+          </p>
+        </div>
+        <a class="back-link" href="/">Back To Site</a>
+      </header>
+
+      <section class="panel">
+        <h2>Upload And Generate</h2>
+        <form id="uploadForm" class="form-grid">
+          <label>
+            Source Image
+            <input id="imageFile" name="image" type="file" accept="image/*" required />
+          </label>
+          <label>
+            Asset Name
+            <input
+              id="assetName"
+              name="name"
+              type="text"
+              placeholder="example: summer-campaign"
+              required
+            />
+          </label>
+          <fieldset class="output-set">
+            <legend>Generate Outputs</legend>
+            <label><input type="checkbox" value="logo" checked />Logo (240x240 PNG)</label>
+            <label><input type="checkbox" value="thumb" checked />Thumb (760x570 WEBP)</label>
+            <label><input type="checkbox" value="large" checked />Large (1900x1600 WEBP)</label>
+            <label><input type="checkbox" value="fullscreen" checked />Fullscreen (3200x1800 WEBP)</label>
+          </fieldset>
+          <button class="btn" type="submit">Generate Files</button>
+        </form>
+        <p id="uploadMsg" class="status"></p>
+        <ul id="generatedList" class="generated-list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Assign To Site</h2>
+        <form id="configForm">
+          <div class="logo-grid">
+            <label>
+              Logo Light Theme
+              <select id="logoLightSelect"></select>
+            </label>
+            <label>
+              Logo Dark Theme
+              <select id="logoDarkSelect"></select>
+            </label>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Thumb 760x570</th>
+                  <th>Large 1900x1600</th>
+                  <th>Fullscreen</th>
+                </tr>
+              </thead>
+              <tbody id="projectRows"></tbody>
+            </table>
+          </div>
+
+          <button class="btn" type="submit">Save Site Config</button>
+          <p id="configMsg" class="status"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Current Preview</h2>
+        <div id="previewGrid" class="preview-grid"></div>
+      </section>
+    </main>
+
+    <script src="vscimage.js"></script>
+  </body>
+</html>

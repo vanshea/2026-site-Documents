@@ -1,0 +1,44 @@
+{
+  "logos": {
+    "light": "assets/web_logomark_240_dark.png",
+    "dark": "assets/web_logomark_240_white.png"
+  },
+  "projects": {
+    "northline": {
+      "title": "Northline Coffee",
+      "thumb": "assets/fpo-thumb-760x570.svg",
+      "large": "assets/fpo-large-northline-1900x1600.svg",
+      "fullscreen": "assets/fpo-large-northline-1900x1600.svg"
+    },
+    "atlas": {
+      "title": "Atlas Wellness",
+      "thumb": "assets/fpo-thumb-760x570.svg",
+      "large": "assets/fpo-large-atlas-1900x1600.svg",
+      "fullscreen": "assets/fpo-large-atlas-1900x1600.svg"
+    },
+    "city_transit": {
+      "title": "City Transit Posters",
+      "thumb": "assets/fpo-thumb-760x570.svg",
+      "large": "assets/fpo-large-city-transit-1900x1600.svg",
+      "fullscreen": "assets/fpo-large-city-transit-1900x1600.svg"
+    },
+    "wren": {
+      "title": "Wren Studio",
+      "thumb": "assets/fpo-thumb-760x570.svg",
+      "large": "assets/fpo-large-wren-1900x1600.svg",
+      "fullscreen": "assets/fpo-large-wren-1900x1600.svg"
+    },
+    "hollow_creek": {
+      "title": "Hollow Creek Cider",
+      "thumb": "assets/fpo-thumb-760x570.svg",
+      "large": "assets/fpo-large-hollow-creek-1900x1600.svg",
+      "fullscreen": "assets/fpo-large-hollow-creek-1900x1600.svg"
+    },
+    "field_notes": {
+      "title": "Field Notes Covers",
+      "thumb": "assets/fpo-thumb-760x570.svg",
+      "large": "assets/fpo-large-field-notes-1900x1600.svg",
+      "fullscreen": "assets/fpo-large-field-notes-1900x1600.svg"
+    }
+  }
+}
