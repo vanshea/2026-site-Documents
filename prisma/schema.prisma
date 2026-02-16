@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id                BigInt   @id @default(autoincrement())
+  eventName         String   @db.VarChar(64)
+  eventTime         DateTime @default(now())
+  eventDate         DateTime @db.Date
+  userId            String   @db.VarChar(64)
+  sessionId         String   @db.VarChar(64)
+  pagePath          String?  @db.VarChar(255)
+  pageTitle         String?  @db.VarChar(200)
+  referrerDomain    String?  @db.VarChar(120)
+  deviceType        String?  @db.VarChar(24)
+  countryCode       String?  @db.VarChar(2)
+  sessionSource     String?  @db.VarChar(64)
+  sessionMedium     String?  @db.VarChar(64)
+  sessionCampaign   String?  @db.VarChar(120)
+  firstTouchSource  String?  @db.VarChar(64)
+  firstTouchMedium  String?  @db.VarChar(64)
+  firstTouchCampaign String? @db.VarChar(120)
+  slug              String?  @db.VarChar(120)
+  caseStudyTitle    String?  @db.VarChar(200)
+  percent           Int?
+  location          String?  @db.VarChar(64)
+  method            String?  @db.VarChar(32)
+  destinationDomain String?  @db.VarChar(120)
+  linkText          String?  @db.VarChar(120)
+  success           Boolean?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+
+  @@index([eventTime])
+  @@index([eventDate, eventName])
+  @@index([eventName, eventTime])
+  @@index([pagePath, eventTime])
+  @@index([slug, eventTime])
+  @@index([userId, eventTime])
+  @@index([sessionId, eventTime])
+  @@index([sessionSource, sessionMedium, eventTime])
+  @@index([sessionCampaign, eventTime])
+  @@index([referrerDomain, eventTime])
+  @@index([deviceType, eventTime])
+  @@index([countryCode, eventTime])
+}
+
+model DailyAggregate {
+  id          BigInt   @id @default(autoincrement())
+  day         DateTime @db.Date
+  bucket      String   @db.VarChar(64)
+  metric      String   @db.VarChar(64)
+  dimension   String?  @db.VarChar(160)
+  value       Float
+  uniqueUsers Int?
+  sessions    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([day, bucket, metric, dimension])
+  @@index([day, bucket])
+  @@index([bucket, metric, day])
+}

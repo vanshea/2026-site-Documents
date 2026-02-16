@@ -1,0 +1,69 @@
+<%- include('../partials/dashboard_head', { title: 'Engagement' }) %>
+<%- include('../partials/dashboard_nav', { activeTab, range, rangeQuery, exportReport, currentPath }) %>
+
+<main class="grid gap-4 lg:grid-cols-2">
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4 lg:col-span-2">
+    <h2 class="text-base font-semibold">Top Pages</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-4">Page</th>
+            <th class="py-1 pr-4">Pageviews</th>
+            <th class="py-1 pr-4">Avg Time on Page</th>
+            <th class="py-1">Exit Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!engagement.topPages.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="4">No page engagement data in selected range.</td></tr>
+          <% } %>
+          <% engagement.topPages.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-4 font-mono text-xs"><%= row.pagePath %></td>
+              <td class="py-2 pr-4"><%= row.pageviews %></td>
+              <td class="py-2 pr-4"><%= Number(row.avgTimeSeconds).toFixed(1) %>s</td>
+              <td class="py-2"><%= Number(row.exitRate).toFixed(1) %>%</td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Case Studies (Deep Scroll 75%+)</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-4">Slug</th>
+            <th class="py-1">Sessions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!engagement.caseStudyDeepScroll.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="2">No deep scroll activity in selected range.</td></tr>
+          <% } %>
+          <% engagement.caseStudyDeepScroll.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-4 font-mono text-xs"><%= row.slug %></td>
+              <td class="py-2"><%= row.deepScrollSessions %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Notes</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-300">
+      <li>Time-on-page is estimated from the time between tracked events within a session.</li>
+      <li>Exit rate is calculated as exits from a page divided by sessions that visited the page.</li>
+      <li>Deep scroll ranking uses sessions reaching at least 75% scroll depth.</li>
+    </ul>
+  </section>
+</main>
+
+<%- include('../partials/dashboard_footer') %>

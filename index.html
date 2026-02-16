@@ -41,6 +41,16 @@
       <nav class="nav">
         <a href="#work">Work</a>
         <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a
+          href="https://www.vansheacreative.com/resume"
+          target="_blank"
+          rel="noreferrer noopener"
+          data-analytics="resume_download"
+          data-analytics-location="header"
+        >
+          Resume
+        </a>
       </nav>
     </header>
 
@@ -238,7 +248,43 @@
         </p>
       </section>
 
-      <section id="contact" class="contact reveal">
+      <section id="experience" class="experience reveal">
+        <h2>Experience</h2>
+        <p class="experience-intro">
+          Explore my resume for experience, skills, and recent project work.
+        </p>
+        <div class="experience-shell">
+          <div class="experience-actions">
+            <a
+              class="btn"
+              href="https://www.vansheacreative.com/resume"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open Resume
+            </a>
+          </div>
+          <iframe
+            class="resume-frame"
+            src="https://www.vansheacreative.com/resume"
+            title="Van Shea Sedita resume"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+          <p class="experience-fallback">
+            If the preview is blocked in your browser,
+            <a
+              href="https://www.vansheacreative.com/resume"
+              target="_blank"
+              rel="noreferrer"
+            >
+              open the resume in a new tab
+            </a>.
+          </p>
+        </div>
+      </section>
+
+      <section id="contact" class="contact reveal" data-analytics-location="contact">
         <div class="contact-shell">
           <p class="contact-kicker">Let&apos;s Build Something Useful</p>
           <h2>Project Inquiry</h2>
@@ -342,11 +388,45 @@
             data-theme="theme3"
             aria-pressed="false"
           >
-            Theme 3
+            High Contrast
+          </button>
+          <a
+            class="theme-link"
+            href="https://www.vansheacreative.com/resume"
+            target="_blank"
+            rel="noreferrer noopener"
+            data-analytics="resume_download"
+            data-analytics-location="footer"
+          >
+            Resume
+          </a>
+          <button class="theme-link consent-manage-btn" id="consentManageBtn" type="button">
+            Privacy Settings
           </button>
         </div>
       </div>
     </footer>
+
+    <aside
+      class="consent-banner"
+      id="consentBanner"
+      role="dialog"
+      aria-live="polite"
+      aria-label="Analytics consent"
+      hidden
+    >
+      <p class="consent-text">
+        We use privacy-first analytics to measure meaningful actions, not personal identity.
+      </p>
+      <div class="consent-actions">
+        <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+          Deny
+        </button>
+        <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+          Allow Analytics
+        </button>
+      </div>
+    </aside>
 
     <div class="lightbox" id="lightbox" aria-hidden="true">
       <button class="lightbox-close" id="lightboxClose" aria-label="Close image">
@@ -379,6 +459,7 @@
       </figure>
     </div>
 
+    <script src="analytics.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

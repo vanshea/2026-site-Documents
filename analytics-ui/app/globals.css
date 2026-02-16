@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(circle at top right, #e2f0ea 0%, #f5f7f4 42%, #edf2ef 100%);
+  color: #1d2c2f;
+}
+
+a {
+  color: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bfd0c7;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-track {
+  background: #edf2ef;
+}

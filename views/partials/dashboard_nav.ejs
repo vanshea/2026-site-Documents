@@ -1,0 +1,79 @@
+<header class="mb-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-xl">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-lg font-semibold">Internal Analytics Dashboard</h1>
+      <p class="text-sm text-slate-400">
+        First-party event analytics only. Range: <%= range.startDate %> to <%= range.endDate %>
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <form method="get" action="<%= currentPath %>" class="flex flex-wrap items-end gap-2">
+        <label class="text-xs text-slate-400">
+          Start
+          <input
+            class="mt-1 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-slate-100"
+            type="date"
+            name="start"
+            value="<%= range.startDate %>"
+            required
+          />
+        </label>
+        <label class="text-xs text-slate-400">
+          End
+          <input
+            class="mt-1 rounded-md border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-slate-100"
+            type="date"
+            name="end"
+            value="<%= range.endDate %>"
+            required
+          />
+        </label>
+        <button
+          class="rounded-md border border-cyan-500/60 bg-cyan-500/10 px-3 py-1.5 text-sm font-medium text-cyan-200 hover:bg-cyan-500/20"
+          type="submit"
+        >
+          Apply
+        </button>
+      </form>
+
+      <a
+        class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500"
+        href="/analytics/export.csv?report=<%= exportReport %>&<%= rangeQuery %>"
+      >
+        Export CSV
+      </a>
+
+      <form method="post" action="/logout">
+        <button
+          class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500"
+          type="submit"
+        >
+          Logout
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <nav class="mt-4 grid grid-cols-2 gap-2 text-sm sm:flex sm:flex-wrap sm:gap-2">
+    <% const tabs = [
+      { key: 'overview', label: 'Overview', href: '/analytics/overview' },
+      { key: 'realtime', label: 'Realtime', href: '/analytics/realtime' },
+      { key: 'acquisition', label: 'Acquisition', href: '/analytics/acquisition' },
+      { key: 'engagement', label: 'Engagement', href: '/analytics/engagement' },
+      { key: 'events', label: 'Events', href: '/analytics/events' },
+      { key: 'conversions', label: 'Conversions', href: '/analytics/conversions' }
+    ]; %>
+
+    <% tabs.forEach((tab) => { %>
+      <a
+        href="<%= tab.href %>?<%= rangeQuery %>"
+        class="rounded-md border px-3 py-1.5 text-center transition <%= activeTab === tab.key
+          ? 'border-cyan-500/80 bg-cyan-500/20 text-cyan-100'
+          : 'border-slate-700 text-slate-300 hover:border-slate-500' %>"
+      >
+        <%= tab.label %>
+      </a>
+    <% }); %>
+  </nav>
+</header>

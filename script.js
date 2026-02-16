@@ -208,6 +208,8 @@ if (projectInquiryForm) {
   ).trim();
   const googleFormLink = String(projectInquiryForm.dataset.googleFormLink || "").trim();
   const googleEntryMap = parseGoogleEntryMap(projectInquiryForm);
+  const contactLocation =
+    window.siteAnalytics?.getElementLocation?.(projectInquiryForm) || "contact";
 
   if (!googleFormAction || !googleEntryMap) {
     setProjectInquiryStatus(
@@ -220,6 +222,7 @@ if (projectInquiryForm) {
 
   projectInquiryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    window.siteAnalytics?.trackContactClick?.("form", contactLocation);
 
     const formData = new FormData(projectInquiryForm);
     const name = String(formData.get("name") || "").trim();
@@ -228,11 +231,13 @@ if (projectInquiryForm) {
 
     if (!name || !email || !brief) {
       setProjectInquiryStatus("Please complete all required fields.", "error");
+      window.siteAnalytics?.trackContactFormSubmit?.(false);
       return;
     }
 
     if (!isValidPublicEmail(email)) {
       setProjectInquiryStatus("Please enter a valid email address.", "error");
+      window.siteAnalytics?.trackContactFormSubmit?.(false);
       return;
     }
 
@@ -243,6 +248,7 @@ if (projectInquiryForm) {
           : "This page is not fully configured yet.",
         "error"
       );
+      window.siteAnalytics?.trackContactFormSubmit?.(false);
       return;
     }
 
@@ -259,6 +265,7 @@ if (projectInquiryForm) {
       });
       projectInquiryForm.reset();
       setProjectInquiryStatus("Thanks. Your inquiry was sent.", "success");
+      window.siteAnalytics?.trackContactFormSubmit?.(true);
     } catch (error) {
       setProjectInquiryStatus(
         googleFormLink
@@ -266,6 +273,7 @@ if (projectInquiryForm) {
           : "Unable to submit from this page right now.",
         "error"
       );
+      window.siteAnalytics?.trackContactFormSubmit?.(false);
     } finally {
       if (projectInquirySubmit) {
         projectInquirySubmit.removeAttribute("disabled");

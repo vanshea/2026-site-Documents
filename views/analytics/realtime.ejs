@@ -1,0 +1,70 @@
+<%- include('../partials/dashboard_head', { title: 'Realtime' }) %>
+<%- include('../partials/dashboard_nav', { activeTab, range, rangeQuery, exportReport, currentPath }) %>
+
+<main class="space-y-4">
+  <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <article class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Active Users</p>
+      <p class="mt-2 text-3xl font-semibold"><%= realtime.activeUsers %></p>
+      <p class="mt-1 text-xs text-slate-400">Last 30 minutes</p>
+    </article>
+
+    <article class="rounded-xl border border-slate-800 bg-slate-900/80 p-4 sm:col-span-2">
+      <p class="text-xs uppercase tracking-wide text-slate-400">Top Pages (30 min)</p>
+      <div class="mt-2 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="text-left text-slate-400">
+            <tr>
+              <th class="py-1 pr-4">Page</th>
+              <th class="py-1">Events</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!realtime.topPages.length) { %>
+              <tr><td class="py-2 text-slate-500" colspan="2">No activity in the last 30 minutes.</td></tr>
+            <% } %>
+            <% realtime.topPages.forEach((row) => { %>
+              <tr class="border-t border-slate-800">
+                <td class="py-2 pr-4 font-mono text-xs"><%= row.pagePath %></td>
+                <td class="py-2"><%= row.events %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Live Event Feed</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-3">Time (UTC)</th>
+            <th class="py-1 pr-3">Event</th>
+            <th class="py-1 pr-3">Page</th>
+            <th class="py-1 pr-3">Slug</th>
+            <th class="py-1">Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!realtime.liveFeed.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="5">No live events found.</td></tr>
+          <% } %>
+          <% realtime.liveFeed.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-3 font-mono text-xs"><%= row.at.toISOString() %></td>
+              <td class="py-2 pr-3"><%= row.eventName %></td>
+              <td class="py-2 pr-3 font-mono text-xs"><%= row.pagePath %></td>
+              <td class="py-2 pr-3 font-mono text-xs"><%= row.slug || '-' %></td>
+              <td class="py-2"><%= row.location || '-' %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<%- include('../partials/dashboard_footer') %>

@@ -1,4 +1,6 @@
 node_modules
+analytics-ui/node_modules
+analytics-ui/.next
 .env
 assets/vscimage/originals
 assets/vscimage/generated

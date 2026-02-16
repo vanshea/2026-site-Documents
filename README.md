@@ -1,66 +1,99 @@
 # Design Portfolio Site
 
-Simple HTML/CSS/JS portfolio site with an Express backend contact API that sends email via Resend.
+Portfolio site with an Express backend and a password-protected first-party analytics dashboard.
 
-## Setup
+## Stack
 
-1. Install dependencies:
+- Portfolio + ingestion API: Node.js + Express (`server.js`)
+- Analytics storage: PostgreSQL + Prisma
+- Analytics UI: Next.js 14 + TypeScript + Tailwind + Recharts (mounted at `/analytics`)
+
+## Local Setup
+
+1. Install dependencies for both apps:
 
 ```bash
-npm install
+npm install && npm --prefix analytics-ui install
 ```
 
-2. Create your env file:
-
-```bash
-cp .env.example .env
-```
-
-3. Update `.env`:
-- `RESEND_API_KEY`: Your Resend API key.
-- `CONTACT_TO_EMAIL`: Inbox that receives contact form messages.
-- `CONTACT_FROM_EMAIL`: Verified sender in your Resend account.
-
-4. Start the app:
+2. Run both servers (Express + Next.js UI):
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open:
+- Portfolio: [http://localhost:3000](http://localhost:3000)
+- Analytics login: [http://localhost:3000/login](http://localhost:3000/login)
+- Analytics app (after login): [http://localhost:3000/analytics](http://localhost:3000/analytics)
 
-## VSCimage Admin App
+## Environment Variables
 
-VSCimage is a separate webpage for administering logos and portfolio images.
+Copy `.env.example` to `.env` and set:
 
-- Open: `http://localhost:3000/vscimage`
-- Upload any image size.
-- Generate required variants:
-  - Logo: `240x240`
-  - Thumb: `760x570`
-  - Large: `1900x1600`
-  - Fullscreen: `3200x1800`
-- Assign generated files to:
-  - Light and dark logos
-  - Each portfolio project's thumb, large, and fullscreen image
-- Saved config file: `assets/vscimage/config.json`
+- `PORT`: Express port (`3000` by default)
+- `DATABASE_URL`: Postgres connection string
+- `SESSION_SECRET`: long random session secret
+- `ANALYTICS_ADMIN_USERNAME` / `ANALYTICS_ADMIN_PASSWORD`: admin credentials
+- `ANALYTICS_VIEWER_USERNAME` / `ANALYTICS_VIEWER_PASSWORD`: read-only viewer credentials
+- `ANALYTICS_UI_ENABLED`: enable Next.js proxy mount (`true`)
+- `ANALYTICS_UI_ORIGIN`: Next.js origin (`http://127.0.0.1:3001`)
+- `ANALYTICS_SESSION_TTL_MINUTES`: session timeout
+- `ANALYTICS_COLLECT_ENABLED`, `ANALYTICS_DASHBOARD_ENABLED`
+- Optional mail settings: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
 
-VSCimage API endpoints:
+## Prisma
 
-- `GET /api/vscimage/config`
-- `POST /api/vscimage/config`
-- `GET /api/vscimage/files`
-- `POST /api/vscimage/upload`
+Generate and migrate:
 
-## API
-
-- `POST /api/contact`
-- JSON body:
-
-```json
-{
-  "name": "Your Name",
-  "email": "you@example.com",
-  "brief": "Project details"
-}
+```bash
+npm run prisma:generate
+npm run prisma:migrate
 ```
+
+Production migration deploy:
+
+```bash
+npm run prisma:deploy
+```
+
+## Analytics API Surface
+
+All endpoints require authenticated session:
+
+- `GET /api/analytics/overview?from&to&compare=true`
+- `GET /api/analytics/realtime?minutes=30`
+- `GET /api/analytics/acquisition?from&to&dimension=sourceMedium|campaign`
+- `GET /api/analytics/engagement/pages?from&to`
+- `GET /api/analytics/engagement/case-studies?from&to`
+- `GET /api/analytics/events?from&to&type=`
+- `GET /api/analytics/conversions?from&to`
+- `GET /api/analytics/funnels?from&to&funnel=home_to_contact|case_to_resume`
+- `GET /api/analytics/export.csv?from&to&report=`
+
+Supported filters via query params:
+- `device`, `country`, `referrer`, `source`, `medium`, `campaign`, `page_path`, `case_study_slug`, `q`
+
+## Deploy
+
+Run two processes (or two containers):
+
+1. Express app:
+
+```bash
+npm start
+```
+
+2. Analytics UI:
+
+```bash
+npm --prefix analytics-ui run build && npm --prefix analytics-ui run start
+```
+
+Ensure `ANALYTICS_UI_ORIGIN` points to the deployed Next.js analytics UI service.
+
+## Existing APIs
+
+- `POST /api/collect` (first-party analytics ingestion)
+- `POST /api/contact`
+- `GET /vscimage` + `/api/vscimage/*`
