@@ -14,6 +14,9 @@ const state = {
   apiOrigin: window.location.origin
 };
 
+const THUMB_CARD_MIN_WIDTH = 210;
+const THUMB_ROWS_PER_BATCH = 3;
+
 const API_ORIGIN_CANDIDATES = (() => {
   const origins = [window.location.origin];
   const localhostOrigin = "http://localhost:3000";
@@ -44,6 +47,7 @@ const logoLightSelect = document.getElementById("logoLightSelect");
 const logoDarkSelect = document.getElementById("logoDarkSelect");
 const projectRows = document.getElementById("projectRows");
 const previewGrid = document.getElementById("previewGrid");
+const thumbAccordion = document.getElementById("thumbAccordion");
 
 function setStatus(element, message, type = "") {
   element.textContent = message;
@@ -97,13 +101,55 @@ function collectConfigImagePaths(config) {
     if (project.fullscreen) files.add(project.fullscreen);
   });
 
+  (config.gallery || []).forEach((item) => {
+    if (!item) return;
+    if (item.thumb) files.add(item.thumb);
+    if (item.large) files.add(item.large);
+    if (item.fullscreen) files.add(item.fullscreen);
+  });
+
   return Array.from(files).sort((a, b) => a.localeCompare(b));
+}
+
+function normalizeGalleryEntries(entries) {
+  const rows = Array.isArray(entries) ? entries : [];
+  const seen = new Set();
+
+  return rows
+    .map((entry, index) => {
+      const thumb = String(entry?.thumb || "").trim();
+      if (!thumb) return null;
+
+      const id = String(entry?.id || `gallery-${index + 1}`).trim();
+      const title = String(entry?.title || id)
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 120);
+      const large = String(entry?.large || thumb).trim() || thumb;
+      const fullscreen = String(entry?.fullscreen || large || thumb).trim() || large;
+      const createdAt = String(entry?.createdAt || "").trim();
+
+      const dedupeKey = `${thumb}::${large}::${fullscreen}`;
+      if (seen.has(dedupeKey)) return null;
+      seen.add(dedupeKey);
+
+      return {
+        id,
+        title: title || id,
+        thumb,
+        large,
+        fullscreen,
+        createdAt
+      };
+    })
+    .filter(Boolean);
 }
 
 function ensureConfigShape(config) {
   const merged = cloneJson(config || {});
   merged.logos = merged.logos || {};
   merged.projects = merged.projects || {};
+  merged.gallery = normalizeGalleryEntries(merged.gallery);
 
   if (!merged.logos.light) merged.logos.light = "";
   if (!merged.logos.dark) merged.logos.dark = "";
@@ -119,6 +165,96 @@ function ensureConfigShape(config) {
   });
 
   return merged;
+}
+
+function buildThumbnailCard(entry) {
+  const card = document.createElement("article");
+  card.className = "thumb-card";
+
+  const image = document.createElement("img");
+  image.src = toAssetUrl(entry.thumb);
+  image.alt = entry.title;
+  image.loading = "lazy";
+
+  const title = document.createElement("h3");
+  title.textContent = entry.title;
+
+  const path = document.createElement("p");
+  path.className = "path";
+  path.textContent = entry.thumb;
+
+  const link = document.createElement("a");
+  link.href = toAssetUrl(entry.large || entry.thumb);
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.textContent = "Open large image";
+
+  card.appendChild(image);
+  card.appendChild(title);
+  card.appendChild(path);
+  card.appendChild(link);
+  return card;
+}
+
+function getThumbBatchSize() {
+  if (!thumbAccordion) return 12;
+
+  const availableWidth =
+    thumbAccordion.clientWidth ||
+    thumbAccordion.parentElement?.clientWidth ||
+    window.innerWidth ||
+    1024;
+  const columnCount = Math.max(1, Math.floor(availableWidth / THUMB_CARD_MIN_WIDTH));
+  return columnCount * THUMB_ROWS_PER_BATCH;
+}
+
+function renderThumbAccordion() {
+  if (!thumbAccordion || !state.config) return;
+
+  const entries = normalizeGalleryEntries(state.config.gallery);
+  thumbAccordion.innerHTML = "";
+
+  if (!entries.length) {
+    const empty = document.createElement("p");
+    empty.className = "thumb-empty";
+    empty.textContent = "No generated thumbnails yet. Upload an image to start the gallery.";
+    thumbAccordion.appendChild(empty);
+    return;
+  }
+
+  const batchSize = Math.max(1, getThumbBatchSize());
+
+  const batches = [];
+  for (let i = 0; i < entries.length; i += batchSize) {
+    batches.push(entries.slice(i, i + batchSize));
+  }
+
+  const firstBatch = document.createElement("div");
+  firstBatch.className = "thumb-grid";
+  batches[0].forEach((entry) => {
+    firstBatch.appendChild(buildThumbnailCard(entry));
+  });
+  thumbAccordion.appendChild(firstBatch);
+
+  batches.slice(1).forEach((batch, index) => {
+    const start = index * batchSize + batchSize + 1;
+    const end = start + batch.length - 1;
+
+    const details = document.createElement("details");
+    details.className = "thumb-batch";
+    details.innerHTML = `
+      <summary>Show thumbnails ${start}-${end}</summary>
+    `;
+
+    const grid = document.createElement("div");
+    grid.className = "thumb-grid";
+    batch.forEach((entry) => {
+      grid.appendChild(buildThumbnailCard(entry));
+    });
+
+    details.appendChild(grid);
+    thumbAccordion.appendChild(details);
+  });
 }
 
 function renderSelect(selectElement, selectedValue) {
@@ -293,6 +429,7 @@ async function reloadData() {
   buildProjectRows();
   renderConfigControls();
   renderPreview();
+  renderThumbAccordion();
 
   const uploadButton = uploadForm?.querySelector('button[type="submit"]');
   const saveButton = configForm?.querySelector('button[type="submit"]');
@@ -373,12 +510,22 @@ if (configForm) {
       });
       state.config = nextConfig;
       renderPreview();
+      renderThumbAccordion();
       setStatus(configMsg, "Site image configuration saved.", "ok");
     } catch (error) {
       setStatus(configMsg, error.message, "error");
     }
   });
 }
+
+let thumbResizeTimer = null;
+window.addEventListener("resize", () => {
+  if (!state.config) return;
+  clearTimeout(thumbResizeTimer);
+  thumbResizeTimer = setTimeout(() => {
+    renderThumbAccordion();
+  }, 120);
+});
 
 reloadData().catch((error) => {
   setStatus(configMsg, error.message, "error");

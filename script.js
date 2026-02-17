@@ -48,6 +48,7 @@ themeButtons.forEach((button) => {
 
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
+const workGrid = document.querySelector("#work .grid");
 
 function toSitePath(filePath) {
   if (!filePath) return "";
@@ -113,6 +114,8 @@ async function loadSiteImageConfig() {
         );
       }
     });
+
+    applyActiveFilter();
   } catch (error) {
     // Keep the site functional using default markup if config is unavailable.
   }
@@ -283,22 +286,74 @@ if (projectInquiryForm) {
 }
 
 const filterButtons = document.querySelectorAll(".filter-btn");
-const cards = document.querySelectorAll(".card");
+const workLoadMoreButton = document.getElementById("workLoadMore");
+const WORK_ROWS_PER_PAGE = 2;
+let visibleWorkCards = 0;
+
+function getWorkCardsPerPage() {
+  if (!workGrid) return 6;
+
+  const computed = window.getComputedStyle(workGrid);
+  const template = String(computed.gridTemplateColumns || "").trim();
+  const columns = template ? template.split(/\s+/).filter(Boolean).length : 3;
+  return Math.max(1, columns) * WORK_ROWS_PER_PAGE;
+}
+
+function getFilteredCards() {
+  const activeButton = document.querySelector(".filter-btn.active");
+  const target = activeButton?.dataset?.filter || "all";
+  const cards = Array.from(document.querySelectorAll(".card"));
+
+  return cards.filter((card) => {
+    const category = card.dataset.category;
+    return target === "all" || category === target;
+  });
+}
+
+function applyActiveFilter() {
+  const cards = Array.from(document.querySelectorAll(".card"));
+  const filteredCards = getFilteredCards();
+  const maxVisible = Math.max(0, visibleWorkCards || getWorkCardsPerPage());
+  const visibleSet = new Set(filteredCards.slice(0, maxVisible));
+
+  cards.forEach((card) => {
+    const show = visibleSet.has(card);
+    card.classList.toggle("hide", !show);
+    card.setAttribute("aria-hidden", show ? "false" : "true");
+  });
+
+  if (workLoadMoreButton) {
+    const hasMore = filteredCards.length > maxVisible;
+    workLoadMoreButton.hidden = !hasMore;
+    workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
+  }
+}
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const target = button.dataset.filter;
-
     filterButtons.forEach((btn) => btn.classList.remove("active"));
     button.classList.add("active");
-
-    cards.forEach((card) => {
-      const category = card.dataset.category;
-      const show = target === "all" || category === target;
-      card.classList.toggle("hide", !show);
-      card.setAttribute("aria-hidden", show ? "false" : "true");
-    });
+    visibleWorkCards = getWorkCardsPerPage();
+    applyActiveFilter();
   });
+});
+
+if (workLoadMoreButton) {
+  workLoadMoreButton.addEventListener("click", () => {
+    visibleWorkCards += getWorkCardsPerPage();
+    applyActiveFilter();
+  });
+}
+
+let workResizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(workResizeTimer);
+  workResizeTimer = setTimeout(() => {
+    const perPage = getWorkCardsPerPage();
+    const currentPages = Math.max(1, Math.ceil((visibleWorkCards || perPage) / perPage));
+    visibleWorkCards = currentPages * perPage;
+    applyActiveFilter();
+  }, 100);
 });
 
 const revealItems = document.querySelectorAll(".reveal");
@@ -327,10 +382,12 @@ const lightboxCaption = document.getElementById("lightboxCaption");
 const lightboxClose = document.getElementById("lightboxClose");
 const lightboxPrev = document.getElementById("lightboxPrev");
 const lightboxNext = document.getElementById("lightboxNext");
-const workLinks = document.querySelectorAll(".work-link");
-const cardFullscreenButtons = document.querySelectorAll(".card-fullscreen");
 let activeLightboxIndex = 0;
 let useFullscreenAssets = false;
+
+function getWorkLinks() {
+  return Array.from(document.querySelectorAll(".card:not(.hide) .work-link"));
+}
 
 function isFullscreenActive() {
   return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
@@ -348,7 +405,11 @@ function exitFullscreenSafely() {
 }
 
 function renderLightboxImage(index) {
-  const link = workLinks[index];
+  const workLinks = getWorkLinks();
+  if (workLinks.length === 0) return;
+
+  const safeIndex = ((index % workLinks.length) + workLinks.length) % workLinks.length;
+  const link = workLinks[safeIndex];
   if (!link || !lightboxImage || !lightboxCaption) return;
 
   const standardSource = link.dataset.lightboxSrc || link.getAttribute("href");
@@ -356,15 +417,19 @@ function renderLightboxImage(index) {
   const source = useFullscreenAssets ? fullscreenSource : standardSource;
   const title = link.dataset.lightboxTitle || "Selected work sample";
 
+  activeLightboxIndex = safeIndex;
   lightboxImage.setAttribute("src", source);
   lightboxImage.setAttribute("alt", `Large FPO image for ${title}`);
-  lightboxCaption.textContent = `${title} (${index + 1}/${workLinks.length})`;
+  lightboxCaption.textContent = `${title} (${safeIndex + 1}/${workLinks.length})`;
 }
 
 function openLightbox(index, useFullscreenVersion = false) {
+  const workLinks = getWorkLinks();
+  if (workLinks.length === 0) return;
   if (!lightbox) return;
   useFullscreenAssets = useFullscreenVersion;
-  activeLightboxIndex = index;
+  activeLightboxIndex =
+    ((index % workLinks.length) + workLinks.length) % workLinks.length;
   renderLightboxImage(activeLightboxIndex);
   lightbox.classList.add("is-open");
   lightbox.setAttribute("aria-hidden", "false");
@@ -398,27 +463,33 @@ function closeLightbox() {
 }
 
 if (lightbox && lightboxImage && lightboxCaption) {
-  workLinks.forEach((link, index) => {
-    link.addEventListener("click", (event) => {
+  if (workGrid) {
+    workGrid.addEventListener("click", (event) => {
+      const fullscreenButton = event.target.closest(".card-fullscreen");
+      if (fullscreenButton && workGrid.contains(fullscreenButton)) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const card = fullscreenButton.closest(".card");
+        const link = card ? card.querySelector(".work-link") : null;
+        const workLinks = getWorkLinks();
+        const index = workLinks.indexOf(link);
+        if (index < 0) return;
+
+        openLightbox(index, true);
+        requestElementFullscreen(lightbox);
+        return;
+      }
+
+      const link = event.target.closest(".work-link");
+      if (!link || !workGrid.contains(link)) return;
       event.preventDefault();
+      const workLinks = getWorkLinks();
+      const index = workLinks.indexOf(link);
+      if (index < 0) return;
       openLightbox(index, false);
     });
-  });
-
-  cardFullscreenButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      const card = button.closest(".card");
-      const link = card ? card.querySelector(".work-link") : null;
-      const index = Array.from(workLinks).indexOf(link);
-
-      if (index < 0) return;
-      openLightbox(index, true);
-      requestElementFullscreen(lightbox);
-    });
-  });
+  }
 
   if (lightboxClose) {
     lightboxClose.addEventListener("click", closeLightbox);
@@ -426,6 +497,8 @@ if (lightbox && lightboxImage && lightboxCaption) {
 
   if (lightboxPrev) {
     lightboxPrev.addEventListener("click", () => {
+      const workLinks = getWorkLinks();
+      if (workLinks.length === 0) return;
       activeLightboxIndex =
         (activeLightboxIndex - 1 + workLinks.length) % workLinks.length;
       renderLightboxImage(activeLightboxIndex);
@@ -434,6 +507,8 @@ if (lightbox && lightboxImage && lightboxCaption) {
 
   if (lightboxNext) {
     lightboxNext.addEventListener("click", () => {
+      const workLinks = getWorkLinks();
+      if (workLinks.length === 0) return;
       activeLightboxIndex = (activeLightboxIndex + 1) % workLinks.length;
       renderLightboxImage(activeLightboxIndex);
     });
@@ -446,6 +521,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
   });
 
   document.addEventListener("keydown", (event) => {
+    const workLinks = getWorkLinks();
     const isOpen = lightbox.classList.contains("is-open");
     if (event.key === "Escape" && isOpen) {
       if (isFullscreenActive()) return;
@@ -463,4 +539,6 @@ if (lightbox && lightboxImage && lightboxCaption) {
   });
 }
 
+visibleWorkCards = getWorkCardsPerPage();
+applyActiveFilter();
 loadSiteImageConfig();

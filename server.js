@@ -34,6 +34,7 @@ const vscimageDir = path.join(assetsDir, "vscimage");
 const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
 const vscimageConfigPath = path.join(vscimageDir, "config.json");
+const homepageIndexPath = path.join(rootDir, "index.html");
 const acceptedImageExt = new Set([
   ".png",
   ".jpg",
@@ -49,6 +50,7 @@ const defaultVscimageConfig = {
     light: "assets/web_logomark_240_dark.png",
     dark: "assets/web_logomark_240_white.png"
   },
+  gallery: [],
   projects: {
     northline: {
       title: "Northline Coffee",
@@ -89,6 +91,9 @@ const defaultVscimageConfig = {
   }
 };
 
+const generatedGalleryStartMarker = "<!-- VSCIMAGE_GENERATED_START -->";
+const generatedGalleryEndMarker = "<!-- VSCIMAGE_GENERATED_END -->";
+
 let upload = null;
 if (multer) {
   upload = multer({
@@ -124,6 +129,91 @@ function sanitizeName(value) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 64);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function sanitizeAssetPath(value) {
+  const raw = String(value || "")
+    .trim()
+    .split("?")[0]
+    .split("#")[0];
+  if (!raw) return "";
+
+  if (/^(https?:)?\/\//.test(raw)) {
+    return raw;
+  }
+
+  return raw.replace(/^\/+/, "");
+}
+
+function buildGeneratedGalleryMarkup(galleryEntries) {
+  const entries = Array.isArray(galleryEntries) ? galleryEntries : [];
+
+  return entries
+    .map((entry, index) => {
+      const thumb = sanitizeAssetPath(entry?.thumb);
+      if (!thumb) return "";
+
+      const large = sanitizeAssetPath(entry?.large) || thumb;
+      const fullscreen = sanitizeAssetPath(entry?.fullscreen) || large;
+      const displayTitle = String(entry?.title || entry?.id || `Generated ${index + 1}`)
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 120);
+      const idToken = sanitizeName(entry?.id || displayTitle || `generated-${index + 1}`);
+      const escapedTitle = escapeHtml(displayTitle);
+      const escapedThumb = escapeHtml(thumb);
+      const escapedLarge = escapeHtml(large);
+      const escapedFullscreen = escapeHtml(fullscreen);
+
+      return [
+        '          <article class="card reveal generated-card" data-category="all" data-generated="true">',
+        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}">`,
+        `              <img class="card-image" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
+        `              <h3>${escapedTitle}</h3>`,
+        "              <p>Generated in VSCimage.</p>",
+        "            </a>",
+        '            <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">',
+        '              <span aria-hidden="true">⤢</span>',
+        "            </button>",
+        "          </article>"
+      ].join("\n");
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
+async function syncHomepageGeneratedGallery(galleryEntries) {
+  if (!fsSync.existsSync(homepageIndexPath)) {
+    return;
+  }
+
+  const html = await fs.readFile(homepageIndexPath, "utf8");
+  if (!html.includes(generatedGalleryStartMarker) || !html.includes(generatedGalleryEndMarker)) {
+    return;
+  }
+
+  const generatedMarkup = buildGeneratedGalleryMarkup(galleryEntries);
+  const replacement = [
+    generatedGalleryStartMarker,
+    generatedMarkup || "",
+    `          ${generatedGalleryEndMarker}`
+  ].join("\n");
+
+  const markerPattern = new RegExp(
+    `${escapeRegExp(generatedGalleryStartMarker)}[\\s\\S]*?${escapeRegExp(
+      generatedGalleryEndMarker
+    )}`,
+    "m"
+  );
+
+  const nextHtml = html.replace(markerPattern, replacement);
+  if (nextHtml !== html) {
+    await fs.writeFile(homepageIndexPath, nextHtml, "utf8");
+  }
 }
 
 async function ensureVscimageStorage() {
@@ -758,7 +848,11 @@ app.post("/api/vscimage/config", async (req, res) => {
 
   try {
     await ensureVscimageStorage();
+    if (!Array.isArray(payload.gallery)) {
+      payload.gallery = [];
+    }
     await fs.writeFile(vscimageConfigPath, JSON.stringify(payload, null, 2), "utf8");
+    await syncHomepageGeneratedGallery(payload.gallery);
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("Unable to save VSCimage config:", error);
@@ -882,10 +976,40 @@ if (upload) {
         generated.fullscreen = toWebPath(fullscreenPath);
       }
 
+      let galleryEntry = null;
+      const galleryThumb =
+        generated.thumb || generated.large || generated.fullscreen || generated.logo || null;
+
+      if (galleryThumb) {
+        const config = await readVscimageConfig();
+        const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+        const entryId = `${baseName}-${Date.now()}`;
+        const displayTitle = String(req.body.name || baseName)
+          .trim()
+          .replace(/\s+/g, " ")
+          .slice(0, 120);
+
+        galleryEntry = {
+          id: entryId,
+          title: displayTitle || baseName,
+          thumb: galleryThumb,
+          large: generated.large || generated.fullscreen || galleryThumb,
+          fullscreen: generated.fullscreen || generated.large || galleryThumb,
+          createdAt: new Date().toISOString()
+        };
+
+        const deduped = gallery.filter((item) => item?.thumb !== galleryThumb);
+        config.gallery = [galleryEntry, ...deduped].slice(0, 300);
+
+        await fs.writeFile(vscimageConfigPath, JSON.stringify(config, null, 2), "utf8");
+        await syncHomepageGeneratedGallery(config.gallery);
+      }
+
       return res.status(200).json({
         ok: true,
         original: toWebPath(originalPath),
-        outputs: generated
+        outputs: generated,
+        galleryEntry
       });
     } catch (error) {
       console.error("Unable to process uploaded image:", error);
@@ -908,6 +1032,12 @@ let analyticsCronJob = null;
 
 async function bootstrap() {
   await ensureVscimageStorage();
+  try {
+    const config = await readVscimageConfig();
+    await syncHomepageGeneratedGallery(config.gallery || []);
+  } catch (error) {
+    console.warn("Unable to sync generated gallery into index.html:", error.message);
+  }
 
   if (process.env.DATABASE_URL && (ANALYTICS_DASHBOARD_ENABLED || ANALYTICS_COLLECT_ENABLED)) {
     try {

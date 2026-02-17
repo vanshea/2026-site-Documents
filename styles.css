@@ -158,12 +158,13 @@
 
 :root[data-theme="theme3"] {
   color-scheme: dark;
-  --type-scale: 1.14;
-  --type-line-height: 1.68;
+  --control-scale: 1.1;
+  --type-scale: 1.05;
+  --type-line-height: 1.5;
   --type-body-weight: 500;
-  --type-heading-weight: 800;
-  --type-heading-letter-spacing: 0.01em;
-  --type-heading-line-height: 1.24;
+  --type-heading-weight: 760;
+  --type-heading-letter-spacing: -0.02em;
+  --type-heading-line-height: 1.18;
   --bg: #000000;
   --ink: #ffffff;
   --ink-soft: #f5f5f5;
@@ -204,12 +205,13 @@
 @media (prefers-color-scheme: dark) {
   :root[data-theme="theme3"] {
     color-scheme: dark;
-    --type-scale: 1.14;
-    --type-line-height: 1.68;
+    --control-scale: 1.1;
+    --type-scale: 1.05;
+    --type-line-height: 1.5;
     --type-body-weight: 500;
-    --type-heading-weight: 800;
-    --type-heading-letter-spacing: 0.01em;
-    --type-heading-line-height: 1.24;
+    --type-heading-weight: 760;
+    --type-heading-letter-spacing: -0.02em;
+    --type-heading-line-height: 1.18;
     --bg: #000000;
     --ink: #ffffff;
     --ink-soft: #f2f2f2;
@@ -478,6 +480,16 @@ h2 {
   gap: 18px;
 }
 
+.work-load-more-wrap {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.work-load-more[hidden] {
+  display: none;
+}
+
 .card {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -587,7 +599,7 @@ h2 {
   max-width: 65ch;
 }
 
-.experience-shell {
+.experience-link-shell {
   margin-top: 14px;
   border: 1px solid var(--line);
   border-radius: calc(var(--radius) + 8px);
@@ -600,29 +612,53 @@ h2 {
   box-shadow: var(--shadow);
 }
 
-.experience-actions {
+.experience-page {
+  margin-top: 20px;
+  max-width: min(980px, 100%);
+}
+
+.experience-page h1 {
+  margin-bottom: 6px;
+  max-width: 100%;
+}
+
+.experience-role-title {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.experience-summary {
+  max-width: 74ch;
+}
+
+.experience-role-entry {
+  margin-top: 14px;
+}
+
+.experience-role-entry h3 {
+  margin-bottom: 8px;
+}
+
+.experience-role-entry ul,
+.experience-list {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+
+.experience-role-entry li,
+.experience-list li {
+  color: var(--ink-soft);
+}
+
+.experience-buttons {
+  margin-top: 22px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.resume-frame {
-  width: 100%;
-  min-height: 760px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--embed-bg);
-}
-
-.experience-fallback {
-  margin-top: 12px;
-  font-size: 0.92rem;
-}
-
-.experience-fallback a {
-  color: inherit;
-  font-weight: 700;
+  gap: 12px;
 }
 
 form {
@@ -850,23 +886,12 @@ textarea:focus {
   min-width: 120px;
 }
 
-:root[data-theme="theme3"] body {
-  font-family: "Atkinson Hyperlegible", "Space Grotesk", sans-serif;
-}
-
-:root[data-theme="theme3"] .brand-name,
-:root[data-theme="theme3"] h1,
-:root[data-theme="theme3"] h2,
-:root[data-theme="theme3"] h3 {
-  font-family: "Atkinson Hyperlegible", "Space Grotesk", sans-serif;
-}
-
 :root[data-theme="theme3"] .eyebrow,
 :root[data-theme="theme3"] .contact-kicker,
 :root[data-theme="theme3"] .theme-switcher-label {
-  font-size: 0.96rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 :root[data-theme="theme3"] .nav a,
@@ -875,19 +900,7 @@ textarea:focus {
 :root[data-theme="theme3"] .theme-link,
 :root[data-theme="theme3"] label,
 :root[data-theme="theme3"] .project-inquiry-status {
-  font-weight: 700;
-}
-
-:root[data-theme="theme3"] .btn,
-:root[data-theme="theme3"] .filter-btn,
-:root[data-theme="theme3"] .theme-link,
-:root[data-theme="theme3"] input,
-:root[data-theme="theme3"] select,
-:root[data-theme="theme3"] textarea,
-:root[data-theme="theme3"] .google-form-fallback,
-:root[data-theme="theme3"] .experience-fallback,
-:root[data-theme="theme3"] .consent-text {
-  font-size: 1rem;
+  font-weight: 600;
 }
 
 .lightbox {
@@ -1168,12 +1181,8 @@ textarea:focus {
     padding: 14px;
   }
 
-  .experience-shell {
+  .experience-link-shell {
     padding: 14px;
-  }
-
-  .resume-frame {
-    min-height: 620px;
   }
 
   .card-fullscreen {

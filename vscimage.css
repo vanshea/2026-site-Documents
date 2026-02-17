@@ -198,6 +198,82 @@ select {
   color: var(--ink);
 }
 
+.thumb-accordion {
+  display: grid;
+  gap: 12px;
+}
+
+.thumb-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.thumb-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.52);
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.thumb-card h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.thumb-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.thumb-card a {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.thumb-batch {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.42);
+  padding: 10px;
+}
+
+.thumb-batch summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.thumb-batch summary::-webkit-details-marker {
+  display: none;
+}
+
+.thumb-batch summary::before {
+  content: "▸";
+  margin-right: 8px;
+}
+
+.thumb-batch[open] summary::before {
+  content: "▾";
+}
+
+.thumb-batch .thumb-grid {
+  margin-top: 10px;
+}
+
+.thumb-empty {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
 .logo-grid {
   display: grid;
   gap: 12px;
