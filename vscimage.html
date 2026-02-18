@@ -28,17 +28,32 @@
         <h2>Upload And Generate</h2>
         <form id="uploadForm" class="form-grid">
           <label>
-            Source Image
-            <input id="imageFile" name="image" type="file" accept="image/*" required />
+            Source Image (Single)
+            <input id="imageFile" name="image" type="file" accept="image/*" />
           </label>
           <label>
-            Asset Name
+            Source Folder (Batch)
+            <input
+              id="imageFolder"
+              name="images"
+              type="file"
+              accept="image/*"
+              webkitdirectory
+              directory
+              multiple
+            />
+            <span class="field-note">
+              Select a folder of source images (recommended 3200x1800). Files are processed one
+              at a time.
+            </span>
+          </label>
+          <label>
+            Asset Name / Prefix (Optional)
             <input
               id="assetName"
               name="name"
               type="text"
               placeholder="example: summer-campaign"
-              required
             />
           </label>
           <fieldset class="output-set">
@@ -85,6 +100,7 @@
                   <th>Thumb 760x570</th>
                   <th>Large 1900x1600</th>
                   <th>Fullscreen</th>
+                  <th>Fullscreen Description</th>
                 </tr>
               </thead>
               <tbody id="projectRows"></tbody>

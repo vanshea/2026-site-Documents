@@ -56,37 +56,43 @@ const defaultVscimageConfig = {
       title: "Northline Coffee",
       thumb: "assets/fpo-thumb-760x570.svg",
       large: "assets/fpo-large-northline-1900x1600.svg",
-      fullscreen: "assets/fpo-large-northline-1900x1600.svg"
+      fullscreen: "assets/fpo-large-northline-1900x1600.svg",
+      description: ""
     },
     atlas: {
       title: "Atlas Wellness",
       thumb: "assets/fpo-thumb-760x570.svg",
       large: "assets/fpo-large-atlas-1900x1600.svg",
-      fullscreen: "assets/fpo-large-atlas-1900x1600.svg"
+      fullscreen: "assets/fpo-large-atlas-1900x1600.svg",
+      description: ""
     },
     city_transit: {
       title: "City Transit Posters",
       thumb: "assets/fpo-thumb-760x570.svg",
       large: "assets/fpo-large-city-transit-1900x1600.svg",
-      fullscreen: "assets/fpo-large-city-transit-1900x1600.svg"
+      fullscreen: "assets/fpo-large-city-transit-1900x1600.svg",
+      description: ""
     },
     wren: {
       title: "Wren Studio",
       thumb: "assets/fpo-thumb-760x570.svg",
       large: "assets/fpo-large-wren-1900x1600.svg",
-      fullscreen: "assets/fpo-large-wren-1900x1600.svg"
+      fullscreen: "assets/fpo-large-wren-1900x1600.svg",
+      description: ""
     },
     hollow_creek: {
       title: "Hollow Creek Cider",
       thumb: "assets/fpo-thumb-760x570.svg",
       large: "assets/fpo-large-hollow-creek-1900x1600.svg",
-      fullscreen: "assets/fpo-large-hollow-creek-1900x1600.svg"
+      fullscreen: "assets/fpo-large-hollow-creek-1900x1600.svg",
+      description: ""
     },
     field_notes: {
       title: "Field Notes Covers",
       thumb: "assets/fpo-thumb-760x570.svg",
       large: "assets/fpo-large-field-notes-1900x1600.svg",
-      fullscreen: "assets/fpo-large-field-notes-1900x1600.svg"
+      fullscreen: "assets/fpo-large-field-notes-1900x1600.svg",
+      description: ""
     }
   }
 };
@@ -163,18 +169,24 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 120);
+      const displayDescription =
+        String(entry?.description || "")
+          .trim()
+          .replace(/\s+/g, " ")
+          .slice(0, 320) || "Generated in VSCimage.";
       const idToken = sanitizeName(entry?.id || displayTitle || `generated-${index + 1}`);
       const escapedTitle = escapeHtml(displayTitle);
       const escapedThumb = escapeHtml(thumb);
       const escapedLarge = escapeHtml(large);
       const escapedFullscreen = escapeHtml(fullscreen);
+      const escapedDescription = escapeHtml(displayDescription);
 
       return [
         '          <article class="card reveal generated-card" data-category="all" data-generated="true">',
-        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}">`,
+        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}">`,
         `              <img class="card-image" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
-        "              <p>Generated in VSCimage.</p>",
+        `              <p>${escapedDescription}</p>`,
         "            </a>",
         '            <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">',
         '              <span aria-hidden="true">⤢</span>',
@@ -992,6 +1004,11 @@ if (upload) {
         galleryEntry = {
           id: entryId,
           title: displayTitle || baseName,
+          description:
+            String(req.body.description || "")
+              .trim()
+              .replace(/\s+/g, " ")
+              .slice(0, 320) || "Generated in VSCimage.",
           thumb: galleryThumb,
           large: generated.large || generated.fullscreen || galleryThumb,
           fullscreen: generated.fullscreen || generated.large || galleryThumb,

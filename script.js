@@ -105,6 +105,18 @@ async function loadSiteImageConfig() {
         link.dataset.fullscreenSrc = toSitePath(projectConfig.fullscreen);
       }
 
+      const normalizedDescription = String(projectConfig.description || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 320);
+      if (normalizedDescription) {
+        link.dataset.lightboxDescription = normalizedDescription;
+        const descriptionElement = link.querySelector("p");
+        if (descriptionElement) {
+          descriptionElement.textContent = normalizedDescription;
+        }
+      }
+
       const thumb = link.querySelector(".card-image");
       if (thumb && projectConfig.thumb) {
         thumb.setAttribute("src", toSitePath(projectConfig.thumb));
@@ -416,11 +428,21 @@ function renderLightboxImage(index) {
   const fullscreenSource = link.dataset.fullscreenSrc || standardSource;
   const source = useFullscreenAssets ? fullscreenSource : standardSource;
   const title = link.dataset.lightboxTitle || "Selected work sample";
+  const inlineDescription = link.querySelector("p")?.textContent || "";
+  const description =
+    String(link.dataset.lightboxDescription || inlineDescription || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .slice(0, 320) || "";
 
   activeLightboxIndex = safeIndex;
   lightboxImage.setAttribute("src", source);
   lightboxImage.setAttribute("alt", `Large FPO image for ${title}`);
-  lightboxCaption.textContent = `${title} (${safeIndex + 1}/${workLinks.length})`;
+  if (description) {
+    lightboxCaption.textContent = `${title}: ${description} (${safeIndex + 1}/${workLinks.length})`;
+  } else {
+    lightboxCaption.textContent = `${title} (${safeIndex + 1}/${workLinks.length})`;
+  }
 }
 
 function openLightbox(index, useFullscreenVersion = false) {

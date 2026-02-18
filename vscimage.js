@@ -38,9 +38,14 @@ function toAssetUrl(filePath) {
   return filePath.startsWith("/") ? filePath : `/${filePath}`;
 }
 
+const IMAGE_FILE_EXT_PATTERN = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
+
 const uploadForm = document.getElementById("uploadForm");
 const uploadMsg = document.getElementById("uploadMsg");
 const generatedList = document.getElementById("generatedList");
+const imageFileInput = document.getElementById("imageFile");
+const imageFolderInput = document.getElementById("imageFolder");
+const assetNameInput = document.getElementById("assetName");
 const configForm = document.getElementById("configForm");
 const configMsg = document.getElementById("configMsg");
 const logoLightSelect = document.getElementById("logoLightSelect");
@@ -49,10 +54,109 @@ const projectRows = document.getElementById("projectRows");
 const previewGrid = document.getElementById("previewGrid");
 const thumbAccordion = document.getElementById("thumbAccordion");
 
+if (imageFileInput && imageFolderInput) {
+  imageFileInput.addEventListener("change", () => {
+    if (imageFileInput.files?.length) {
+      imageFolderInput.value = "";
+    }
+  });
+
+  imageFolderInput.addEventListener("change", () => {
+    if (imageFolderInput.files?.length) {
+      imageFileInput.value = "";
+    }
+  });
+}
+
 function setStatus(element, message, type = "") {
   element.textContent = message;
   element.classList.remove("ok", "error");
   if (type) element.classList.add(type);
+}
+
+function sanitizeAssetName(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+}
+
+function normalizeDescription(value, maxLength = 320) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, maxLength);
+}
+
+function stripExtension(fileName) {
+  return String(fileName || "").replace(/\.[^.]+$/, "");
+}
+
+function isImageFile(file) {
+  if (!file) return false;
+  const mime = String(file.type || "").trim().toLowerCase();
+  if (mime.startsWith("image/")) return true;
+  return IMAGE_FILE_EXT_PATTERN.test(String(file.name || ""));
+}
+
+function toDisplaySourceName(file, index = 0) {
+  if (!file) return `image-${index + 1}`;
+  return String(file.webkitRelativePath || file.name || `image-${index + 1}`).trim();
+}
+
+function collectUploadFiles() {
+  const folderFiles = Array.from(imageFolderInput?.files || []).filter(isImageFile);
+  if (folderFiles.length) {
+    return folderFiles.sort((left, right) =>
+      toDisplaySourceName(left).localeCompare(toDisplaySourceName(right))
+    );
+  }
+
+  const singleFile = imageFileInput?.files?.[0];
+  if (isImageFile(singleFile)) {
+    return [singleFile];
+  }
+
+  return [];
+}
+
+function buildAssetNameForFile(file, namePrefix, index, totalFiles = 1) {
+  if (namePrefix && totalFiles === 1) {
+    return namePrefix;
+  }
+
+  const rawName = toDisplaySourceName(file, index)
+    .replaceAll("\\", "/")
+    .split("/")
+    .join("-");
+  const stem = sanitizeAssetName(stripExtension(rawName)) || `image-${index + 1}`;
+  return namePrefix ? sanitizeAssetName(`${namePrefix}-${stem}`) : stem;
+}
+
+function appendGeneratedOutputLine(label, value, className = "", isLink = true) {
+  const item = document.createElement("li");
+  if (className) item.className = className;
+
+  const prefix = document.createElement("span");
+  prefix.textContent = `${label}: `;
+  item.appendChild(prefix);
+
+  if (value && isLink) {
+    const link = document.createElement("a");
+    link.href = toAssetUrl(value);
+    link.target = "_blank";
+    link.rel = "noreferrer";
+    link.textContent = value;
+    item.appendChild(link);
+  } else {
+    const fallback = document.createElement("span");
+    fallback.textContent = value || "(none)";
+    item.appendChild(fallback);
+  }
+
+  generatedList.appendChild(item);
 }
 
 async function fetchJson(url, options) {
@@ -125,6 +229,9 @@ function normalizeGalleryEntries(entries) {
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 120);
+      const description = normalizeDescription(
+        entry?.description || "Generated in VSCimage."
+      );
       const large = String(entry?.large || thumb).trim() || thumb;
       const fullscreen = String(entry?.fullscreen || large || thumb).trim() || large;
       const createdAt = String(entry?.createdAt || "").trim();
@@ -136,6 +243,7 @@ function normalizeGalleryEntries(entries) {
       return {
         id,
         title: title || id,
+        description,
         thumb,
         large,
         fullscreen,
@@ -162,6 +270,9 @@ function ensureConfigShape(config) {
     merged.projects[project.id].large = merged.projects[project.id].large || "";
     merged.projects[project.id].fullscreen =
       merged.projects[project.id].fullscreen || "";
+    merged.projects[project.id].description = normalizeDescription(
+      merged.projects[project.id].description || ""
+    );
   });
 
   return merged;
@@ -292,6 +403,15 @@ function buildProjectRows() {
       <td><select data-project="${project.id}" data-field="thumb"></select></td>
       <td><select data-project="${project.id}" data-field="large"></select></td>
       <td><select data-project="${project.id}" data-field="fullscreen"></select></td>
+      <td>
+        <textarea
+          class="project-description"
+          data-project="${project.id}"
+          data-field="description"
+          rows="3"
+          placeholder="Description for fullscreen image"
+        ></textarea>
+      </td>
     `;
     projectRows.appendChild(row);
   });
@@ -309,6 +429,13 @@ function renderConfigControls() {
     const field = selectElement.dataset.field;
     const value = state.config.projects[projectId]?.[field] || "";
     renderSelect(selectElement, value);
+  });
+
+  const projectDescriptions = projectRows.querySelectorAll("textarea[data-project]");
+  projectDescriptions.forEach((textareaElement) => {
+    const projectId = textareaElement.dataset.project;
+    const value = state.config.projects[projectId]?.description || "";
+    textareaElement.value = value;
   });
 }
 
@@ -367,19 +494,45 @@ function collectConfigFromForm() {
     nextConfig.projects[projectId][field] = selectElement.value;
   });
 
+  const projectDescriptions = projectRows.querySelectorAll("textarea[data-project]");
+  projectDescriptions.forEach((textareaElement) => {
+    const projectId = textareaElement.dataset.project;
+    nextConfig.projects[projectId].description = normalizeDescription(
+      textareaElement.value,
+      320
+    );
+  });
+
   return nextConfig;
 }
 
-function renderGeneratedOutputs(payload) {
+function renderGeneratedOutputs(successfulEntries, failedEntries = []) {
   generatedList.innerHTML = "";
-  const original = document.createElement("li");
-  original.innerHTML = `Original saved: <a href="${toAssetUrl(payload.original)}" target="_blank" rel="noreferrer">${payload.original}</a>`;
-  generatedList.appendChild(original);
 
-  Object.entries(payload.outputs || {}).forEach(([key, filePath]) => {
-    const item = document.createElement("li");
-    item.innerHTML = `${key}: <a href="${toAssetUrl(filePath)}" target="_blank" rel="noreferrer">${filePath}</a>`;
-    generatedList.appendChild(item);
+  successfulEntries.forEach((entry, index) => {
+    const header = document.createElement("li");
+    header.className = "generated-heading";
+    if (successfulEntries.length > 1) {
+      header.textContent = `${index + 1}. ${entry.sourceName}`;
+    } else {
+      header.textContent = entry.sourceName;
+    }
+    generatedList.appendChild(header);
+
+    appendGeneratedOutputLine("Original saved", entry.payload.original);
+
+    Object.entries(entry.payload.outputs || {}).forEach(([key, filePath]) => {
+      appendGeneratedOutputLine(key, filePath);
+    });
+  });
+
+  failedEntries.forEach((failedEntry) => {
+    appendGeneratedOutputLine(
+      failedEntry.sourceName,
+      failedEntry.error,
+      "generated-error",
+      false
+    );
   });
 }
 
@@ -452,14 +605,15 @@ if (uploadForm) {
       return;
     }
 
-    const fileInput = document.getElementById("imageFile");
-    const nameInput = document.getElementById("assetName");
+    const submitButton = uploadForm.querySelector('button[type="submit"]');
+    const selectedFiles = collectUploadFiles();
+    const namePrefix = sanitizeAssetName(assetNameInput?.value || "");
     const checked = Array.from(
       uploadForm.querySelectorAll('input[type="checkbox"]:checked')
     ).map((input) => input.value);
 
-    if (!fileInput.files?.[0]) {
-      setStatus(uploadMsg, "Select an image to upload.", "error");
+    if (!selectedFiles.length) {
+      setStatus(uploadMsg, "Select a source image or folder to upload.", "error");
       return;
     }
 
@@ -468,22 +622,70 @@ if (uploadForm) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("image", fileInput.files[0]);
-    formData.append("name", nameInput.value.trim());
-    formData.append("outputs", checked.join(","));
+    const successfulEntries = [];
+    const failedEntries = [];
 
     try {
-      setStatus(uploadMsg, "Generating image outputs...", "");
-      const payload = await fetchJson(`${state.apiOrigin}/api/vscimage/upload`, {
-        method: "POST",
-        body: formData
-      });
-      renderGeneratedOutputs(payload);
-      setStatus(uploadMsg, "Files generated successfully.", "ok");
-      await reloadData();
+      if (submitButton) submitButton.disabled = true;
+
+      for (let index = 0; index < selectedFiles.length; index += 1) {
+        const currentFile = selectedFiles[index];
+        const sourceName = toDisplaySourceName(currentFile, index);
+        const generatedName = buildAssetNameForFile(
+          currentFile,
+          namePrefix,
+          index,
+          selectedFiles.length
+        );
+
+        const formData = new FormData();
+        formData.append("image", currentFile);
+        formData.append("name", generatedName);
+        formData.append("outputs", checked.join(","));
+
+        setStatus(
+          uploadMsg,
+          `Generating ${index + 1}/${selectedFiles.length}: ${sourceName}`,
+          ""
+        );
+
+        try {
+          const payload = await fetchJson(`${state.apiOrigin}/api/vscimage/upload`, {
+            method: "POST",
+            body: formData
+          });
+          successfulEntries.push({ sourceName, payload });
+        } catch (error) {
+          failedEntries.push({ sourceName, error: error.message });
+        }
+
+        renderGeneratedOutputs(successfulEntries, failedEntries);
+      }
+
+      if (successfulEntries.length) {
+        await reloadData();
+      }
+
+      if (successfulEntries.length && !failedEntries.length) {
+        const label = successfulEntries.length === 1 ? "image" : "images";
+        setStatus(
+          uploadMsg,
+          `Batch complete. ${successfulEntries.length} ${label} generated successfully.`,
+          "ok"
+        );
+      } else if (successfulEntries.length && failedEntries.length) {
+        setStatus(
+          uploadMsg,
+          `Batch complete with errors. ${successfulEntries.length} succeeded, ${failedEntries.length} failed.`,
+          "error"
+        );
+      } else {
+        setStatus(uploadMsg, "Batch failed. No images were generated.", "error");
+      }
     } catch (error) {
       setStatus(uploadMsg, error.message, "error");
+    } finally {
+      if (submitButton) submitButton.disabled = !state.apiAvailable;
     }
   });
 }

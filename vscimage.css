@@ -113,6 +113,12 @@ label {
   font-weight: 600;
 }
 
+.field-note {
+  font-size: 0.84rem;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
 input,
 select,
 button {
@@ -121,6 +127,7 @@ button {
 
 input[type="text"],
 input[type="file"],
+textarea,
 select {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -132,6 +139,7 @@ select {
 @media (prefers-color-scheme: dark) {
   input[type="text"],
   input[type="file"],
+  textarea,
   select {
     background: rgba(8, 19, 30, 0.88);
   }
@@ -196,6 +204,20 @@ select {
 
 .generated-list a {
   color: var(--ink);
+}
+
+.generated-heading {
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.generated-list .generated-heading:first-child {
+  margin-top: 0;
+}
+
+.generated-error {
+  color: var(--error);
+  font-weight: 600;
 }
 
 .thumb-accordion {
@@ -289,7 +311,7 @@ select {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 780px;
+  min-width: 960px;
 }
 
 th,
@@ -303,6 +325,12 @@ th {
   font-size: 0.86rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.project-description {
+  width: 100%;
+  min-width: 240px;
+  resize: vertical;
 }
 
 .preview-grid {
