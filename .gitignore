@@ -4,3 +4,4 @@ analytics-ui/.next
 .env
 assets/vscimage/originals
 assets/vscimage/generated
+.DS_Store
