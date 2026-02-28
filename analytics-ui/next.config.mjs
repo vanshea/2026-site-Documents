@@ -9,7 +9,10 @@ const nextConfig = {
   experimental: {
     typedRoutes: false,
     externalDir: true,
-    outputFileTracingRoot: path.join(currentDir, "..")
+    outputFileTracingRoot: path.join(currentDir, ".."),
+    serverActions: {
+      allowedOrigins: ["localhost:3000", "127.0.0.1:3000"]
+    }
   }
 };
 

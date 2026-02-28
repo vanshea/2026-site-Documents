@@ -733,7 +733,23 @@ if (ANALYTICS_UI_ENABLED) {
     changeOrigin: true,
     ws: true,
     logLevel: "warn",
+    xfwd: false,
     pathRewrite: (pathValue) => `/analytics${pathValue}`,
+    onProxyReq: (proxyReq, req) => {
+      const forwardedHost = String(req.headers.host || "").trim();
+      if (forwardedHost) {
+        proxyReq.setHeader("host", forwardedHost);
+        proxyReq.setHeader("x-forwarded-host", forwardedHost);
+
+        const forwardedPort = forwardedHost.split(":")[1];
+        if (forwardedPort) {
+          proxyReq.setHeader("x-forwarded-port", forwardedPort);
+        }
+      }
+
+      const forwardedProto = String(req.headers["x-forwarded-proto"] || req.protocol || "http");
+      proxyReq.setHeader("x-forwarded-proto", forwardedProto);
+    },
     onError: (error, req, res) => {
       console.error("Analytics UI proxy failed:", error.message);
       if (!res.headersSent) {
