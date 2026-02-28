@@ -1,9 +1,24 @@
 import "server-only";
 
-import { createHmac, timingSafeEqual } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { createHmac } from "node:crypto";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { cookies } from "next/headers";
+import {
+  CLIENTS_ROOT,
+  CLIENT_INDEX_PATH,
+  CONTENT_CLIENTS_ROOT,
+  assertValidClientId,
+  normalizeAssetPath,
+  readServerEnv,
+  resolveInside,
+  safeCompare
+} from "@/lib/server-runtime";
+import {
+  getClientPasswordHash,
+  hasClientPassword,
+  verifyClientPassword
+} from "@/lib/client-secrets";
 
 export type ClientAccess = "public" | "password";
 
@@ -12,6 +27,7 @@ export type ClientRegistryEntry = {
   title: string;
   access: ClientAccess;
   coverImage: string;
+  updatedAt?: string;
 };
 
 export type ClientSlide = {
@@ -29,7 +45,6 @@ export type ClientSlide = {
 
 export type ClientContent = ClientRegistryEntry & {
   summary?: string;
-  updatedAt?: string;
   slides: ClientSlide[];
 };
 
@@ -38,11 +53,6 @@ export type ClientPasswordVerificationResult = "ok" | "invalid" | "not-configure
 export const ANALYTICS_BASE_PATH = "/analytics";
 export const CLIENT_ACCESS_COOKIE_NAME = "vsc_client_access";
 export const CLIENT_ACCESS_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
-
-const DOCUMENTS_ROOT = path.resolve(process.cwd(), "..");
-const CLIENTS_ROOT = path.join(DOCUMENTS_ROOT, "clients");
-const CLIENT_INDEX_PATH = path.join(DOCUMENTS_ROOT, "content", "clients", "index.json");
-const ROOT_ENV_PATH = path.join(DOCUMENTS_ROOT, ".env");
 
 type ClientAccessErrorCode = "client-not-found" | "unlock-required" | "password-not-configured";
 
@@ -56,20 +66,6 @@ export class ClientAccessError extends Error {
   }
 }
 
-let rootEnvCachePromise: Promise<Record<string, string>> | null = null;
-
-function assertValidClientId(clientId: string): string {
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(clientId)) {
-    throw new ClientAccessError("client-not-found", "Invalid client id.");
-  }
-
-  return clientId;
-}
-
-function toClientPasswordEnvKey(clientId: string): string {
-  return `CLIENT_PASSWORD_${clientId.replaceAll("-", "_").toUpperCase()}`;
-}
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -78,106 +74,9 @@ function normalizeAccess(value: unknown): ClientAccess {
   return value === "password" ? "password" : "public";
 }
 
-function resolveInside(rootPath: string, ...segments: string[]): string {
-  const resolvedPath = path.resolve(rootPath, ...segments);
-  const relativePath = path.relative(rootPath, resolvedPath);
-
-  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
-    throw new Error("Path escapes client content root.");
-  }
-
-  return resolvedPath;
-}
-
-function normalizeAssetPath(assetPath: string): string {
-  const normalized = assetPath
-    .split("/")
-    .map((segment) => segment.trim())
-    .filter(Boolean)
-    .join("/");
-
-  if (!normalized || normalized.includes("..")) {
-    throw new Error("Invalid client asset path.");
-  }
-
-  return normalized;
-}
-
-function parseDotEnv(raw: string): Record<string, string> {
-  const envMap: Record<string, string> = {};
-
-  for (const line of raw.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) {
-      continue;
-    }
-
-    const separatorIndex = trimmed.indexOf("=");
-    if (separatorIndex <= 0) {
-      continue;
-    }
-
-    const key = trimmed.slice(0, separatorIndex).trim();
-    let value = trimmed.slice(separatorIndex + 1).trim();
-
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-
-    envMap[key] = value.replaceAll("\\n", "\n");
-  }
-
-  return envMap;
-}
-
-async function readRootEnvMap(): Promise<Record<string, string>> {
-  try {
-    const raw = await readFile(ROOT_ENV_PATH, "utf8");
-    return parseDotEnv(raw);
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException).code;
-    if (code === "ENOENT") {
-      return {};
-    }
-
-    throw error;
-  }
-}
-
-async function getRootEnvMap(): Promise<Record<string, string>> {
-  if (!rootEnvCachePromise) {
-    rootEnvCachePromise = readRootEnvMap();
-  }
-
-  return rootEnvCachePromise;
-}
-
-async function readServerEnv(key: string): Promise<string> {
-  const directValue = process.env[key];
-  if (typeof directValue === "string" && directValue.length > 0) {
-    return directValue;
-  }
-
-  const rootEnvMap = await getRootEnvMap();
-  return rootEnvMap[key] || "";
-}
-
-function safeCompare(left: string, right: string): boolean {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
-
-  if (leftBuffer.length !== rightBuffer.length) {
-    return false;
-  }
-
-  return timingSafeEqual(leftBuffer, rightBuffer);
-}
-
-function buildCookiePath(clientId: string): string {
-  return `${ANALYTICS_BASE_PATH}/clients/${assertValidClientId(clientId)}`;
+function normalizeRegistryTimestamp(value: unknown): string | undefined {
+  const normalized = String(value || "").trim();
+  return normalized || undefined;
 }
 
 async function readClientRegistryFile(): Promise<unknown> {
@@ -187,26 +86,22 @@ async function readClientRegistryFile(): Promise<unknown> {
 
 function toClientRegistryEntry(value: unknown): ClientRegistryEntry {
   if (!isRecord(value)) {
-    throw new Error("Client index entry must be an object.");
+    throw new Error("Client registry entry must be an object.");
   }
 
   const clientId = assertValidClientId(String(value.clientId || ""));
   const title = String(value.title || "").trim();
-  const coverImage = String(value.coverImage || "").trim();
 
   if (!title) {
-    throw new Error(`Client "${clientId}" is missing a title in the index.`);
-  }
-
-  if (!coverImage) {
-    throw new Error(`Client "${clientId}" is missing a coverImage in the index.`);
+    throw new Error(`Client "${clientId}" is missing a title in index.json.`);
   }
 
   return {
     clientId,
     title,
     access: normalizeAccess(value.access),
-    coverImage
+    coverImage: String(value.coverImage || "").trim(),
+    updatedAt: normalizeRegistryTimestamp(value.updatedAt)
   };
 }
 
@@ -251,12 +146,6 @@ function toClientContent(value: unknown, registryEntry: ClientRegistryEntry): Cl
     throw new Error(`Client "${registryEntry.clientId}" content must be an object.`);
   }
 
-  const slidesSource = Array.isArray(value.slides) ? value.slides : [];
-
-  if (slidesSource.length === 0) {
-    throw new Error(`Client "${registryEntry.clientId}" content requires at least one slide.`);
-  }
-
   const contentClientId = String(value.clientId || registryEntry.clientId).trim();
   if (contentClientId !== registryEntry.clientId) {
     throw new Error(
@@ -267,43 +156,44 @@ function toClientContent(value: unknown, registryEntry: ClientRegistryEntry): Cl
   const access = normalizeAccess(value.access ?? registryEntry.access);
   if (access !== registryEntry.access) {
     throw new Error(
-      `Client access mismatch for "${registryEntry.clientId}". Keep index.json and content.json aligned.`
+      `Client access mismatch for "${registryEntry.clientId}". Keep index.json and content JSON aligned.`
     );
   }
+
+  const slidesSource = Array.isArray(value.slides) ? value.slides : [];
 
   return {
     ...registryEntry,
     summary: String(value.summary || "").trim() || undefined,
-    updatedAt: String(value.updatedAt || "").trim() || undefined,
     slides: slidesSource.map(toClientSlide)
   };
 }
 
-async function getClientPassword(clientId: string): Promise<string> {
-  return readServerEnv(toClientPasswordEnvKey(assertValidClientId(clientId)));
+function buildCookiePath(clientId: string): string {
+  return `${ANALYTICS_BASE_PATH}/clients/${assertValidClientId(clientId)}`;
 }
 
-async function getCookieSecret(clientId: string, clientPassword: string): Promise<string> {
+async function getCookieSecret(clientId: string, passwordHash: string): Promise<string> {
   const configuredSecret =
     (await readServerEnv("CLIENT_ACCESS_COOKIE_SECRET")) ||
     (await readServerEnv("SESSION_SECRET")) ||
     "client-access-cookie-secret";
 
-  return `${configuredSecret}:${clientId}:${clientPassword}`;
+  return `${configuredSecret}:${clientId}:${passwordHash}`;
 }
 
 async function createCookieSignature(
   clientId: string,
   payload: string,
-  clientPassword: string
+  passwordHash: string
 ): Promise<string> {
-  const secret = await getCookieSecret(clientId, clientPassword);
+  const secret = await getCookieSecret(clientId, passwordHash);
   return createHmac("sha256", secret).update(payload).digest("base64url");
 }
 
 async function hasValidAccessCookie(clientId: string): Promise<boolean> {
-  const clientPassword = await getClientPassword(clientId);
-  if (!clientPassword) {
+  const passwordHash = await getClientPasswordHash(clientId);
+  if (!passwordHash) {
     return false;
   }
 
@@ -313,7 +203,7 @@ async function hasValidAccessCookie(clientId: string): Promise<boolean> {
   }
 
   const separatorIndex = cookieValue.lastIndexOf(".");
-  if (separatorIndex < 0) {
+  if (separatorIndex <= 0) {
     return false;
   }
 
@@ -324,11 +214,11 @@ async function hasValidAccessCookie(clientId: string): Promise<boolean> {
     return false;
   }
 
-  const expectedSignature = await createCookieSignature(clientId, payload, clientPassword);
+  const expectedSignature = await createCookieSignature(clientId, payload, passwordHash);
   return safeCompare(signature, expectedSignature);
 }
 
-export async function getClientRegistry(): Promise<ClientRegistryEntry[]> {
+export async function loadClientRegistry(): Promise<ClientRegistryEntry[]> {
   const parsed = await readClientRegistryFile();
   if (!Array.isArray(parsed)) {
     throw new Error("content/clients/index.json must contain an array.");
@@ -337,46 +227,44 @@ export async function getClientRegistry(): Promise<ClientRegistryEntry[]> {
   return parsed.map(toClientRegistryEntry);
 }
 
+export async function saveClientRegistry(updatedRegistry: ClientRegistryEntry[]) {
+  const normalizedRegistry = updatedRegistry
+    .map((entry) => toClientRegistryEntry(entry))
+    .sort((left, right) => left.clientId.localeCompare(right.clientId));
+
+  await writeFile(CLIENT_INDEX_PATH, `${JSON.stringify(normalizedRegistry, null, 2)}\n`, "utf8");
+}
+
 export async function getClientMetadata(clientId: string): Promise<ClientRegistryEntry | null> {
   const normalizedClientId = assertValidClientId(clientId);
-  const registry = await getClientRegistry();
-
+  const registry = await loadClientRegistry();
   return registry.find((entry) => entry.clientId === normalizedClientId) || null;
 }
 
-export async function isClientPasswordConfigured(clientId: string): Promise<boolean> {
-  return Boolean(await getClientPassword(clientId));
+export async function hasClientPasswordConfigured(clientId: string): Promise<boolean> {
+  return hasClientPassword(clientId);
 }
 
 export async function verifySubmittedClientPassword(
   clientId: string,
   submittedPassword: string
 ): Promise<ClientPasswordVerificationResult> {
-  const configuredPassword = await getClientPassword(clientId);
-  if (!configuredPassword) {
-    return "not-configured";
-  }
-
-  return safeCompare(submittedPassword, configuredPassword) ? "ok" : "invalid";
+  return verifyClientPassword(assertValidClientId(clientId), submittedPassword);
 }
 
 export async function createSignedClientAccessCookieValue(clientId: string): Promise<string> {
   const normalizedClientId = assertValidClientId(clientId);
-  const configuredPassword = await getClientPassword(normalizedClientId);
+  const passwordHash = await getClientPasswordHash(normalizedClientId);
 
-  if (!configuredPassword) {
+  if (!passwordHash) {
     throw new ClientAccessError(
       "password-not-configured",
-      `Password env var ${toClientPasswordEnvKey(normalizedClientId)} is not configured.`
+      `Client "${normalizedClientId}" does not have a password configured in SQLite.`
     );
   }
 
   const payload = `${normalizedClientId}:${Date.now()}`;
-  const signature = await createCookieSignature(
-    normalizedClientId,
-    payload,
-    configuredPassword
-  );
+  const signature = await createCookieSignature(normalizedClientId, payload, passwordHash);
 
   return `${payload}.${signature}`;
 }
@@ -405,11 +293,11 @@ export async function assertClientAccess(
     return true;
   }
 
-  const passwordConfigured = await isClientPasswordConfigured(entry.clientId);
+  const passwordConfigured = await hasClientPasswordConfigured(entry.clientId);
   if (!passwordConfigured) {
     throw new ClientAccessError(
       "password-not-configured",
-      `Password env var ${toClientPasswordEnvKey(entry.clientId)} is not configured.`
+      `Client "${entry.clientId}" does not have a password configured in SQLite.`
     );
   }
 
@@ -417,7 +305,7 @@ export async function assertClientAccess(
   if (!hasAccess) {
     throw new ClientAccessError(
       "unlock-required",
-      `Client "${entry.clientId}" requires a valid access cookie.`
+      `Client "${entry.clientId}" requires a valid signed cookie.`
     );
   }
 
@@ -426,20 +314,18 @@ export async function assertClientAccess(
 
 export async function loadClientContent(clientId: string): Promise<ClientContent> {
   const registryEntry = await getClientMetadata(clientId);
-
   if (!registryEntry) {
     throw new ClientAccessError("client-not-found", `Unknown client "${clientId}".`);
   }
 
   const accessGranted = await assertClientAccess(registryEntry.clientId, registryEntry);
   if (accessGranted !== true) {
-    throw new Error("Regression guard: client content cannot load before access passes.");
+    throw new Error("Regression guard: slide JSON cannot load before auth passes.");
   }
 
   const contentPath = resolveInside(
-    CLIENTS_ROOT,
-    registryEntry.clientId,
-    "content.json"
+    CONTENT_CLIENTS_ROOT,
+    `${registryEntry.clientId}.json`
   );
   const raw = await readFile(contentPath, "utf8");
   const parsed = JSON.parse(raw);
@@ -447,21 +333,17 @@ export async function loadClientContent(clientId: string): Promise<ClientContent
   return toClientContent(parsed, registryEntry);
 }
 
-export function buildClientAppPath(clientId: string): string {
-  return `/clients/${assertValidClientId(clientId)}`;
-}
-
-export function buildClientCoverHref(clientId: string, assetPath: string): string {
-  const normalizedAssetPath = normalizeAssetPath(assetPath);
-  return `${ANALYTICS_BASE_PATH}/clients/${assertValidClientId(clientId)}/cover/${normalizedAssetPath}`;
-}
-
 export function buildClientAssetHref(clientId: string, assetPath: string): string {
-  const normalizedAssetPath = normalizeAssetPath(assetPath);
-  return `${ANALYTICS_BASE_PATH}/clients/${assertValidClientId(clientId)}/assets/${normalizedAssetPath}`;
+  return `${ANALYTICS_BASE_PATH}/clients/${assertValidClientId(clientId)}/assets/${normalizeAssetPath(
+    assetPath
+  )}`;
 }
 
 export function getRegistryCoverAssetPath(registryEntry: ClientRegistryEntry): string | null {
+  if (!registryEntry.coverImage) {
+    return null;
+  }
+
   const prefix = `${ANALYTICS_BASE_PATH}/clients/${registryEntry.clientId}/cover/`;
 
   try {
@@ -480,13 +362,11 @@ export async function readClientImageAsset(
   clientId: string,
   assetPath: string
 ): Promise<{ body: Buffer; contentType: string }> {
-  const normalizedClientId = assertValidClientId(clientId);
-  const normalizedAssetPath = normalizeAssetPath(assetPath);
   const filePath = resolveInside(
     CLIENTS_ROOT,
-    normalizedClientId,
+    assertValidClientId(clientId),
     "images",
-    normalizedAssetPath
+    normalizeAssetPath(assetPath)
   );
   const body = await readFile(filePath);
   const extension = path.extname(filePath).toLowerCase();

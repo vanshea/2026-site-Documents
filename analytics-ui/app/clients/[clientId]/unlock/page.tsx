@@ -9,7 +9,7 @@ import {
   createSignedClientAccessCookieValue,
   getClientAccessCookieOptions,
   getClientMetadata,
-  isClientPasswordConfigured,
+  hasClientPasswordConfigured,
   verifySubmittedClientPassword
 } from "@/lib/client-content";
 
@@ -53,7 +53,6 @@ export default async function ClientUnlockPage({
   }
 
   const clientId = metadata.clientId;
-  const passwordEnvLabel = `CLIENT_PASSWORD_${clientId.replaceAll("-", "_").toUpperCase()}`;
 
   try {
     await assertClientAccess(clientId, metadata);
@@ -64,7 +63,7 @@ export default async function ClientUnlockPage({
     }
   }
 
-  const passwordConfigured = await isClientPasswordConfigured(clientId);
+  const passwordConfigured = await hasClientPasswordConfigured(clientId);
 
   async function unlockClient(formData: FormData) {
     "use server";
@@ -97,22 +96,29 @@ export default async function ClientUnlockPage({
           </p>
           <h1 className="mt-4 text-3xl font-semibold md:text-5xl">{metadata.title}</h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-white/82 md:text-base">
-            The page checks for a valid signed cookie before it reads <code>content.json</code>. If
+            The page checks for a valid signed cookie before it reads the client&apos;s slide JSON. If
             the cookie is missing or invalid, rendering stops here.
           </p>
 
-          <img
-            src={metadata.coverImage}
-            alt={`${metadata.title} cover`}
-            className="mt-8 h-72 w-full rounded-[24px] border border-white/15 object-cover shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
-          />
+          {metadata.coverImage ? (
+            <img
+              src={metadata.coverImage}
+              alt={`${metadata.title} cover`}
+              className="mt-8 h-72 w-full rounded-[24px] border border-white/15 object-cover shadow-[0_20px_60px_rgba(0,0,0,0.22)]"
+            />
+          ) : (
+            <div className="mt-8 flex h-72 w-full items-end rounded-[24px] border border-white/15 bg-white/10 p-6 text-sm uppercase tracking-[0.18em] text-white/75">
+              No cover image configured
+            </div>
+          )}
         </div>
 
         <div className="p-6 md:p-10">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-inkSoft">Unlock</p>
           <h2 className="mt-3 text-3xl font-semibold text-ink">Enter client password</h2>
           <p className="mt-3 text-sm leading-7 text-inkSoft">
-            Expected env var: <code>{passwordEnvLabel}</code>
+            Password presence is managed in SQLite from <code>/home</code>. The stored value is never
+            shown again after it is saved.
           </p>
 
           {!passwordConfigured && (

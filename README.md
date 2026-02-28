@@ -7,7 +7,8 @@ Portfolio site with an Express backend, a password-protected first-party analyti
 - Portfolio + ingestion API: Node.js + Express (`server.js`)
 - Analytics storage: PostgreSQL + Prisma
 - Analytics UI: Next.js 14 + TypeScript + Tailwind + Recharts (mounted at `/analytics`)
-- Client content: `/content/clients/index.json` registry + `/clients/<clientId>/content.json`
+- Client content: `/content/clients/index.json` registry + `/content/clients/<clientId>.json`
+- Client secret storage: SQLite (`/data/client-secrets.sqlite`)
 
 ## Local Setup
 
@@ -28,6 +29,7 @@ Open:
 - Analytics login: [http://localhost:3000/login](http://localhost:3000/login)
 - Analytics app (after login): [http://localhost:3000/analytics](http://localhost:3000/analytics)
 - Client rooms: [http://localhost:3000/analytics/clients](http://localhost:3000/analytics/clients)
+- Client admin: [http://localhost:3000/analytics/home](http://localhost:3000/analytics/home)
 
 ## Environment Variables
 
@@ -41,7 +43,8 @@ Copy `.env.example` to `.env` and set:
 - `ANALYTICS_UI_ENABLED`: enable Next.js proxy mount (`true`)
 - `ANALYTICS_UI_ORIGIN`: Next.js origin (`http://127.0.0.1:3001`)
 - `CLIENT_ACCESS_COOKIE_SECRET`: signing secret for per-client unlock cookies
-- `CLIENT_PASSWORD_<CLIENTID_UPPER_SNAKE>`: password for each `access="password"` client
+- `ADMIN_SESSION_COOKIE_SECRET`: signing secret for the `/home` admin cookie
+- `CLIENT_PASSWORD_PEPPER`: optional extra server-side pepper for Argon2 client password hashes
 - `ANALYTICS_SESSION_TTL_MINUTES`: session timeout
 - `ANALYTICS_COLLECT_ENABLED`, `ANALYTICS_DASHBOARD_ENABLED`
 - Optional mail settings: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
@@ -52,15 +55,32 @@ Next client-room auth reads env vars from the normal process environment and fal
 
 Runtime source of truth:
 - Registry: [`/Library/WebServer/Documents/content/clients/index.json`](/Library/WebServer/Documents/content/clients/index.json)
-- Per-client content: [`/Library/WebServer/Documents/clients`](/Library/WebServer/Documents/clients)
+- Full slide content: [`/Library/WebServer/Documents/content/clients`](/Library/WebServer/Documents/content/clients)
+- Per-client folders: [`/Library/WebServer/Documents/clients`](/Library/WebServer/Documents/clients)
 
 Per-client structure:
-- `/clients/<clientId>/content.json`
 - `/clients/<clientId>/images/`
 - `/clients/<clientId>/http/README.md`
+- `/content/clients/<clientId>.json`
 
 Security rule:
-- No slide JSON is read before auth passes. The page loads only lightweight metadata from `index.json`, checks the signed per-client cookie for `access="password"` clients, redirects to the unlock page if needed, and only then reads `/clients/<clientId>/content.json`.
+- No slide JSON is read before auth passes. The page loads only lightweight metadata from `index.json`, checks the signed per-client cookie for `access="password"` clients, redirects to the unlock page if needed, and only then reads `/content/clients/<clientId>.json`.
+
+## Home Admin
+
+How `/home` works:
+- Route path in the Next app is `/home`, exposed publicly at `/analytics/home` because the app uses `basePath: /analytics`.
+- Login page is `/analytics/home/login`.
+- The admin password is checked server-side with a timing-safe compare against the literal `1013VS1#`.
+- Successful login sets a signed `httpOnly` `admin_session` cookie with a 12 hour max age.
+- `/home` never displays any stored client password. Password resets are write-only and stored as Argon2 hashes in SQLite.
+- Registry edits update [`/Library/WebServer/Documents/content/clients/index.json`](/Library/WebServer/Documents/content/clients/index.json).
+- Client password resets upsert into the SQLite database at [`/Library/WebServer/Documents/data/client-secrets.sqlite`](/Library/WebServer/Documents/data/client-secrets.sqlite).
+
+Warnings:
+- No plaintext passwords are stored in JSON.
+- No plaintext passwords are re-displayed by `/home`.
+- If you need to rotate the admin password, update the literal in [`admin-auth.ts`](/Library/WebServer/Documents/analytics-ui/lib/admin-auth.ts) and restart the Next app.
 
 Create a new client scaffold:
 
@@ -69,9 +89,9 @@ npm run client:scaffold -- acme --title "ACME" --access password
 ```
 
 What the scaffold does:
-- creates `/clients/<clientId>/content.json`
 - creates `/clients/<clientId>/images/cover.svg`
 - creates `/clients/<clientId>/http/README.md`
+- creates `/content/clients/<clientId>.json`
 - upserts the lightweight registry entry in `content/clients/index.json`
 
 ## Prisma

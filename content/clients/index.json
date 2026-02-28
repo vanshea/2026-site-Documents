@@ -1,14 +1,16 @@
 [
   {
-    "access": "password",
     "clientId": "acme",
+    "title": "ACME",
+    "access": "password",
     "coverImage": "/analytics/clients/acme/cover/cover.svg",
-    "title": "ACME"
+    "updatedAt": "2026-02-28T00:00:00.000Z"
   },
   {
-    "access": "public",
     "clientId": "sample-public",
+    "title": "Sample Public",
+    "access": "public",
     "coverImage": "/analytics/clients/sample-public/cover/cover.svg",
-    "title": "Sample Public"
+    "updatedAt": "2026-02-28T00:00:00.000Z"
   }
 ]

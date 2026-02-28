@@ -748,6 +748,8 @@ if (ANALYTICS_UI_ENABLED) {
       const publicClientUiPath =
         req.path === "/clients" ||
         req.path.startsWith("/clients/") ||
+        req.path === "/home" ||
+        req.path.startsWith("/home/") ||
         req.path.startsWith("/_next/");
 
       if (publicClientUiPath) {

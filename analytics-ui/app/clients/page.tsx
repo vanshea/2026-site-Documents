@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
-import { getClientRegistry } from "@/lib/client-content";
+import { loadClientRegistry } from "@/lib/client-content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -8,7 +8,7 @@ export const revalidate = 0;
 export default async function ClientsIndexPage() {
   noStore();
 
-  const clients = await getClientRegistry();
+  const clients = await loadClientRegistry();
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-6 py-10 md:px-10 md:py-14">
@@ -41,11 +41,17 @@ export default async function ClientsIndexPage() {
             key={client.clientId}
             className="overflow-hidden rounded-[28px] border border-border/80 bg-white shadow-card"
           >
-            <img
-              src={client.coverImage}
-              alt={`${client.title} cover`}
-              className="h-56 w-full border-b border-border/80 object-cover"
-            />
+            {client.coverImage ? (
+              <img
+                src={client.coverImage}
+                alt={`${client.title} cover`}
+                className="h-56 w-full border-b border-border/80 object-cover"
+              />
+            ) : (
+              <div className="flex h-56 w-full items-end border-b border-border/80 bg-[linear-gradient(135deg,#173c39_0%,#1f6f5f_55%,#b8dacf_100%)] p-6 text-white">
+                <span className="text-xs font-semibold uppercase tracking-[0.22em]">No cover image</span>
+              </div>
+            )}
             <div className="p-6">
               <div className="flex items-center justify-between gap-4">
                 <div>
