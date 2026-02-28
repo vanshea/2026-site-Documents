@@ -2,6 +2,13 @@
 
 Portfolio site with an Express backend, a password-protected first-party analytics dashboard, and file-backed client presentation rooms.
 
+Simple how-to guides:
+- Localhost: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md)
+- Publishing online: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md)
+
+Maintenance rule:
+- If startup, localhost, deployment, database, env var, or domain-routing behavior changes, update both of the files above in the same change.
+
 ## Stack
 
 - Portfolio + ingestion API: Node.js + Express (`server.js`)
