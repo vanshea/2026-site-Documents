@@ -1,12 +1,13 @@
 # Design Portfolio Site
 
-Portfolio site with an Express backend and a password-protected first-party analytics dashboard.
+Portfolio site with an Express backend, a password-protected first-party analytics dashboard, and file-backed client presentation rooms.
 
 ## Stack
 
 - Portfolio + ingestion API: Node.js + Express (`server.js`)
 - Analytics storage: PostgreSQL + Prisma
 - Analytics UI: Next.js 14 + TypeScript + Tailwind + Recharts (mounted at `/analytics`)
+- Client content: `/content/clients/index.json` registry + `/clients/<clientId>/content.json`
 
 ## Local Setup
 
@@ -26,6 +27,7 @@ Open:
 - Portfolio: [http://localhost:3000](http://localhost:3000)
 - Analytics login: [http://localhost:3000/login](http://localhost:3000/login)
 - Analytics app (after login): [http://localhost:3000/analytics](http://localhost:3000/analytics)
+- Client rooms: [http://localhost:3000/analytics/clients](http://localhost:3000/analytics/clients)
 
 ## Environment Variables
 
@@ -38,9 +40,39 @@ Copy `.env.example` to `.env` and set:
 - `ANALYTICS_VIEWER_USERNAME` / `ANALYTICS_VIEWER_PASSWORD`: read-only viewer credentials
 - `ANALYTICS_UI_ENABLED`: enable Next.js proxy mount (`true`)
 - `ANALYTICS_UI_ORIGIN`: Next.js origin (`http://127.0.0.1:3001`)
+- `CLIENT_ACCESS_COOKIE_SECRET`: signing secret for per-client unlock cookies
+- `CLIENT_PASSWORD_<CLIENTID_UPPER_SNAKE>`: password for each `access="password"` client
 - `ANALYTICS_SESSION_TTL_MINUTES`: session timeout
 - `ANALYTICS_COLLECT_ENABLED`, `ANALYTICS_DASHBOARD_ENABLED`
 - Optional mail settings: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
+
+Next client-room auth reads env vars from the normal process environment and falls back to the root [`/Library/WebServer/Documents/.env`](/Library/WebServer/Documents/.env) file, so the same `.env` can drive both Express and the Next app locally.
+
+## Client Content
+
+Runtime source of truth:
+- Registry: [`/Library/WebServer/Documents/content/clients/index.json`](/Library/WebServer/Documents/content/clients/index.json)
+- Per-client content: [`/Library/WebServer/Documents/clients`](/Library/WebServer/Documents/clients)
+
+Per-client structure:
+- `/clients/<clientId>/content.json`
+- `/clients/<clientId>/images/`
+- `/clients/<clientId>/http/README.md`
+
+Security rule:
+- No slide JSON is read before auth passes. The page loads only lightweight metadata from `index.json`, checks the signed per-client cookie for `access="password"` clients, redirects to the unlock page if needed, and only then reads `/clients/<clientId>/content.json`.
+
+Create a new client scaffold:
+
+```bash
+npm run client:scaffold -- acme --title "ACME" --access password
+```
+
+What the scaffold does:
+- creates `/clients/<clientId>/content.json`
+- creates `/clients/<clientId>/images/cover.svg`
+- creates `/clients/<clientId>/http/README.md`
+- upserts the lightweight registry entry in `content/clients/index.json`
 
 ## Prisma
 

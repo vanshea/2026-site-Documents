@@ -9,6 +9,7 @@
     "analytics:dev": "npm --prefix analytics-ui run dev",
     "analytics:build": "npm --prefix analytics-ui run build",
     "analytics:start": "npm --prefix analytics-ui run start",
+    "client:scaffold": "node scripts/create-client-scaffold.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init_analytics",
     "prisma:deploy": "prisma migrate deploy",

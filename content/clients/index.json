@@ -1,0 +1,14 @@
+[
+  {
+    "access": "password",
+    "clientId": "acme",
+    "coverImage": "/analytics/clients/acme/cover/cover.svg",
+    "title": "ACME"
+  },
+  {
+    "access": "public",
+    "clientId": "sample-public",
+    "coverImage": "/analytics/clients/sample-public/cover/cover.svg",
+    "title": "Sample Public"
+  }
+]

@@ -4,6 +4,8 @@
 
 :root {
   color-scheme: light;
+  --font-sans: "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "SF Mono", "Menlo", "Monaco", monospace;
 }
 
 * {

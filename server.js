@@ -728,24 +728,38 @@ app.get(
 );
 
 if (ANALYTICS_UI_ENABLED) {
+  const analyticsUiProxy = createProxyMiddleware({
+    target: ANALYTICS_UI_ORIGIN,
+    changeOrigin: true,
+    ws: true,
+    logLevel: "warn",
+    pathRewrite: (pathValue) => `/analytics${pathValue}`,
+    onError: (error, req, res) => {
+      console.error("Analytics UI proxy failed:", error.message);
+      if (!res.headersSent) {
+        res.status(502).send("Analytics UI is unavailable. Start the Next.js analytics app.");
+      }
+    }
+  });
+
   app.use(
     "/analytics",
+    (req, res, next) => {
+      const publicClientUiPath =
+        req.path === "/clients" ||
+        req.path.startsWith("/clients/") ||
+        req.path.startsWith("/_next/");
+
+      if (publicClientUiPath) {
+        return analyticsUiProxy(req, res, next);
+      }
+
+      return next();
+    },
     requireDashboardEnabled,
     requireAnalyticsStorage,
     requireAnalyticsAuth,
-    createProxyMiddleware({
-      target: ANALYTICS_UI_ORIGIN,
-      changeOrigin: true,
-      ws: true,
-      logLevel: "warn",
-      pathRewrite: (pathValue) => `/analytics${pathValue}`,
-      onError: (error, req, res) => {
-        console.error("Analytics UI proxy failed:", error.message);
-        if (!res.headersSent) {
-          res.status(502).send("Analytics UI is unavailable. Start the Next.js analytics app.");
-        }
-      }
-    })
+    analyticsUiProxy
   );
 } else {
   app.get(
