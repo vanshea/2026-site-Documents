@@ -49,11 +49,72 @@ themeButtons.forEach((button) => {
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
 const workGrid = document.querySelector("#work .grid");
+const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
 
 function toSitePath(filePath) {
   if (!filePath) return "";
   if (/^(https?:)?\/\//.test(filePath)) return filePath;
   return filePath.startsWith("/") ? filePath : `/${filePath}`;
+}
+
+function getWorkCardElements() {
+  if (!workGrid) return [];
+  return Array.from(workGrid.children).filter((element) =>
+    element.classList?.contains("card")
+  );
+}
+
+function isPlaceholderAssetPath(filePath) {
+  const normalized = String(filePath || "")
+    .trim()
+    .replace(/^\//, "");
+  return FPO_ASSET_PATTERN.test(normalized);
+}
+
+function setWorkCardPlaceholderState(card, isPlaceholder) {
+  if (!card || card.dataset.generated === "true") return;
+  card.classList.toggle("is-placeholder", isPlaceholder);
+  card.dataset.placeholder = isPlaceholder ? "true" : "false";
+}
+
+function sortWorkGridCards() {
+  if (!workGrid) return;
+
+  const orderedCards = getWorkCardElements()
+    .map((card, index) => ({
+      card,
+      index,
+      rank: card.classList.contains("is-featured")
+        ? 0
+        : card.classList.contains("is-placeholder")
+          ? 2
+          : 1
+    }))
+    .sort((left, right) => left.rank - right.rank || left.index - right.index);
+
+  orderedCards.forEach(({ card }) => {
+    workGrid.appendChild(card);
+  });
+}
+
+function refreshWorkCardState() {
+  getWorkCardElements().forEach((card) => {
+    if (card.dataset.generated === "true") {
+      return;
+    }
+
+    const link = card.querySelector(".work-link");
+    const thumbSource = link?.querySelector(".card-image")?.getAttribute("src") || "";
+    const largeSource = link?.dataset?.lightboxSrc || link?.getAttribute("href") || "";
+    const fullscreenSource = link?.dataset?.fullscreenSrc || "";
+    const isPlaceholder = [thumbSource, largeSource, fullscreenSource].some(
+      isPlaceholderAssetPath
+    );
+
+    setWorkCardPlaceholderState(card, isPlaceholder);
+  });
+
+  sortWorkGridCards();
 }
 
 async function readSiteImageConfig() {
@@ -75,7 +136,11 @@ async function readSiteImageConfig() {
 async function loadSiteImageConfig() {
   try {
     const config = await readSiteImageConfig();
-    if (!config) return;
+    if (!config) {
+      refreshWorkCardState();
+      applyActiveFilter();
+      return;
+    }
 
     if (config.logos?.light && brandLogoLightImage) {
       brandLogoLightImage.src = toSitePath(config.logos.light);
@@ -127,9 +192,12 @@ async function loadSiteImageConfig() {
       }
     });
 
+    refreshWorkCardState();
     applyActiveFilter();
   } catch (error) {
     // Keep the site functional using default markup if config is unavailable.
+    refreshWorkCardState();
+    applyActiveFilter();
   }
 }
 
@@ -315,7 +383,9 @@ function getWorkCardsPerPage() {
 function getFilteredCards() {
   const activeButton = document.querySelector(".filter-btn.active");
   const target = activeButton?.dataset?.filter || "all";
-  const cards = Array.from(document.querySelectorAll(".card"));
+  const cards = getWorkCardElements().filter(
+    (card) => !card.classList.contains("is-placeholder")
+  );
 
   return cards.filter((card) => {
     const category = card.dataset.category;
@@ -675,6 +745,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
   });
 }
 
+refreshWorkCardState();
 visibleWorkCards = getWorkCardsPerPage();
 applyActiveFilter();
 loadSiteImageConfig();
