@@ -5,9 +5,10 @@ Portfolio site with an Express backend, a password-protected first-party analyti
 Simple how-to guides:
 - Localhost: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md)
 - Publishing online: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md)
+- Network Solutions handoff: [`/Library/WebServer/Documents/docs/NETWORK-SOLUTIONS-HOSTING-HANDOFF.md`](/Library/WebServer/Documents/docs/NETWORK-SOLUTIONS-HOSTING-HANDOFF.md)
 
 Maintenance rule:
-- If startup, localhost, deployment, database, env var, or domain-routing behavior changes, update both of the files above in the same change.
+- If startup, localhost, deployment, database, env var, or domain-routing behavior changes, update all of the docs above in the same change.
 
 ## Stack
 
