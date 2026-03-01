@@ -132,6 +132,7 @@ select {
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: calc(10px * var(--control-scale)) calc(12px * var(--control-scale));
+  font-family: "Open Sans", sans-serif;
   background: rgba(255, 255, 255, 0.7);
   color: var(--ink);
 }

@@ -20,33 +20,6 @@
       "cardDescription": "Patent for gesture interfaces."
     },
     {
-      "id": "large-web-portfolio-pat3200x1800-1772332872835",
-      "title": "large-web-portfolio-pat3200x1800",
-      "description": "Generated in VSCimage.",
-      "thumb": "assets/vscimage/generated/large-web-portfolio-pat3200x1800-thumb-760x570.webp",
-      "large": "assets/vscimage/generated/large-web-portfolio-pat3200x1800-large-1900x1600.webp",
-      "fullscreen": "assets/vscimage/generated/large-web-portfolio-pat3200x1800-large-1900x1600.webp",
-      "createdAt": "2026-03-01T02:41:12.835Z"
-    },
-    {
-      "id": "large-web-portfolio-pat1900x1600-1772332872534",
-      "title": "large-web-portfolio-pat1900x1600",
-      "description": "Generated in VSCimage.",
-      "thumb": "assets/vscimage/generated/large-web-portfolio-pat1900x1600-thumb-760x570.webp",
-      "large": "assets/vscimage/generated/large-web-portfolio-pat1900x1600-large-1900x1600.webp",
-      "fullscreen": "assets/vscimage/generated/large-web-portfolio-pat1900x1600-large-1900x1600.webp",
-      "createdAt": "2026-03-01T02:41:12.534Z"
-    },
-    {
-      "id": "large-web-portfolio-pat120x120-1772332872271",
-      "title": "large-web-portfolio-pat120x120",
-      "description": "Generated in VSCimage.",
-      "thumb": "assets/vscimage/generated/large-web-portfolio-pat120x120-thumb-760x570.webp",
-      "large": "assets/vscimage/generated/large-web-portfolio-pat120x120-large-1900x1600.webp",
-      "fullscreen": "assets/vscimage/generated/large-web-portfolio-pat120x120-large-1900x1600.webp",
-      "createdAt": "2026-03-01T02:41:12.271Z"
-    },
-    {
       "id": "large-web-portfolio-linedraw-01-3200x1800-1772332872067",
       "title": "large-web-portfolio-linedraw-01-3200x1800",
       "description": "Generated in VSCimage.",
@@ -117,70 +90,6 @@
       "large": "assets/vscimage/generated/large-web-portfolio-airdolly-large-1900x1600.webp",
       "fullscreen": "assets/vscimage/generated/large-web-portfolio-airdolly-large-1900x1600.webp",
       "createdAt": "2026-03-01T02:41:09.961Z"
-    },
-    {
-      "id": "fpo-seed-01-1771276187269",
-      "title": "FPO Seed 01",
-      "thumb": "assets/vscimage/generated/fpo-seed-01-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-01-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-01-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:48.268Z"
-    },
-    {
-      "id": "fpo-seed-02-1771276187270",
-      "title": "FPO Seed 02",
-      "thumb": "assets/vscimage/generated/fpo-seed-02-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-02-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-02-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:49.268Z"
-    },
-    {
-      "id": "fpo-seed-03-1771276187271",
-      "title": "FPO Seed 03",
-      "thumb": "assets/vscimage/generated/fpo-seed-03-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-03-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-03-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:50.268Z"
-    },
-    {
-      "id": "fpo-seed-04-1771276187272",
-      "title": "FPO Seed 04",
-      "thumb": "assets/vscimage/generated/fpo-seed-04-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-04-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-04-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:51.268Z"
-    },
-    {
-      "id": "fpo-seed-05-1771276187273",
-      "title": "FPO Seed 05",
-      "thumb": "assets/vscimage/generated/fpo-seed-05-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-05-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-05-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:52.268Z"
-    },
-    {
-      "id": "fpo-seed-06-1771276187274",
-      "title": "FPO Seed 06",
-      "thumb": "assets/vscimage/generated/fpo-seed-06-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-06-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-06-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:53.268Z"
-    },
-    {
-      "id": "fpo-seed-07-1771276187275",
-      "title": "FPO Seed 07",
-      "thumb": "assets/vscimage/generated/fpo-seed-07-thumb-760x570.svg",
-      "large": "assets/vscimage/generated/fpo-seed-07-large-1900x1600.svg",
-      "fullscreen": "assets/vscimage/generated/fpo-seed-07-fullscreen-3200x1800.svg",
-      "createdAt": "2026-02-16T21:09:54.268Z"
-    },
-    {
-      "id": "fp-test-1771275230166",
-      "title": "fp-test",
-      "thumb": "assets/vscimage/generated/fp-test-thumb-760x570.webp",
-      "large": "assets/vscimage/generated/fp-test-large-1900x1600.webp",
-      "fullscreen": "assets/vscimage/generated/fp-test-fullscreen-3200x1800.webp",
-      "createdAt": "2026-02-16T20:53:50.166Z"
     }
   ],
   "projects": {

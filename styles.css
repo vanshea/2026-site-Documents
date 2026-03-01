@@ -681,6 +681,7 @@ textarea {
   border: 1px solid var(--line);
   padding: calc(12px * var(--control-scale));
   font: inherit;
+  font-family: "Open Sans", sans-serif;
   color: var(--ink);
   background: var(--input-bg);
 }
@@ -727,6 +728,7 @@ textarea:focus {
 
 .contact-kicker {
   margin-bottom: calc(8px * 1.05);
+  font-family: "Open Sans", sans-serif;
   font-size: 0.84rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -740,6 +742,7 @@ textarea:focus {
 .contact-intro {
   max-width: 60ch;
   margin-bottom: calc(14px * 1.05);
+  font-family: "Open Sans", sans-serif;
 }
 
 .form-embed-slot {
@@ -777,6 +780,8 @@ textarea:focus {
 
 .project-inquiry-actions .btn {
   min-width: calc(170px * var(--control-scale));
+  margin-top: 5%;
+  margin-bottom: 5%;
 }
 
 .project-inquiry-status {
