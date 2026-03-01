@@ -49,12 +49,56 @@ themeButtons.forEach((button) => {
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
 const workGrid = document.querySelector("#work .grid");
+const siteHeader = document.querySelector(".site-header");
+const navToggle = document.querySelector(".nav-toggle");
+const siteNav = document.querySelector(".nav");
+const mobileNavMedia = window.matchMedia("(max-width: 640px)");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
 
 function toSitePath(filePath) {
   if (!filePath) return "";
   if (/^(https?:)?\/\//.test(filePath)) return filePath;
   return filePath.startsWith("/") ? filePath : `/${filePath}`;
+}
+
+function setMobileNavState(isOpen) {
+  if (!siteHeader || !navToggle || !siteNav) return;
+
+  siteHeader.classList.toggle("is-nav-open", isOpen);
+  navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  navToggle.setAttribute(
+    "aria-label",
+    isOpen ? "Close navigation menu" : "Open navigation menu"
+  );
+
+  if (mobileNavMedia.matches) {
+    siteNav.hidden = !isOpen;
+    siteNav.setAttribute("aria-hidden", isOpen ? "false" : "true");
+  } else {
+    siteNav.hidden = false;
+    siteNav.setAttribute("aria-hidden", "false");
+  }
+}
+
+function syncMobileNavMode() {
+  if (!siteHeader || !navToggle || !siteNav) return;
+
+  document.body.classList.add("nav-ready");
+
+  if (mobileNavMedia.matches) {
+    const isOpen = siteHeader.classList.contains("is-nav-open");
+    siteNav.hidden = !isOpen;
+    siteNav.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    navToggle.setAttribute("aria-hidden", "false");
+    return;
+  }
+
+  siteHeader.classList.remove("is-nav-open");
+  siteNav.hidden = false;
+  siteNav.setAttribute("aria-hidden", "false");
+  navToggle.setAttribute("aria-expanded", "false");
+  navToggle.setAttribute("aria-label", "Open navigation menu");
+  navToggle.setAttribute("aria-hidden", "true");
 }
 
 function getWorkCardElements() {
@@ -393,6 +437,18 @@ function getFilteredCards() {
   });
 }
 
+function getFeaturedCardHeightScale() {
+  if (window.innerWidth <= 640) {
+    return 1.25;
+  }
+
+  if (window.innerWidth <= 960) {
+    return 1.15;
+  }
+
+  return 1;
+}
+
 function updateFeaturedCardHeight() {
   if (!workGrid) return;
 
@@ -415,7 +471,8 @@ function updateFeaturedCardHeight() {
 
   const referenceHeight = Math.round(referenceImage.getBoundingClientRect().height);
   if (referenceHeight > 0) {
-    workGrid.style.setProperty("--featured-card-image-height", `${referenceHeight}px`);
+    const featuredHeight = Math.round(referenceHeight * getFeaturedCardHeightScale());
+    workGrid.style.setProperty("--featured-card-image-height", `${featuredHeight}px`);
   } else {
     workGrid.style.removeProperty("--featured-card-image-height");
   }
@@ -481,8 +538,47 @@ if (workGrid) {
   );
 }
 
+if (navToggle && siteHeader && siteNav) {
+  const navLinks = Array.from(siteNav.querySelectorAll("a"));
+  syncMobileNavMode();
+
+  navToggle.addEventListener("click", () => {
+    if (!mobileNavMedia.matches) return;
+    const isOpen = siteHeader.classList.contains("is-nav-open");
+    setMobileNavState(!isOpen);
+  });
+
+  navLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (!mobileNavMedia.matches) return;
+      setMobileNavState(false);
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!mobileNavMedia.matches) return;
+    if (!siteHeader.classList.contains("is-nav-open")) return;
+    if (siteHeader.contains(event.target)) return;
+    setMobileNavState(false);
+  });
+
+  window.addEventListener("hashchange", () => {
+    if (!mobileNavMedia.matches) return;
+    setMobileNavState(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (!mobileNavMedia.matches) return;
+    if (!siteHeader.classList.contains("is-nav-open")) return;
+    setMobileNavState(false);
+    navToggle.focus();
+  });
+}
+
 let workResizeTimer = null;
 window.addEventListener("resize", () => {
+  syncMobileNavMode();
   clearTimeout(workResizeTimer);
   workResizeTimer = setTimeout(() => {
     const perPage = getWorkCardsPerPage();
