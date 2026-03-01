@@ -63,7 +63,7 @@
             <label><input type="checkbox" value="large" checked />Large (1900x1600 WEBP)</label>
             <label><input type="checkbox" value="fullscreen" checked />Fullscreen (3200x1800 WEBP)</label>
           </fieldset>
-          <button class="btn" type="submit">Generate Files</button>
+          <button id="uploadButton" class="btn" type="submit" disabled>Generate Files</button>
         </form>
         <p id="uploadMsg" class="status"></p>
         <ul id="generatedList" class="generated-list"></ul>
@@ -76,6 +76,7 @@
           3 more rows.
         </p>
         <div id="thumbAccordion" class="thumb-accordion"></div>
+        <p id="thumbMsg" class="status"></p>
       </section>
 
       <section class="panel">
@@ -117,6 +118,82 @@
         <div id="previewGrid" class="preview-grid"></div>
       </section>
     </main>
+
+    <dialog id="thumbEditorDialog" class="editor-dialog">
+      <form id="thumbEditorForm" class="editor-form" method="dialog">
+        <div class="editor-header">
+          <div>
+            <p class="kicker">Processed Thumbnail</p>
+            <h2>Edit Image</h2>
+          </div>
+          <button id="thumbEditorClose" class="btn btn-secondary" type="button">Close</button>
+        </div>
+
+        <div class="editor-grid">
+          <div class="editor-preview-panel">
+            <div id="thumbEditorPreviewFrame" class="editor-preview-frame">
+              <img id="thumbEditorPreviewImage" alt="" />
+            </div>
+            <p id="thumbEditorPreviewLabel" class="path"></p>
+            <ul id="thumbEditorAssetList" class="generated-list"></ul>
+          </div>
+
+          <div class="editor-fields">
+            <label>
+              Replace Source Image
+              <input id="thumbEditorImage" name="image" type="file" accept="image/*" />
+              <span class="field-note">
+                Leave empty to keep the current source image and only regenerate metadata or asset names.
+              </span>
+            </label>
+
+            <label>
+              Asset Name / Filename Prefix
+              <input id="thumbEditorName" name="name" type="text" maxlength="64" />
+            </label>
+
+            <label>
+              Display Title
+              <input id="thumbEditorTitle" name="title" type="text" maxlength="120" />
+            </label>
+
+            <label>
+              Description
+              <textarea
+                id="thumbEditorDescription"
+                name="description"
+                rows="4"
+                maxlength="320"
+              ></textarea>
+            </label>
+
+            <div class="editor-background">
+              <label class="editor-background-toggle">
+                <input id="thumbEditorUseBg" type="checkbox" />
+                Apply background color for transparent images
+              </label>
+
+              <div class="editor-background-controls">
+                <label>
+                  Background Color
+                  <input id="thumbEditorBgColor" name="backgroundColor" type="color" value="#ffffff" />
+                </label>
+                <p class="field-note">
+                  Used when transparent pixels or letterboxing need a solid fill in generated outputs.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p id="thumbEditorMsg" class="status"></p>
+
+        <div class="editor-actions">
+          <button id="thumbEditorSave" class="btn" type="submit">Save Changes</button>
+          <button id="thumbEditorDelete" class="btn btn-danger" type="button">Delete</button>
+        </div>
+      </form>
+    </dialog>
 
     <script src="vscimage.js"></script>
   </body>

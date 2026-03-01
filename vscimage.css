@@ -176,6 +176,17 @@ select {
   width: fit-content;
 }
 
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: #fff;
+}
+
 .btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -238,11 +249,19 @@ select {
   padding: 10px;
   display: grid;
   gap: 8px;
+  align-content: start;
 }
 
 .thumb-card h3 {
   margin: 0;
   font-size: 0.98rem;
+}
+
+.thumb-card-description {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.45;
 }
 
 .thumb-card img {
@@ -258,6 +277,22 @@ select {
   font-size: 0.84rem;
   font-weight: 700;
   color: var(--ink);
+}
+
+.thumb-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.thumb-card-edit {
+  display: grid;
+  gap: 8px;
+}
+
+.thumb-card-edit textarea {
+  width: 100%;
+  resize: vertical;
 }
 
 .thumb-batch {
@@ -367,6 +402,99 @@ th {
   word-break: break-all;
 }
 
+.editor-dialog {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 0;
+  width: min(1080px, 92vw);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.editor-dialog::backdrop {
+  background: rgba(8, 18, 30, 0.62);
+  backdrop-filter: blur(6px);
+}
+
+.editor-form {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+}
+
+.editor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editor-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+}
+
+.editor-preview-panel,
+.editor-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.editor-preview-frame {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  background:
+    linear-gradient(45deg, rgba(15, 45, 71, 0.08) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(15, 45, 71, 0.08) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(15, 45, 71, 0.08) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(15, 45, 71, 0.08) 75%),
+    var(--editor-preview-bg, rgba(255, 255, 255, 0.4));
+  background-size: 22px 22px;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+}
+
+.editor-preview-frame img {
+  max-width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+}
+
+.editor-background {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.editor-background-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-background-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.editor-background-controls.is-disabled {
+  opacity: 0.55;
+}
+
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 @media (max-width: 760px) {
   .app {
     width: min(1260px, 94vw);
@@ -383,5 +511,13 @@ th {
 
   .logo-grid {
     grid-template-columns: 1fr;
+  }
+
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-header {
+    flex-direction: column;
   }
 }

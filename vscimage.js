@@ -11,7 +11,10 @@ const state = {
   config: null,
   files: [],
   apiAvailable: true,
-  apiOrigin: window.location.origin
+  apiOrigin: window.location.origin,
+  editorEntryId: "",
+  editorPreviewUrl: "",
+  galleryBusyId: ""
 };
 
 const THUMB_CARD_MIN_WIDTH = 210;
@@ -46,6 +49,7 @@ const generatedList = document.getElementById("generatedList");
 const imageFileInput = document.getElementById("imageFile");
 const imageFolderInput = document.getElementById("imageFolder");
 const assetNameInput = document.getElementById("assetName");
+const uploadButton = document.getElementById("uploadButton");
 const configForm = document.getElementById("configForm");
 const configMsg = document.getElementById("configMsg");
 const logoLightSelect = document.getElementById("logoLightSelect");
@@ -53,20 +57,60 @@ const logoDarkSelect = document.getElementById("logoDarkSelect");
 const projectRows = document.getElementById("projectRows");
 const previewGrid = document.getElementById("previewGrid");
 const thumbAccordion = document.getElementById("thumbAccordion");
+const thumbMsg = document.getElementById("thumbMsg");
+const thumbEditorDialog = document.getElementById("thumbEditorDialog");
+const thumbEditorForm = document.getElementById("thumbEditorForm");
+const thumbEditorClose = document.getElementById("thumbEditorClose");
+const thumbEditorSave = document.getElementById("thumbEditorSave");
+const thumbEditorDelete = document.getElementById("thumbEditorDelete");
+const thumbEditorImage = document.getElementById("thumbEditorImage");
+const thumbEditorName = document.getElementById("thumbEditorName");
+const thumbEditorTitle = document.getElementById("thumbEditorTitle");
+const thumbEditorDescription = document.getElementById("thumbEditorDescription");
+const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
+const thumbEditorBgColor = document.getElementById("thumbEditorBgColor");
+const thumbEditorPreviewFrame = document.getElementById("thumbEditorPreviewFrame");
+const thumbEditorPreviewImage = document.getElementById("thumbEditorPreviewImage");
+const thumbEditorPreviewLabel = document.getElementById("thumbEditorPreviewLabel");
+const thumbEditorAssetList = document.getElementById("thumbEditorAssetList");
+const thumbEditorMsg = document.getElementById("thumbEditorMsg");
+const uploadOutputInputs = Array.from(
+  uploadForm?.querySelectorAll('input[type="checkbox"]') || []
+);
+
+function collectSelectedOutputs() {
+  return uploadOutputInputs.filter((input) => input.checked).map((input) => input.value);
+}
+
+function updateUploadButtonState() {
+  if (!uploadButton) return;
+
+  const hasFiles = collectUploadFiles().length > 0;
+  const hasOutputs = collectSelectedOutputs().length > 0;
+  uploadButton.disabled = !state.apiAvailable || !hasFiles || !hasOutputs;
+}
 
 if (imageFileInput && imageFolderInput) {
   imageFileInput.addEventListener("change", () => {
     if (imageFileInput.files?.length) {
       imageFolderInput.value = "";
     }
+    updateUploadButtonState();
   });
 
   imageFolderInput.addEventListener("change", () => {
     if (imageFolderInput.files?.length) {
       imageFileInput.value = "";
     }
+    updateUploadButtonState();
   });
 }
+
+uploadOutputInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    updateUploadButtonState();
+  });
+});
 
 function setStatus(element, message, type = "") {
   element.textContent = message;
@@ -88,6 +132,22 @@ function normalizeDescription(value, maxLength = 320) {
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
+}
+
+function normalizeHexColor(value) {
+  let raw = String(value || "").trim();
+  if (!raw) return "";
+  if (!raw.startsWith("#")) raw = `#${raw}`;
+
+  if (/^#[0-9a-f]{3}$/i.test(raw)) {
+    raw = `#${raw
+      .slice(1)
+      .split("")
+      .map((char) => `${char}${char}`)
+      .join("")}`;
+  }
+
+  return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : "";
 }
 
 function stripExtension(fileName) {
@@ -135,7 +195,15 @@ function buildAssetNameForFile(file, namePrefix, index, totalFiles = 1) {
   return namePrefix ? sanitizeAssetName(`${namePrefix}-${stem}`) : stem;
 }
 
-function appendGeneratedOutputLine(label, value, className = "", isLink = true) {
+function appendGeneratedOutputLine(
+  label,
+  value,
+  className = "",
+  isLink = true,
+  listElement = generatedList
+) {
+  if (!listElement) return;
+
   const item = document.createElement("li");
   if (className) item.className = className;
 
@@ -156,7 +224,7 @@ function appendGeneratedOutputLine(label, value, className = "", isLink = true) 
     item.appendChild(fallback);
   }
 
-  generatedList.appendChild(item);
+  listElement.appendChild(item);
 }
 
 async function fetchJson(url, options) {
@@ -210,6 +278,7 @@ function collectConfigImagePaths(config) {
     if (item.thumb) files.add(item.thumb);
     if (item.large) files.add(item.large);
     if (item.fullscreen) files.add(item.fullscreen);
+    if (item.logo) files.add(item.logo);
   });
 
   return Array.from(files).sort((a, b) => a.localeCompare(b));
@@ -234,7 +303,12 @@ function normalizeGalleryEntries(entries) {
       );
       const large = String(entry?.large || thumb).trim() || thumb;
       const fullscreen = String(entry?.fullscreen || large || thumb).trim() || large;
+      const logo = String(entry?.logo || "").trim();
+      const original = String(entry?.original || "").trim();
+      const assetBaseName = sanitizeAssetName(entry?.assetBaseName || "");
+      const backgroundColor = normalizeHexColor(entry?.backgroundColor);
       const createdAt = String(entry?.createdAt || "").trim();
+      const updatedAt = String(entry?.updatedAt || "").trim();
 
       const dedupeKey = `${thumb}::${large}::${fullscreen}`;
       if (seen.has(dedupeKey)) return null;
@@ -247,10 +321,43 @@ function normalizeGalleryEntries(entries) {
         thumb,
         large,
         fullscreen,
-        createdAt
+        logo,
+        original,
+        assetBaseName,
+        backgroundColor,
+        createdAt,
+        updatedAt
       };
     })
     .filter(Boolean);
+}
+
+function getGalleryEntryBaseName(entry) {
+  const explicitName = sanitizeAssetName(entry?.assetBaseName || "");
+  if (explicitName) {
+    return explicitName;
+  }
+
+  const sourcePath = String(entry?.thumb || entry?.large || entry?.fullscreen || "").trim();
+  const fileName = sourcePath.split("/").pop() || "";
+  const match = fileName.match(
+    /^(.*?)-(?:thumb-\d+x\d+|large-\d+x\d+|fullscreen-\d+x\d+|logo-\d+)\.[^.]+$/i
+  );
+  return sanitizeAssetName(match?.[1] || "");
+}
+
+function getGalleryEntryLogoPath(entry) {
+  const explicitLogo = String(entry?.logo || "").trim();
+  if (explicitLogo) {
+    return explicitLogo;
+  }
+
+  const baseName = getGalleryEntryBaseName(entry);
+  return baseName ? `assets/vscimage/generated/${baseName}-logo-240.png` : "";
+}
+
+function getGalleryEntryById(entryId) {
+  return normalizeGalleryEntries(state.config?.gallery).find((entry) => entry.id === entryId) || null;
 }
 
 function ensureConfigShape(config) {
@@ -281,6 +388,10 @@ function ensureConfigShape(config) {
 function buildThumbnailCard(entry) {
   const card = document.createElement("article");
   card.className = "thumb-card";
+  card.dataset.entryId = entry.id;
+
+  const actionsDisabled = !state.apiAvailable || Boolean(state.galleryBusyId);
+  const isBusy = state.galleryBusyId === entry.id;
 
   const image = document.createElement("img");
   image.src = toAssetUrl(entry.thumb);
@@ -289,6 +400,10 @@ function buildThumbnailCard(entry) {
 
   const title = document.createElement("h3");
   title.textContent = entry.title;
+
+  const description = document.createElement("p");
+  description.className = "thumb-card-description";
+  description.textContent = entry.description || "Generated in VSCimage.";
 
   const path = document.createElement("p");
   path.className = "path";
@@ -300,11 +415,275 @@ function buildThumbnailCard(entry) {
   link.rel = "noreferrer";
   link.textContent = "Open large image";
 
+  const actions = document.createElement("div");
+  actions.className = "thumb-card-actions";
+
+  const editButton = document.createElement("button");
+  editButton.type = "button";
+  editButton.className = "btn btn-secondary";
+  editButton.textContent = isBusy ? "Opening..." : "Edit";
+  editButton.dataset.thumbAction = "edit";
+  editButton.dataset.entryId = entry.id;
+  editButton.disabled = actionsDisabled;
+
+  const deleteButton = document.createElement("button");
+  deleteButton.type = "button";
+  deleteButton.className = "btn btn-danger";
+  deleteButton.textContent = isBusy ? "Deleting..." : "Delete";
+  deleteButton.dataset.thumbAction = "delete";
+  deleteButton.dataset.entryId = entry.id;
+  deleteButton.disabled = actionsDisabled;
+
+  actions.appendChild(editButton);
+  actions.appendChild(deleteButton);
+
   card.appendChild(image);
   card.appendChild(title);
+  card.appendChild(description);
   card.appendChild(path);
   card.appendChild(link);
+  card.appendChild(actions);
   return card;
+}
+
+function setThumbStatus(message, type = "") {
+  if (!thumbMsg) return;
+  setStatus(thumbMsg, message, type);
+}
+
+function setThumbEditorStatus(message, type = "") {
+  if (!thumbEditorMsg) return;
+  setStatus(thumbEditorMsg, message, type);
+}
+
+function cleanupEditorPreviewUrl() {
+  if (!state.editorPreviewUrl) return;
+  URL.revokeObjectURL(state.editorPreviewUrl);
+  state.editorPreviewUrl = "";
+}
+
+function updateThumbEditorBackgroundState() {
+  const useBackground = Boolean(thumbEditorUseBg?.checked);
+  if (thumbEditorBgColor) {
+    thumbEditorBgColor.disabled = !useBackground;
+    thumbEditorBgColor
+      .closest(".editor-background-controls")
+      ?.classList.toggle("is-disabled", !useBackground);
+  }
+
+  if (thumbEditorPreviewFrame) {
+    const previewColor = useBackground
+      ? normalizeHexColor(thumbEditorBgColor?.value || "#ffffff") || "#ffffff"
+      : "rgba(255, 255, 255, 0.4)";
+    thumbEditorPreviewFrame.style.setProperty("--editor-preview-bg", previewColor);
+  }
+}
+
+function updateThumbEditorPreview(entry) {
+  if (!thumbEditorPreviewImage || !thumbEditorPreviewLabel) return;
+
+  const replacementFile = thumbEditorImage?.files?.[0];
+  cleanupEditorPreviewUrl();
+
+  if (replacementFile) {
+    state.editorPreviewUrl = URL.createObjectURL(replacementFile);
+    thumbEditorPreviewImage.src = state.editorPreviewUrl;
+    thumbEditorPreviewImage.alt = replacementFile.name;
+    thumbEditorPreviewLabel.textContent = `Replacement preview: ${replacementFile.name}`;
+  } else {
+    thumbEditorPreviewImage.src = toAssetUrl(entry.large || entry.thumb);
+    thumbEditorPreviewImage.alt = entry.title;
+    thumbEditorPreviewLabel.textContent = entry.original
+      ? `Source: ${entry.original}`
+      : "No stored original source path. Upload a replacement image if regeneration is needed.";
+  }
+
+  updateThumbEditorBackgroundState();
+}
+
+function renderThumbEditorAssetList(entry) {
+  if (!thumbEditorAssetList) return;
+
+  thumbEditorAssetList.innerHTML = "";
+  if (entry.original) {
+    appendGeneratedOutputLine("Original", entry.original, "", true, thumbEditorAssetList);
+  }
+  appendGeneratedOutputLine("Thumb", entry.thumb, "", true, thumbEditorAssetList);
+  appendGeneratedOutputLine("Large", entry.large, "", true, thumbEditorAssetList);
+  appendGeneratedOutputLine("Fullscreen", entry.fullscreen, "", true, thumbEditorAssetList);
+
+  const logoPath = getGalleryEntryLogoPath(entry);
+  if (logoPath) {
+    appendGeneratedOutputLine("Logo", logoPath, "", true, thumbEditorAssetList);
+  }
+}
+
+function openGalleryEditor(entryId) {
+  const entry = getGalleryEntryById(entryId);
+  if (!entry || !thumbEditorDialog || !thumbEditorForm) {
+    return;
+  }
+
+  state.editorEntryId = entryId;
+  cleanupEditorPreviewUrl();
+
+  thumbEditorForm.reset();
+  thumbEditorName.value = getGalleryEntryBaseName(entry) || sanitizeAssetName(entry.title) || "";
+  thumbEditorTitle.value = entry.title || "";
+  thumbEditorDescription.value = entry.description || "";
+  thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
+  thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
+  thumbEditorDelete.dataset.entryId = entryId;
+  thumbEditorSave.disabled = !state.apiAvailable;
+  thumbEditorDelete.disabled = !state.apiAvailable;
+  setThumbEditorStatus("", "");
+  updateThumbEditorPreview(entry);
+  renderThumbEditorAssetList(entry);
+
+  if (thumbEditorDialog.open) {
+    return;
+  }
+
+  if (typeof thumbEditorDialog.showModal === "function") {
+    thumbEditorDialog.showModal();
+  } else {
+    thumbEditorDialog.setAttribute("open", "open");
+  }
+}
+
+function closeGalleryEditor() {
+  if (!thumbEditorDialog) return;
+
+  if (thumbEditorDialog.open) {
+    thumbEditorDialog.close();
+  } else {
+    thumbEditorDialog.removeAttribute("open");
+  }
+
+  state.editorEntryId = "";
+  cleanupEditorPreviewUrl();
+  setThumbEditorStatus("", "");
+}
+
+async function deleteGalleryEntry(entryId) {
+  if (!state.apiAvailable) {
+    setThumbStatus(
+      "Delete is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
+      "error"
+    );
+    return;
+  }
+
+  const entry = normalizeGalleryEntries(state.config?.gallery).find((item) => item.id === entryId);
+  const label = entry?.title || entryId;
+  const confirmed = window.confirm(
+    `Delete "${label}" from Processed Thumbnails? Generated files tied to this card will be removed from VSCimage.`
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  state.galleryBusyId = entryId;
+  renderThumbAccordion();
+  setThumbStatus(`Deleting ${label}...`, "");
+  if (state.editorEntryId === entryId) {
+    thumbEditorSave.disabled = true;
+    thumbEditorDelete.disabled = true;
+    setThumbEditorStatus(`Deleting ${label}...`, "");
+  }
+
+  try {
+    await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entryId)}/delete`, {
+      method: "POST"
+    });
+    if (state.editorEntryId === entryId) {
+      closeGalleryEditor();
+    }
+    await reloadData();
+    setThumbStatus("Thumbnail deleted.", "ok");
+  } catch (error) {
+    setThumbStatus(error.message, "error");
+  } finally {
+    state.galleryBusyId = "";
+    renderThumbAccordion();
+    if (state.editorEntryId === entryId) {
+      thumbEditorSave.disabled = !state.apiAvailable;
+      thumbEditorDelete.disabled = !state.apiAvailable;
+    }
+  }
+}
+
+async function saveGalleryEditor() {
+  if (!state.apiAvailable) {
+    setThumbEditorStatus(
+      "Edit is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
+      "error"
+    );
+    return;
+  }
+
+  const entryId = state.editorEntryId;
+  const entry = getGalleryEntryById(entryId);
+  if (!entry) {
+    setThumbEditorStatus("Thumbnail entry was not found.", "error");
+    return;
+  }
+
+  const nextName = sanitizeAssetName(thumbEditorName?.value || "");
+  const nextTitle = String(thumbEditorTitle?.value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 120);
+  const nextDescription = normalizeDescription(thumbEditorDescription?.value || "", 320);
+  const nextBackgroundColor = thumbEditorUseBg?.checked
+    ? normalizeHexColor(thumbEditorBgColor?.value || "#ffffff")
+    : "";
+
+  if (!nextName) {
+    setThumbEditorStatus("Asset name cannot be empty.", "error");
+    thumbEditorName?.focus();
+    return;
+  }
+
+  if (!nextTitle) {
+    setThumbEditorStatus("Display title cannot be empty.", "error");
+    thumbEditorTitle?.focus();
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("name", nextName);
+  formData.append("title", nextTitle);
+  formData.append("description", nextDescription);
+  formData.append("backgroundColor", nextBackgroundColor);
+
+  const replacementFile = thumbEditorImage?.files?.[0];
+  if (replacementFile) {
+    formData.append("image", replacementFile);
+  }
+
+  state.galleryBusyId = entryId;
+  renderThumbAccordion();
+  thumbEditorSave.disabled = true;
+  thumbEditorDelete.disabled = true;
+  setThumbEditorStatus(`Saving ${nextTitle}...`, "");
+
+  try {
+    await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entryId)}/edit`, {
+      method: "POST",
+      body: formData
+    });
+    await reloadData();
+    closeGalleryEditor();
+    setThumbStatus("Thumbnail updated.", "ok");
+  } catch (error) {
+    setThumbEditorStatus(error.message, "error");
+  } finally {
+    state.galleryBusyId = "";
+    renderThumbAccordion();
+    thumbEditorSave.disabled = !state.apiAvailable;
+    thumbEditorDelete.disabled = !state.apiAvailable;
+  }
 }
 
 function getThumbBatchSize() {
@@ -578,15 +957,20 @@ async function reloadData() {
 
   state.config = ensureConfigShape(config);
   state.files = files;
+  if (
+    state.editorEntryId &&
+    !state.config.gallery.some((entry) => entry.id === state.editorEntryId)
+  ) {
+    closeGalleryEditor();
+  }
 
   buildProjectRows();
   renderConfigControls();
   renderPreview();
   renderThumbAccordion();
 
-  const uploadButton = uploadForm?.querySelector('button[type="submit"]');
   const saveButton = configForm?.querySelector('button[type="submit"]');
-  if (uploadButton) uploadButton.disabled = !state.apiAvailable;
+  updateUploadButtonState();
   if (saveButton) saveButton.disabled = !state.apiAvailable;
 }
 
@@ -605,12 +989,9 @@ if (uploadForm) {
       return;
     }
 
-    const submitButton = uploadForm.querySelector('button[type="submit"]');
     const selectedFiles = collectUploadFiles();
     const namePrefix = sanitizeAssetName(assetNameInput?.value || "");
-    const checked = Array.from(
-      uploadForm.querySelectorAll('input[type="checkbox"]:checked')
-    ).map((input) => input.value);
+    const checked = collectSelectedOutputs();
 
     if (!selectedFiles.length) {
       setStatus(uploadMsg, "Select a source image or folder to upload.", "error");
@@ -626,7 +1007,7 @@ if (uploadForm) {
     const failedEntries = [];
 
     try {
-      if (submitButton) submitButton.disabled = true;
+      if (uploadButton) uploadButton.disabled = true;
 
       for (let index = 0; index < selectedFiles.length; index += 1) {
         const currentFile = selectedFiles[index];
@@ -685,7 +1066,7 @@ if (uploadForm) {
     } catch (error) {
       setStatus(uploadMsg, error.message, "error");
     } finally {
-      if (submitButton) submitButton.disabled = !state.apiAvailable;
+      updateUploadButtonState();
     }
   });
 }
@@ -717,6 +1098,76 @@ if (configForm) {
     } catch (error) {
       setStatus(configMsg, error.message, "error");
     }
+  });
+}
+
+if (thumbAccordion) {
+  thumbAccordion.addEventListener("click", async (event) => {
+    const actionButton = event.target.closest("[data-thumb-action]");
+    if (!actionButton) return;
+
+    const action = actionButton.dataset.thumbAction;
+    const entryId = actionButton.dataset.entryId;
+    if (!entryId) return;
+
+    if (action === "edit") {
+      setThumbStatus("", "");
+      openGalleryEditor(entryId);
+      return;
+    }
+
+    if (action === "delete") {
+      await deleteGalleryEntry(entryId);
+    }
+  });
+}
+
+if (thumbEditorClose) {
+  thumbEditorClose.addEventListener("click", () => {
+    closeGalleryEditor();
+  });
+}
+
+if (thumbEditorDialog) {
+  thumbEditorDialog.addEventListener("close", () => {
+    cleanupEditorPreviewUrl();
+    state.editorEntryId = "";
+    setThumbEditorStatus("", "");
+  });
+}
+
+if (thumbEditorImage) {
+  thumbEditorImage.addEventListener("change", () => {
+    const entry = getGalleryEntryById(state.editorEntryId);
+    if (!entry) return;
+    updateThumbEditorPreview(entry);
+  });
+}
+
+if (thumbEditorUseBg) {
+  thumbEditorUseBg.addEventListener("change", () => {
+    updateThumbEditorBackgroundState();
+  });
+}
+
+if (thumbEditorBgColor) {
+  thumbEditorBgColor.addEventListener("input", () => {
+    updateThumbEditorBackgroundState();
+  });
+}
+
+if (thumbEditorDelete) {
+  thumbEditorDelete.addEventListener("click", async () => {
+    const entryId = thumbEditorDelete.dataset.entryId;
+    if (!entryId) return;
+    await deleteGalleryEntry(entryId);
+  });
+}
+
+if (thumbEditorForm) {
+  thumbEditorForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await saveGalleryEditor();
   });
 }
 

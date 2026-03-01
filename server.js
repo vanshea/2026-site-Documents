@@ -247,6 +247,565 @@ async function readVscimageConfig() {
   return JSON.parse(raw);
 }
 
+async function writeVscimageConfig(config) {
+  await ensureVscimageStorage();
+  await fs.writeFile(vscimageConfigPath, JSON.stringify(config, null, 2), "utf8");
+  await syncHomepageGeneratedGallery(config.gallery || []);
+}
+
+function normalizeTextField(value, maxLength) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, maxLength);
+}
+
+function normalizeHexColor(value) {
+  let raw = String(value || "").trim();
+  if (!raw) return "";
+  if (!raw.startsWith("#")) raw = `#${raw}`;
+
+  if (/^#[0-9a-f]{3}$/i.test(raw)) {
+    raw = `#${raw
+      .slice(1)
+      .split("")
+      .map((char) => `${char}${char}`)
+      .join("")}`;
+  }
+
+  return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : "";
+}
+
+function toSharpColor(color) {
+  const normalized = normalizeHexColor(color);
+  if (!normalized) return null;
+
+  return {
+    r: Number.parseInt(normalized.slice(1, 3), 16),
+    g: Number.parseInt(normalized.slice(3, 5), 16),
+    b: Number.parseInt(normalized.slice(5, 7), 16),
+    alpha: 1
+  };
+}
+
+function resolveVscimageLocalPath(assetPath) {
+  const sanitized = sanitizeAssetPath(assetPath);
+  if (!sanitized || /^(https?:)?\/\//.test(sanitized)) {
+    return "";
+  }
+
+  const absolutePath = path.resolve(rootDir, sanitized);
+  const relativePath = path.relative(rootDir, absolutePath);
+  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+    return "";
+  }
+
+  return absolutePath;
+}
+
+function isPathInsideDirectory(filePath, directoryPath) {
+  const relativePath = path.relative(directoryPath, filePath);
+  return Boolean(relativePath) && !relativePath.startsWith("..") && !path.isAbsolute(relativePath);
+}
+
+function extractGeneratedBaseName(filePath) {
+  const fileName = path.basename(filePath);
+  const match = fileName.match(
+    /^(.*?)-(?:thumb-\d+x\d+|large-\d+x\d+|fullscreen-\d+x\d+|logo-\d+)\.[^.]+$/i
+  );
+  return match?.[1] || "";
+}
+
+function getGalleryEntryBaseName(entry) {
+  const explicitName = sanitizeName(entry?.assetBaseName);
+  if (explicitName) {
+    return explicitName;
+  }
+
+  const assetPaths = [entry?.thumb, entry?.large, entry?.fullscreen, entry?.logo];
+  for (const assetPath of assetPaths) {
+    const localPath = resolveVscimageLocalPath(assetPath);
+    if (!localPath) continue;
+
+    const baseName = extractGeneratedBaseName(localPath);
+    if (baseName) {
+      return baseName;
+    }
+  }
+
+  return "";
+}
+
+function getGalleryEntryLogoPath(entry) {
+  const explicitPath = sanitizeAssetPath(entry?.logo);
+  if (explicitPath) {
+    return explicitPath;
+  }
+
+  const baseName = getGalleryEntryBaseName(entry);
+  if (!baseName) {
+    return "";
+  }
+
+  return `assets/vscimage/generated/${baseName}-logo-240.png`;
+}
+
+function collectGalleryManagedAssetPaths(entry) {
+  return [
+    sanitizeAssetPath(entry?.thumb),
+    sanitizeAssetPath(entry?.large),
+    sanitizeAssetPath(entry?.fullscreen),
+    sanitizeAssetPath(getGalleryEntryLogoPath(entry))
+  ].filter(Boolean);
+}
+
+function collectAssignedAssetUsages(config, assetPath) {
+  const normalizedAssetPath = sanitizeAssetPath(assetPath);
+  const usages = [];
+
+  if (!normalizedAssetPath) {
+    return usages;
+  }
+
+  if (sanitizeAssetPath(config?.logos?.light) === normalizedAssetPath) {
+    usages.push("Logo Light Theme");
+  }
+
+  if (sanitizeAssetPath(config?.logos?.dark) === normalizedAssetPath) {
+    usages.push("Logo Dark Theme");
+  }
+
+  Object.entries(config?.projects || {}).forEach(([projectId, projectConfig]) => {
+    const projectTitle = String(projectConfig?.title || projectId || "Project").trim();
+    if (sanitizeAssetPath(projectConfig?.thumb) === normalizedAssetPath) {
+      usages.push(`${projectTitle} thumb`);
+    }
+    if (sanitizeAssetPath(projectConfig?.large) === normalizedAssetPath) {
+      usages.push(`${projectTitle} large`);
+    }
+    if (sanitizeAssetPath(projectConfig?.fullscreen) === normalizedAssetPath) {
+      usages.push(`${projectTitle} fullscreen`);
+    }
+  });
+
+  return usages;
+}
+
+async function deleteFileIfPresent(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
+async function deleteGeneratedGalleryAssets(entry) {
+  const removablePaths = new Set();
+  const relatedBaseNames = new Set();
+
+  [entry?.thumb, entry?.large, entry?.fullscreen, getGalleryEntryLogoPath(entry)].forEach(
+    (assetPath) => {
+    const localPath = resolveVscimageLocalPath(assetPath);
+    if (!localPath || !isPathInsideDirectory(localPath, vscimageGeneratedDir)) {
+      return;
+    }
+
+    removablePaths.add(localPath);
+    const baseName = extractGeneratedBaseName(localPath);
+    if (baseName) {
+      relatedBaseNames.add(baseName);
+    }
+  });
+
+  relatedBaseNames.forEach((baseName) => {
+    removablePaths.add(path.join(vscimageGeneratedDir, `${baseName}-logo-240.png`));
+  });
+
+  for (const filePath of removablePaths) {
+    await deleteFileIfPresent(filePath);
+  }
+}
+
+async function findLatestOriginalPathForBaseName(baseName) {
+  if (!baseName) {
+    return "";
+  }
+
+  await ensureVscimageStorage();
+  const entries = await fs.readdir(vscimageOriginalsDir, { withFileTypes: true });
+  const matches = entries
+    .filter((entry) => entry.isFile())
+    .filter((entry) => entry.name.startsWith(`${baseName}-`))
+    .filter((entry) => acceptedImageExt.has(path.extname(entry.name).toLowerCase()))
+    .map((entry) => path.join(vscimageOriginalsDir, entry.name))
+    .sort((left, right) => left.localeCompare(right));
+
+  return matches.at(-1) || "";
+}
+
+async function resolveGalleryOriginalPath(entry) {
+  const explicitPath = resolveVscimageLocalPath(entry?.original);
+  if (explicitPath && fsSync.existsSync(explicitPath)) {
+    return explicitPath;
+  }
+
+  return findLatestOriginalPathForBaseName(getGalleryEntryBaseName(entry));
+}
+
+function buildGeneratedAssetPaths(baseName) {
+  return {
+    logo: path.join(vscimageGeneratedDir, `${baseName}-logo-240.png`),
+    thumb: path.join(vscimageGeneratedDir, `${baseName}-thumb-760x570.webp`),
+    large: path.join(vscimageGeneratedDir, `${baseName}-large-1900x1600.webp`),
+    fullscreen: path.join(vscimageGeneratedDir, `${baseName}-fullscreen-3200x1800.webp`)
+  };
+}
+
+async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
+  const baseName = sanitizeName(options.baseName) || `image-${Date.now()}`;
+  const requestedOutputs = Array.isArray(options.outputs) ? options.outputs : [];
+  const outputs = requestedOutputs.length
+    ? requestedOutputs.filter((key) => ["logo", "thumb", "large", "fullscreen"].includes(key))
+    : ["logo", "thumb", "large", "fullscreen"];
+
+  if (!outputs.length) {
+    throw new Error("No output types selected.");
+  }
+
+  const generatedPaths = buildGeneratedAssetPaths(baseName);
+  const generated = {};
+  const backgroundColor = toSharpColor(options.backgroundColor);
+  const fullscreenBackground = backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 };
+  const pipeline = sharp(inputBuffer).rotate();
+
+  if (outputs.includes("logo")) {
+    await pipeline
+      .clone()
+      .resize(240, 240, {
+        fit: "contain",
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png()
+      .toFile(generatedPaths.logo);
+    generated.logo = toWebPath(generatedPaths.logo);
+  }
+
+  if (outputs.includes("thumb")) {
+    let thumbPipeline = pipeline.clone();
+    if (backgroundColor) {
+      thumbPipeline = thumbPipeline.flatten({ background: backgroundColor });
+    }
+    await thumbPipeline
+      .resize(760, 570, {
+        fit: "cover",
+        position: "attention"
+      })
+      .webp({ quality: 88 })
+      .toFile(generatedPaths.thumb);
+    generated.thumb = toWebPath(generatedPaths.thumb);
+  }
+
+  if (outputs.includes("large")) {
+    let largePipeline = pipeline.clone();
+    if (backgroundColor) {
+      largePipeline = largePipeline.flatten({ background: backgroundColor });
+    }
+    await largePipeline
+      .resize(1900, 1600, {
+        fit: "cover",
+        position: "attention"
+      })
+      .webp({ quality: 90 })
+      .toFile(generatedPaths.large);
+    generated.large = toWebPath(generatedPaths.large);
+  }
+
+  if (outputs.includes("fullscreen")) {
+    let fullscreenPipeline = pipeline.clone();
+    if (backgroundColor) {
+      fullscreenPipeline = fullscreenPipeline.flatten({ background: backgroundColor });
+    }
+    await fullscreenPipeline
+      .resize(3200, 1800, {
+        fit: "contain",
+        background: fullscreenBackground
+      })
+      .webp({ quality: 92 })
+      .toFile(generatedPaths.fullscreen);
+    generated.fullscreen = toWebPath(generatedPaths.fullscreen);
+  }
+
+  return generated;
+}
+
+async function saveOriginalImageBuffer(inputBuffer, originalName, baseName) {
+  const inputExt = path.extname(originalName || "").toLowerCase() || ".bin";
+  const originalPath = path.join(vscimageOriginalsDir, `${baseName}-${Date.now()}${inputExt}`);
+  await fs.writeFile(originalPath, inputBuffer);
+  return originalPath;
+}
+
+function replaceConfigAssetReferences(config, replacements) {
+  const normalizedReplacements = Object.entries(replacements || {}).reduce((acc, [from, to]) => {
+    const fromPath = sanitizeAssetPath(from);
+    const toPath = sanitizeAssetPath(to);
+    if (fromPath && toPath) {
+      acc[fromPath] = toPath;
+    }
+    return acc;
+  }, {});
+
+  const replacePath = (value) => {
+    const normalizedValue = sanitizeAssetPath(value);
+    return normalizedReplacements[normalizedValue] || value;
+  };
+
+  if (config.logos) {
+    config.logos.light = replacePath(config.logos.light);
+    config.logos.dark = replacePath(config.logos.dark);
+  }
+
+  Object.values(config.projects || {}).forEach((project) => {
+    if (!project) return;
+    project.thumb = replacePath(project.thumb);
+    project.large = replacePath(project.large);
+    project.fullscreen = replacePath(project.fullscreen);
+  });
+
+  (config.gallery || []).forEach((entry) => {
+    if (!entry) return;
+    entry.thumb = replacePath(entry.thumb);
+    entry.large = replacePath(entry.large);
+    entry.fullscreen = replacePath(entry.fullscreen);
+    if (entry.logo) {
+      entry.logo = replacePath(entry.logo);
+    }
+  });
+}
+
+async function deleteSupersededGeneratedAssets(previousPaths, nextPaths) {
+  const nextPathSet = new Set(nextPaths.map((item) => sanitizeAssetPath(item)).filter(Boolean));
+  const obsoletePaths = previousPaths
+    .map((item) => sanitizeAssetPath(item))
+    .filter((item) => item && !nextPathSet.has(item));
+
+  for (const assetPath of obsoletePaths) {
+    const localPath = resolveVscimageLocalPath(assetPath);
+    if (!localPath || !isPathInsideDirectory(localPath, vscimageGeneratedDir)) {
+      continue;
+    }
+    await deleteFileIfPresent(localPath);
+  }
+}
+
+async function editVscimageGalleryEntry(entryId, options = {}) {
+  const config = await readVscimageConfig();
+  const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+  const entryIndex = gallery.findIndex((entry) => String(entry?.id || "").trim() === entryId);
+
+  if (entryIndex === -1) {
+    return null;
+  }
+
+  const currentEntry = gallery[entryIndex] || {};
+  const currentBaseName =
+    getGalleryEntryBaseName(currentEntry) || sanitizeName(currentEntry.title) || `image-${Date.now()}`;
+  const nextBaseName = sanitizeName(options.name) || currentBaseName;
+  const nextTitle =
+    normalizeTextField(options.title ?? currentEntry.title ?? nextBaseName, 120) || nextBaseName;
+  const nextDescription =
+    normalizeTextField(options.description ?? currentEntry.description ?? "", 320) ||
+    "Generated in VSCimage.";
+  const currentBackgroundColor = normalizeHexColor(currentEntry.backgroundColor);
+  const nextBackgroundColor = Object.prototype.hasOwnProperty.call(options, "backgroundColor")
+    ? normalizeHexColor(options.backgroundColor)
+    : currentBackgroundColor;
+
+  if (
+    Object.prototype.hasOwnProperty.call(options, "backgroundColor") &&
+    String(options.backgroundColor || "").trim() &&
+    !nextBackgroundColor
+  ) {
+    const invalidColorError = new Error("Background color must be a valid hex color.");
+    invalidColorError.code = "VSCIMAGE_INVALID_BACKGROUND";
+    throw invalidColorError;
+  }
+
+  const hasReplacementImage = Buffer.isBuffer(options.imageBuffer) && options.imageBuffer.length > 0;
+  const requiresRegeneration =
+    hasReplacementImage ||
+    nextBaseName !== currentBaseName ||
+    nextBackgroundColor !== currentBackgroundColor;
+
+  let nextOriginalPath = sanitizeAssetPath(currentEntry.original);
+  let nextLogoPath = getGalleryEntryLogoPath(currentEntry);
+  let nextThumbPath = sanitizeAssetPath(currentEntry.thumb);
+  let nextLargePath = sanitizeAssetPath(currentEntry.large);
+  let nextFullscreenPath = sanitizeAssetPath(currentEntry.fullscreen);
+  const previousManagedPaths = collectGalleryManagedAssetPaths(currentEntry);
+
+  if (requiresRegeneration) {
+    if (!sharp) {
+      const dependencyError = new Error(
+        "Image generation dependency is missing. Run npm install to enable editing."
+      );
+      dependencyError.code = "VSCIMAGE_EDITING_UNAVAILABLE";
+      throw dependencyError;
+    }
+
+    let sourceBuffer;
+    if (hasReplacementImage) {
+      const savedOriginalPath = await saveOriginalImageBuffer(
+        options.imageBuffer,
+        options.originalName,
+        nextBaseName
+      );
+      sourceBuffer = options.imageBuffer;
+      nextOriginalPath = toWebPath(savedOriginalPath);
+
+      const previousOriginalPath = resolveVscimageLocalPath(currentEntry.original);
+      if (
+        previousOriginalPath &&
+        previousOriginalPath !== savedOriginalPath &&
+        isPathInsideDirectory(previousOriginalPath, vscimageOriginalsDir)
+      ) {
+        await deleteFileIfPresent(previousOriginalPath);
+      }
+    } else {
+      const existingOriginalPath = await resolveGalleryOriginalPath(currentEntry);
+      if (!existingOriginalPath) {
+        const missingOriginalError = new Error(
+          "Original source image is unavailable. Replace the image to regenerate these assets."
+        );
+        missingOriginalError.code = "VSCIMAGE_ORIGINAL_MISSING";
+        throw missingOriginalError;
+      }
+
+      sourceBuffer = await fs.readFile(existingOriginalPath);
+      nextOriginalPath = toWebPath(existingOriginalPath);
+    }
+
+    const generated = await generateVscimageOutputsFromBuffer(sourceBuffer, {
+      baseName: nextBaseName,
+      backgroundColor: nextBackgroundColor,
+      outputs: ["logo", "thumb", "large", "fullscreen"]
+    });
+
+    nextLogoPath = sanitizeAssetPath(generated.logo);
+    nextThumbPath = sanitizeAssetPath(generated.thumb);
+    nextLargePath = sanitizeAssetPath(generated.large);
+    nextFullscreenPath = sanitizeAssetPath(generated.fullscreen);
+
+    replaceConfigAssetReferences(config, {
+      [sanitizeAssetPath(currentEntry.thumb)]: nextThumbPath,
+      [sanitizeAssetPath(currentEntry.large)]: nextLargePath,
+      [sanitizeAssetPath(currentEntry.fullscreen)]: nextFullscreenPath,
+      [sanitizeAssetPath(getGalleryEntryLogoPath(currentEntry))]: nextLogoPath
+    });
+
+    await deleteSupersededGeneratedAssets(previousManagedPaths, [
+      nextThumbPath,
+      nextLargePath,
+      nextFullscreenPath,
+      nextLogoPath
+    ]);
+  }
+
+  gallery[entryIndex] = {
+    ...currentEntry,
+    title: nextTitle,
+    description: nextDescription,
+    thumb: nextThumbPath,
+    large: nextLargePath,
+    fullscreen: nextFullscreenPath,
+    logo: nextLogoPath,
+    original: nextOriginalPath,
+    assetBaseName: nextBaseName,
+    backgroundColor: nextBackgroundColor,
+    updatedAt: new Date().toISOString()
+  };
+
+  config.gallery = gallery;
+  await writeVscimageConfig(config);
+  return gallery[entryIndex];
+}
+
+async function updateVscimageGalleryEntry(entryId, updates) {
+  const config = await readVscimageConfig();
+  const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+  const entryIndex = gallery.findIndex((entry) => String(entry?.id || "").trim() === entryId);
+
+  if (entryIndex === -1) {
+    return null;
+  }
+
+  const currentEntry = gallery[entryIndex] || {};
+  const nextTitleInput = Object.prototype.hasOwnProperty.call(updates || {}, "title")
+    ? updates.title
+    : currentEntry.title;
+  const nextDescriptionInput = Object.prototype.hasOwnProperty.call(
+    updates || {},
+    "description"
+  )
+    ? updates.description
+    : currentEntry.description;
+  const nextTitle =
+    normalizeTextField(nextTitleInput || entryId, 120) || entryId;
+  const nextDescription =
+    normalizeTextField(nextDescriptionInput || "", 320) ||
+    "Generated in VSCimage.";
+
+  gallery[entryIndex] = {
+    ...currentEntry,
+    title: nextTitle,
+    description: nextDescription,
+    logo: currentEntry.logo || getGalleryEntryLogoPath(currentEntry),
+    assetBaseName: currentEntry.assetBaseName || getGalleryEntryBaseName(currentEntry),
+    backgroundColor: normalizeHexColor(currentEntry.backgroundColor),
+    original: sanitizeAssetPath(currentEntry.original),
+    updatedAt: new Date().toISOString()
+  };
+  config.gallery = gallery;
+
+  await writeVscimageConfig(config);
+  return gallery[entryIndex];
+}
+
+async function deleteVscimageGalleryEntry(entryId) {
+  const config = await readVscimageConfig();
+  const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+  const entryIndex = gallery.findIndex((entry) => String(entry?.id || "").trim() === entryId);
+
+  if (entryIndex === -1) {
+    return null;
+  }
+
+  const [deletedEntry] = gallery.splice(entryIndex, 1);
+  const blockingUsages = [...new Set([
+    ...collectAssignedAssetUsages(config, deletedEntry?.thumb),
+    ...collectAssignedAssetUsages(config, deletedEntry?.large),
+    ...collectAssignedAssetUsages(config, deletedEntry?.fullscreen),
+    ...collectAssignedAssetUsages(config, getGalleryEntryLogoPath(deletedEntry))
+  ])];
+
+  if (blockingUsages.length) {
+    const inUseError = new Error(
+      `Thumbnail is still assigned to: ${blockingUsages.join(", ")}. Reassign those slots before deleting it.`
+    );
+    inUseError.code = "VSCIMAGE_ENTRY_IN_USE";
+    throw inUseError;
+  }
+
+  config.gallery = gallery;
+
+  await deleteGeneratedGalleryAssets(deletedEntry);
+  await writeVscimageConfig(config);
+
+  return deletedEntry;
+}
+
 async function listImageFilesRecursive(dirPath) {
   const entries = await fs.readdir(dirPath, { withFileTypes: true });
   const files = [];
@@ -895,8 +1454,7 @@ app.post("/api/vscimage/config", async (req, res) => {
     if (!Array.isArray(payload.gallery)) {
       payload.gallery = [];
     }
-    await fs.writeFile(vscimageConfigPath, JSON.stringify(payload, null, 2), "utf8");
-    await syncHomepageGeneratedGallery(payload.gallery);
+    await writeVscimageConfig(payload);
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("Unable to save VSCimage config:", error);
@@ -918,7 +1476,102 @@ app.get("/api/vscimage/files", async (req, res) => {
   }
 });
 
+app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
+  const entryId = String(req.params.entryId || "").trim();
+  const title = normalizeTextField(req.body?.title, 120);
+  const description = normalizeTextField(req.body?.description, 320);
+
+  if (!entryId) {
+    return res.status(400).json({ error: "Gallery entry id is required." });
+  }
+
+  if (!title) {
+    return res.status(400).json({ error: "Gallery entry title is required." });
+  }
+
+  try {
+    const updatedEntry = await updateVscimageGalleryEntry(entryId, { title, description });
+    if (!updatedEntry) {
+      return res.status(404).json({ error: "Gallery entry was not found." });
+    }
+
+    return res.status(200).json({ ok: true, entry: updatedEntry });
+  } catch (error) {
+    console.error("Unable to update VSCimage gallery entry:", error);
+    return res.status(500).json({ error: "Unable to update thumbnail entry." });
+  }
+});
+
+app.post("/api/vscimage/gallery/:entryId/delete", async (req, res) => {
+  const entryId = String(req.params.entryId || "").trim();
+
+  if (!entryId) {
+    return res.status(400).json({ error: "Gallery entry id is required." });
+  }
+
+  try {
+    const deletedEntry = await deleteVscimageGalleryEntry(entryId);
+    if (!deletedEntry) {
+      return res.status(404).json({ error: "Gallery entry was not found." });
+    }
+
+    return res.status(200).json({ ok: true, entry: deletedEntry });
+  } catch (error) {
+    if (error.code === "VSCIMAGE_ENTRY_IN_USE") {
+      return res.status(409).json({ error: error.message });
+    }
+    console.error("Unable to delete VSCimage gallery entry:", error);
+    return res.status(500).json({ error: "Unable to delete thumbnail entry." });
+  }
+});
+
 if (upload) {
+  app.post("/api/vscimage/gallery/:entryId/edit", upload.single("image"), async (req, res) => {
+    const entryId = String(req.params.entryId || "").trim();
+
+    if (!entryId) {
+      return res.status(400).json({ error: "Gallery entry id is required." });
+    }
+
+    if (req.file) {
+      const mime = String(req.file.mimetype || "").trim().toLowerCase();
+      const ext = path.extname(req.file.originalname || "").toLowerCase();
+      if (!mime.startsWith("image/") && !acceptedImageExt.has(ext)) {
+        return res.status(400).json({ error: "Only image files are supported." });
+      }
+    }
+
+    try {
+      const editedEntry = await editVscimageGalleryEntry(entryId, {
+        title: req.body?.title,
+        description: req.body?.description,
+        name: req.body?.name,
+        backgroundColor: req.body?.backgroundColor,
+        imageBuffer: req.file?.buffer,
+        originalName: req.file?.originalname
+      });
+
+      if (!editedEntry) {
+        return res.status(404).json({ error: "Gallery entry was not found." });
+      }
+
+      return res.status(200).json({ ok: true, entry: editedEntry });
+    } catch (error) {
+      if (
+        [
+          "VSCIMAGE_ORIGINAL_MISSING",
+          "VSCIMAGE_INVALID_BACKGROUND",
+          "VSCIMAGE_EDITING_UNAVAILABLE"
+        ].includes(error.code)
+      ) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      console.error("Unable to edit VSCimage gallery entry:", error);
+      return res.status(500).json({ error: "Unable to edit thumbnail entry." });
+    }
+  });
+
   app.post("/api/vscimage/upload", upload.single("image"), async (req, res) => {
     if (!sharp) {
       return res.status(503).json({
@@ -931,12 +1584,14 @@ if (upload) {
       return res.status(400).json({ error: "Image file is required." });
     }
 
-    const mime = String(req.file.mimetype || "");
-    if (!mime.startsWith("image/")) {
+    const mime = String(req.file.mimetype || "").trim().toLowerCase();
+    const inputExt = path.extname(req.file.originalname || "").toLowerCase();
+    if (!mime.startsWith("image/") && !acceptedImageExt.has(inputExt)) {
       return res.status(400).json({ error: "Only image files are supported." });
     }
 
     const baseName = sanitizeName(req.body.name) || `image-${Date.now()}`;
+    const backgroundColor = normalizeHexColor(req.body.backgroundColor);
     const requested = Array.isArray(req.body.outputs)
       ? req.body.outputs
       : String(req.body.outputs || "")
@@ -955,70 +1610,16 @@ if (upload) {
     try {
       await ensureVscimageStorage();
 
-      const inputExt = path.extname(req.file.originalname || "").toLowerCase() || ".bin";
-      const originalPath = path.join(
-        vscimageOriginalsDir,
-        `${baseName}-${Date.now()}${inputExt}`
+      const originalPath = await saveOriginalImageBuffer(
+        req.file.buffer,
+        req.file.originalname,
+        baseName
       );
-      await fs.writeFile(originalPath, req.file.buffer);
-
-      const generated = {};
-      const pipeline = sharp(req.file.buffer).rotate();
-
-      if (outputs.includes("logo")) {
-        const logoPath = path.join(vscimageGeneratedDir, `${baseName}-logo-240.png`);
-        await pipeline
-          .clone()
-          .resize(240, 240, {
-            fit: "contain",
-            background: { r: 0, g: 0, b: 0, alpha: 0 }
-          })
-          .png()
-          .toFile(logoPath);
-        generated.logo = toWebPath(logoPath);
-      }
-
-      if (outputs.includes("thumb")) {
-        const thumbPath = path.join(vscimageGeneratedDir, `${baseName}-thumb-760x570.webp`);
-        await pipeline
-          .clone()
-          .resize(760, 570, {
-            fit: "cover",
-            position: "attention"
-          })
-          .webp({ quality: 88 })
-          .toFile(thumbPath);
-        generated.thumb = toWebPath(thumbPath);
-      }
-
-      if (outputs.includes("large")) {
-        const largePath = path.join(vscimageGeneratedDir, `${baseName}-large-1900x1600.webp`);
-        await pipeline
-          .clone()
-          .resize(1900, 1600, {
-            fit: "cover",
-            position: "attention"
-          })
-          .webp({ quality: 90 })
-          .toFile(largePath);
-        generated.large = toWebPath(largePath);
-      }
-
-      if (outputs.includes("fullscreen")) {
-        const fullscreenPath = path.join(
-          vscimageGeneratedDir,
-          `${baseName}-fullscreen-3200x1800.webp`
-        );
-        await pipeline
-          .clone()
-          .resize(3200, 1800, {
-            fit: "contain",
-            background: { r: 0, g: 0, b: 0, alpha: 1 }
-          })
-          .webp({ quality: 92 })
-          .toFile(fullscreenPath);
-        generated.fullscreen = toWebPath(fullscreenPath);
-      }
+      const generated = await generateVscimageOutputsFromBuffer(req.file.buffer, {
+        baseName,
+        backgroundColor,
+        outputs
+      });
 
       let galleryEntry = null;
       const galleryThumb =
@@ -1044,14 +1645,18 @@ if (upload) {
           thumb: galleryThumb,
           large: generated.large || generated.fullscreen || galleryThumb,
           fullscreen: generated.fullscreen || generated.large || galleryThumb,
-          createdAt: new Date().toISOString()
+          logo: generated.logo || "",
+          original: toWebPath(originalPath),
+          assetBaseName: baseName,
+          backgroundColor,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         };
 
         const deduped = gallery.filter((item) => item?.thumb !== galleryThumb);
         config.gallery = [galleryEntry, ...deduped].slice(0, 300);
 
-        await fs.writeFile(vscimageConfigPath, JSON.stringify(config, null, 2), "utf8");
-        await syncHomepageGeneratedGallery(config.gallery);
+        await writeVscimageConfig(config);
       }
 
       return res.status(200).json({
@@ -1066,6 +1671,12 @@ if (upload) {
     }
   });
 } else {
+  app.post("/api/vscimage/gallery/:entryId/edit", async (req, res) => {
+    return res.status(503).json({
+      error: "Upload dependency is missing. Run npm install to enable editing."
+    });
+  });
+
   app.post("/api/vscimage/upload", async (req, res) => {
     return res.status(503).json({
       error: "Upload dependency is missing. Run npm install to enable uploads."
