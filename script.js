@@ -301,6 +301,7 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 const workLoadMoreButton = document.getElementById("workLoadMore");
 const WORK_ROWS_PER_PAGE = 2;
 let visibleWorkCards = 0;
+let featuredCardHeightFrame = 0;
 
 function getWorkCardsPerPage() {
   if (!workGrid) return 6;
@@ -322,6 +323,46 @@ function getFilteredCards() {
   });
 }
 
+function updateFeaturedCardHeight() {
+  if (!workGrid) return;
+
+  const featuredImages = Array.from(
+    workGrid.querySelectorAll(".card.is-featured:not(.hide) .card-image")
+  );
+  if (!featuredImages.length) {
+    workGrid.style.removeProperty("--featured-card-image-height");
+    return;
+  }
+
+  const referenceImage = Array.from(
+    workGrid.querySelectorAll(".card:not(.hide):not(.is-featured) .card-image")
+  ).find((image) => image.getBoundingClientRect().height > 0);
+
+  if (!referenceImage) {
+    workGrid.style.removeProperty("--featured-card-image-height");
+    return;
+  }
+
+  const referenceHeight = Math.round(referenceImage.getBoundingClientRect().height);
+  if (referenceHeight > 0) {
+    workGrid.style.setProperty("--featured-card-image-height", `${referenceHeight}px`);
+  } else {
+    workGrid.style.removeProperty("--featured-card-image-height");
+  }
+}
+
+function scheduleFeaturedCardHeightUpdate() {
+  if (!workGrid) return;
+  if (featuredCardHeightFrame) {
+    window.cancelAnimationFrame(featuredCardHeightFrame);
+  }
+
+  featuredCardHeightFrame = window.requestAnimationFrame(() => {
+    featuredCardHeightFrame = 0;
+    updateFeaturedCardHeight();
+  });
+}
+
 function applyActiveFilter() {
   const cards = Array.from(document.querySelectorAll(".card"));
   const filteredCards = getFilteredCards();
@@ -339,6 +380,8 @@ function applyActiveFilter() {
     workLoadMoreButton.hidden = !hasMore;
     workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
   }
+
+  scheduleFeaturedCardHeightUpdate();
 }
 
 filterButtons.forEach((button) => {
@@ -355,6 +398,17 @@ if (workLoadMoreButton) {
     visibleWorkCards += getWorkCardsPerPage();
     applyActiveFilter();
   });
+}
+
+if (workGrid) {
+  workGrid.addEventListener(
+    "load",
+    (event) => {
+      if (!event.target?.classList?.contains("card-image")) return;
+      scheduleFeaturedCardHeightUpdate();
+    },
+    true
+  );
 }
 
 let workResizeTimer = null;

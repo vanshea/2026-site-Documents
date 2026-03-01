@@ -478,6 +478,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+  --featured-card-image-height: auto;
 }
 
 .work-load-more-wrap {
@@ -509,6 +510,10 @@ h2 {
   transform: translateY(-4px);
 }
 
+.card.is-featured {
+  grid-column: 1 / -1;
+}
+
 .card h3 {
   margin: 12px 0 8px;
 }
@@ -532,6 +537,13 @@ h2 {
   border: 1px solid var(--line);
   object-fit: cover;
   display: block;
+}
+
+.card.is-featured .card-image,
+.card-image-featured {
+  aspect-ratio: auto;
+  height: var(--featured-card-image-height, auto);
+  object-fit: cover;
 }
 
 .card-fullscreen {

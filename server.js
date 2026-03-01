@@ -35,6 +35,10 @@ const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
 const vscimageConfigPath = path.join(vscimageDir, "config.json");
 const homepageIndexPath = path.join(rootDir, "index.html");
+const featuredThumbSize = {
+  width: 2400,
+  height: 570
+};
 const acceptedImageExt = new Set([
   ".png",
   ".jpg",
@@ -163,8 +167,24 @@ function sanitizeAssetPath(value) {
   return raw.replace(/^\/+/, "");
 }
 
+function sortGalleryEntriesForDisplay(entries) {
+  const featuredEntries = [];
+  const standardEntries = [];
+
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    if (toBool(entry?.featured, Boolean(entry?.featuredThumb))) {
+      featuredEntries.push(entry);
+      return;
+    }
+
+    standardEntries.push(entry);
+  });
+
+  return [...featuredEntries, ...standardEntries];
+}
+
 function buildGeneratedGalleryMarkup(galleryEntries) {
-  const entries = Array.isArray(galleryEntries) ? galleryEntries : [];
+  const entries = sortGalleryEntriesForDisplay(galleryEntries);
 
   return entries
     .map((entry, index) => {
@@ -173,6 +193,9 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
 
       const large = sanitizeAssetPath(entry?.large) || thumb;
       const fullscreen = sanitizeAssetPath(entry?.fullscreen) || large;
+      const featured = toBool(entry?.featured, Boolean(entry?.featuredThumb));
+      const featuredThumb = sanitizeAssetPath(entry?.featuredThumb) || thumb;
+      const previewThumb = featured ? featuredThumb : thumb;
       const displayTitle = String(entry?.title || entry?.id || `Generated ${index + 1}`)
         .trim()
         .replace(/\s+/g, " ")
@@ -184,17 +207,25 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
           .replace(/\s+/g, " ")
           .slice(0, 320) || "Generated in VSCimage.";
       const idToken = sanitizeName(entry?.id || displayTitle || `generated-${index + 1}`);
+      const cardClasses = ["card", "reveal", "generated-card"];
+      if (featured) {
+        cardClasses.push("is-featured");
+      }
+      const imageClasses = ["card-image"];
+      if (featured) {
+        imageClasses.push("card-image-featured");
+      }
       const escapedTitle = escapeHtml(displayTitle);
-      const escapedThumb = escapeHtml(thumb);
+      const escapedThumb = escapeHtml(previewThumb);
       const escapedLarge = escapeHtml(large);
       const escapedFullscreen = escapeHtml(fullscreen);
       const escapedCardDescription = escapeHtml(displayCardDescription);
       const escapedDescription = escapeHtml(displayDescription);
 
       return [
-        '          <article class="card reveal generated-card" data-category="all" data-generated="true">',
+        `          <article class="${cardClasses.join(" ")}" data-category="all" data-generated="true"${featured ? ' data-featured="true"' : ""}>`,
         `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}">`,
-        `              <img class="card-image" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
+        `              <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
         displayCardDescription ? `              <p>${escapedCardDescription}</p>` : "",
         "            </a>",
@@ -327,7 +358,7 @@ function isPathInsideDirectory(filePath, directoryPath) {
 function extractGeneratedBaseName(filePath) {
   const fileName = path.basename(filePath);
   const match = fileName.match(
-    /^(.*?)-(?:thumb-\d+x\d+|large-\d+x\d+|fullscreen-\d+x\d+|logo-\d+)\.[^.]+$/i
+    /^(.*?)-(?:thumb-\d+x\d+|featured-thumb-\d+x\d+|large-\d+x\d+|fullscreen-\d+x\d+|logo-\d+)\.[^.]+$/i
   );
   return match?.[1] || "";
 }
@@ -338,7 +369,13 @@ function getGalleryEntryBaseName(entry) {
     return explicitName;
   }
 
-  const assetPaths = [entry?.thumb, entry?.large, entry?.fullscreen, entry?.logo];
+  const assetPaths = [
+    entry?.thumb,
+    entry?.featuredThumb,
+    entry?.large,
+    entry?.fullscreen,
+    entry?.logo
+  ];
   for (const assetPath of assetPaths) {
     const localPath = resolveVscimageLocalPath(assetPath);
     if (!localPath) continue;
@@ -366,9 +403,28 @@ function getGalleryEntryLogoPath(entry) {
   return `assets/vscimage/generated/${baseName}-logo-240.png`;
 }
 
+function getGalleryEntryFeaturedThumbPath(entry) {
+  const explicitPath = sanitizeAssetPath(entry?.featuredThumb);
+  if (explicitPath) {
+    return explicitPath;
+  }
+
+  if (!toBool(entry?.featured, false)) {
+    return "";
+  }
+
+  const baseName = getGalleryEntryBaseName(entry);
+  if (!baseName) {
+    return "";
+  }
+
+  return `assets/vscimage/generated/${baseName}-featured-thumb-${featuredThumbSize.width}x${featuredThumbSize.height}.webp`;
+}
+
 function collectGalleryManagedAssetPaths(entry) {
   return [
     sanitizeAssetPath(entry?.thumb),
+    sanitizeAssetPath(getGalleryEntryFeaturedThumbPath(entry)),
     sanitizeAssetPath(entry?.large),
     sanitizeAssetPath(entry?.fullscreen),
     sanitizeAssetPath(getGalleryEntryLogoPath(entry))
@@ -421,7 +477,7 @@ async function deleteGeneratedGalleryAssets(entry) {
   const removablePaths = new Set();
   const relatedBaseNames = new Set();
 
-  [entry?.thumb, entry?.large, entry?.fullscreen, getGalleryEntryLogoPath(entry)].forEach(
+  [entry?.thumb, getGalleryEntryFeaturedThumbPath(entry), entry?.large, entry?.fullscreen, getGalleryEntryLogoPath(entry)].forEach(
     (assetPath) => {
     const localPath = resolveVscimageLocalPath(assetPath);
     if (!localPath || !isPathInsideDirectory(localPath, vscimageGeneratedDir)) {
@@ -474,6 +530,10 @@ function buildGeneratedAssetPaths(baseName) {
   return {
     logo: path.join(vscimageGeneratedDir, `${baseName}-logo-240.png`),
     thumb: path.join(vscimageGeneratedDir, `${baseName}-thumb-760x570.webp`),
+    featuredThumb: path.join(
+      vscimageGeneratedDir,
+      `${baseName}-featured-thumb-${featuredThumbSize.width}x${featuredThumbSize.height}.webp`
+    ),
     large: path.join(vscimageGeneratedDir, `${baseName}-large-1900x1600.webp`),
     fullscreen: path.join(vscimageGeneratedDir, `${baseName}-fullscreen-3200x1800.webp`)
   };
@@ -484,6 +544,7 @@ function buildGeneratedAssetWebPaths(baseName) {
   return {
     logo: toWebPath(localPaths.logo),
     thumb: toWebPath(localPaths.thumb),
+    featuredThumb: toWebPath(localPaths.featuredThumb),
     large: toWebPath(localPaths.large),
     fullscreen: toWebPath(localPaths.fullscreen)
   };
@@ -531,6 +592,21 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
       .webp({ quality: 88 })
       .toFile(generatedPaths.thumb);
     generated.thumb = toWebPath(generatedPaths.thumb);
+  }
+
+  if (outputs.includes("featuredThumb")) {
+    let featuredPipeline = pipeline.clone();
+    if (backgroundColor) {
+      featuredPipeline = featuredPipeline.flatten({ background: backgroundColor });
+    }
+    await featuredPipeline
+      .resize(featuredThumbSize.width, featuredThumbSize.height, {
+        fit: "cover",
+        position: "attention"
+      })
+      .webp({ quality: 90 })
+      .toFile(generatedPaths.featuredThumb);
+    generated.featuredThumb = toWebPath(generatedPaths.featuredThumb);
   }
 
   if (outputs.includes("large")) {
@@ -628,6 +704,21 @@ async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, 
     return;
   }
 
+  if (outputKey === "featuredThumb") {
+    let outputPipeline = pipeline.clone();
+    if (backgroundColor) {
+      outputPipeline = outputPipeline.flatten({ background: backgroundColor });
+    }
+    await outputPipeline
+      .resize(featuredThumbSize.width, featuredThumbSize.height, {
+        fit: "cover",
+        position: "attention"
+      })
+      .webp({ quality: 90 })
+      .toFile(targetFilePath);
+    return;
+  }
+
   if (outputKey === "fullscreen") {
     let outputPipeline = pipeline.clone();
     if (backgroundColor) {
@@ -651,6 +742,34 @@ async function saveOriginalImageBuffer(inputBuffer, originalName, baseName) {
   const originalPath = path.join(vscimageOriginalsDir, `${baseName}-${Date.now()}${inputExt}`);
   await fs.writeFile(originalPath, inputBuffer);
   return originalPath;
+}
+
+async function resolveGalleryFeaturedSourceBuffer(entry, candidateAssetPaths = []) {
+  const originalPath = await resolveGalleryOriginalPath(entry);
+  if (originalPath && fsSync.existsSync(originalPath)) {
+    return fs.readFile(originalPath);
+  }
+
+  const sourceCandidates = [
+    ...candidateAssetPaths,
+    entry?.fullscreen,
+    entry?.large,
+    entry?.thumb
+  ];
+
+  for (const assetPath of sourceCandidates) {
+    const localPath = resolveVscimageLocalPath(assetPath);
+    if (!localPath || !fsSync.existsSync(localPath)) {
+      continue;
+    }
+    return fs.readFile(localPath);
+  }
+
+  const missingSourceError = new Error(
+    "A source image is required to build the featured full-width thumbnail."
+  );
+  missingSourceError.code = "VSCIMAGE_FEATURED_SOURCE_MISSING";
+  throw missingSourceError;
 }
 
 function replaceConfigAssetReferences(config, replacements) {
@@ -683,6 +802,9 @@ function replaceConfigAssetReferences(config, replacements) {
   (config.gallery || []).forEach((entry) => {
     if (!entry) return;
     entry.thumb = replacePath(entry.thumb);
+    if (entry.featuredThumb) {
+      entry.featuredThumb = replacePath(entry.featuredThumb);
+    }
     entry.large = replacePath(entry.large);
     entry.fullscreen = replacePath(entry.fullscreen);
     if (entry.logo) {
@@ -728,6 +850,10 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextDescription =
     normalizeTextField(options.description ?? currentEntry.description ?? "", 320) ||
     "Generated in VSCimage.";
+  const currentFeatured = toBool(currentEntry.featured, Boolean(currentEntry.featuredThumb));
+  const nextFeatured = Object.prototype.hasOwnProperty.call(options, "featured")
+    ? toBool(options.featured, currentFeatured)
+    : currentFeatured;
   const currentBackgroundColor = normalizeHexColor(currentEntry.backgroundColor);
   const nextBackgroundColor = Object.prototype.hasOwnProperty.call(options, "backgroundColor")
     ? normalizeHexColor(options.backgroundColor)
@@ -761,8 +887,11 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     hasReplacementImage ||
     (nextBackgroundColor !== currentBackgroundColor && !replacesBackgroundSensitiveOutputs);
   const requiresPathRefresh = nextBaseName !== currentBaseName;
+  const hasMaterialAssetChanges =
+    requiresFullRegeneration || requiresPathRefresh || hasDirectReplacements;
   const nextManagedPaths = buildGeneratedAssetWebPaths(nextBaseName);
   const currentThumbPath = sanitizeAssetPath(currentEntry.thumb) || nextManagedPaths.thumb;
+  const currentFeaturedThumbPath = sanitizeAssetPath(currentEntry.featuredThumb);
   const currentLargePath = sanitizeAssetPath(currentEntry.large) || nextManagedPaths.large;
   const currentFullscreenPath =
     sanitizeAssetPath(currentEntry.fullscreen) || currentLargePath || nextManagedPaths.fullscreen;
@@ -771,9 +900,11 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
 
   let nextOriginalPath = sanitizeAssetPath(currentEntry.original);
   let nextThumbPath = currentThumbPath;
+  let nextFeaturedThumbPath = currentFeaturedThumbPath;
   let nextLargePath = currentLargePath;
   let nextFullscreenPath = currentFullscreenPath;
   let nextLogoPath = currentLogoPath;
+  let primarySourceBuffer = null;
 
   if ((requiresFullRegeneration || hasDirectReplacements) && !sharp) {
     const dependencyError = new Error(
@@ -800,6 +931,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
         nextBaseName
       );
       sourceBuffer = options.imageBuffer;
+      primarySourceBuffer = sourceBuffer;
       nextOriginalPath = toWebPath(savedOriginalPath);
 
       const previousOriginalPath = resolveVscimageLocalPath(currentEntry.original);
@@ -821,6 +953,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
       }
 
       sourceBuffer = await fs.readFile(existingOriginalPath);
+      primarySourceBuffer = sourceBuffer;
       nextOriginalPath = toWebPath(existingOriginalPath);
     }
 
@@ -903,9 +1036,46 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     }
   }
 
+  if (nextFeatured) {
+    const shouldRefreshFeaturedThumb =
+      hasMaterialAssetChanges || !currentFeatured || !currentFeaturedThumbPath;
+
+    if (shouldRefreshFeaturedThumb) {
+      const featuredSourceBuffer =
+        primarySourceBuffer ||
+        (await resolveGalleryFeaturedSourceBuffer(currentEntry, [
+          nextFullscreenPath,
+          nextLargePath,
+          nextThumbPath,
+          currentFullscreenPath,
+          currentLargePath,
+          currentThumbPath
+        ]));
+
+      nextFeaturedThumbPath = nextManagedPaths.featuredThumb;
+      await writeManagedGalleryAsset(
+        "featuredThumb",
+        featuredSourceBuffer,
+        resolveVscimageLocalPath(nextFeaturedThumbPath),
+        { backgroundColor: nextBackgroundColor }
+      );
+    } else {
+      nextFeaturedThumbPath = currentFeaturedThumbPath || nextManagedPaths.featuredThumb;
+    }
+  } else {
+    nextFeaturedThumbPath = "";
+  }
+
   const pathReplacements = {};
   if (currentThumbPath && nextThumbPath && currentThumbPath !== nextThumbPath) {
     pathReplacements[currentThumbPath] = nextThumbPath;
+  }
+  if (
+    currentFeaturedThumbPath &&
+    nextFeaturedThumbPath &&
+    currentFeaturedThumbPath !== nextFeaturedThumbPath
+  ) {
+    pathReplacements[currentFeaturedThumbPath] = nextFeaturedThumbPath;
   }
   if (currentLargePath && nextLargePath && currentLargePath !== nextLargePath) {
     pathReplacements[currentLargePath] = nextLargePath;
@@ -922,9 +1092,14 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   }
   replaceConfigAssetReferences(config, pathReplacements);
 
-  if (requiresFullRegeneration || requiresPathRefresh || hasDirectReplacements) {
+  if (
+    hasMaterialAssetChanges ||
+    currentFeatured !== nextFeatured ||
+    currentFeaturedThumbPath !== nextFeaturedThumbPath
+  ) {
     await deleteSupersededGeneratedAssets(previousManagedPaths, [
       nextThumbPath,
+      nextFeaturedThumbPath,
       nextLargePath,
       nextFullscreenPath,
       nextLogoPath
@@ -936,7 +1111,9 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     title: nextTitle,
     cardDescription: nextCardDescription,
     description: nextDescription,
+    featured: nextFeatured,
     thumb: nextThumbPath,
+    featuredThumb: nextFeaturedThumbPath,
     large: nextLargePath,
     fullscreen: nextFullscreenPath,
     logo: nextLogoPath,
@@ -988,7 +1165,9 @@ async function updateVscimageGalleryEntry(entryId, updates) {
     title: nextTitle,
     cardDescription: nextCardDescription,
     description: nextDescription,
+    featured: toBool(currentEntry.featured, Boolean(currentEntry.featuredThumb)),
     logo: currentEntry.logo || getGalleryEntryLogoPath(currentEntry),
+    featuredThumb: sanitizeAssetPath(currentEntry.featuredThumb),
     assetBaseName: currentEntry.assetBaseName || getGalleryEntryBaseName(currentEntry),
     backgroundColor: normalizeHexColor(currentEntry.backgroundColor),
     original: sanitizeAssetPath(currentEntry.original),
@@ -1787,6 +1966,7 @@ if (upload) {
         title: req.body?.title,
         cardDescription: req.body?.cardDescription,
         description: req.body?.description,
+        featured: req.body?.featured,
         name: req.body?.name,
         backgroundColor: req.body?.backgroundColor,
         imageBuffer: sourceImage?.buffer,
@@ -1807,6 +1987,7 @@ if (upload) {
         [
           "VSCIMAGE_ORIGINAL_MISSING",
           "VSCIMAGE_ASSET_MISSING",
+          "VSCIMAGE_FEATURED_SOURCE_MISSING",
           "VSCIMAGE_INVALID_BACKGROUND",
           "VSCIMAGE_EDITING_UNAVAILABLE"
         ].includes(error.code)
@@ -1890,7 +2071,9 @@ if (upload) {
               .trim()
               .replace(/\s+/g, " ")
               .slice(0, 320) || "Generated in VSCimage.",
+          featured: false,
           thumb: galleryThumb,
+          featuredThumb: "",
           large: generated.large || generated.fullscreen || galleryThumb,
           fullscreen: generated.fullscreen || generated.large || galleryThumb,
           logo: generated.logo || "",

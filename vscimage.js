@@ -73,6 +73,7 @@ const thumbEditorName = document.getElementById("thumbEditorName");
 const thumbEditorTitle = document.getElementById("thumbEditorTitle");
 const thumbEditorCardDescription = document.getElementById("thumbEditorCardDescription");
 const thumbEditorDescription = document.getElementById("thumbEditorDescription");
+const thumbEditorFeatured = document.getElementById("thumbEditorFeatured");
 const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
 const thumbEditorBgColor = document.getElementById("thumbEditorBgColor");
 const thumbEditorPreviewFrame = document.getElementById("thumbEditorPreviewFrame");
@@ -296,6 +297,7 @@ function collectConfigImagePaths(config) {
   (config.gallery || []).forEach((item) => {
     if (!item) return;
     if (item.thumb) files.add(item.thumb);
+    if (item.featuredThumb) files.add(item.featuredThumb);
     if (item.large) files.add(item.large);
     if (item.fullscreen) files.add(item.fullscreen);
     if (item.logo) files.add(item.logo);
@@ -322,8 +324,15 @@ function normalizeGalleryEntries(entries) {
         entry?.description || "Generated in VSCimage."
       );
       const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
+      const featured =
+        ["1", "true", "yes", "on"].includes(
+          String(entry?.featured || "")
+            .trim()
+            .toLowerCase()
+        ) || Boolean(entry?.featuredThumb);
       const large = String(entry?.large || thumb).trim() || thumb;
       const fullscreen = String(entry?.fullscreen || large || thumb).trim() || large;
+      const featuredThumb = String(entry?.featuredThumb || "").trim();
       const logo = String(entry?.logo || "").trim();
       const original = String(entry?.original || "").trim();
       const assetBaseName = sanitizeAssetName(entry?.assetBaseName || "");
@@ -340,7 +349,9 @@ function normalizeGalleryEntries(entries) {
         title: title || id,
         description,
         cardDescription,
+        featured,
         thumb,
+        featuredThumb,
         large,
         fullscreen,
         logo,
@@ -354,6 +365,22 @@ function normalizeGalleryEntries(entries) {
     .filter(Boolean);
 }
 
+function sortGalleryEntriesForDisplay(entries) {
+  const featuredEntries = [];
+  const standardEntries = [];
+
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    if (entry?.featured || entry?.featuredThumb) {
+      featuredEntries.push(entry);
+      return;
+    }
+
+    standardEntries.push(entry);
+  });
+
+  return [...featuredEntries, ...standardEntries];
+}
+
 function getGalleryEntryBaseName(entry) {
   const explicitName = sanitizeAssetName(entry?.assetBaseName || "");
   if (explicitName) {
@@ -363,7 +390,7 @@ function getGalleryEntryBaseName(entry) {
   const sourcePath = String(entry?.thumb || entry?.large || entry?.fullscreen || "").trim();
   const fileName = sourcePath.split("/").pop() || "";
   const match = fileName.match(
-    /^(.*?)-(?:thumb-\d+x\d+|large-\d+x\d+|fullscreen-\d+x\d+|logo-\d+)\.[^.]+$/i
+    /^(.*?)-(?:thumb-\d+x\d+|featured-thumb-\d+x\d+|large-\d+x\d+|fullscreen-\d+x\d+|logo-\d+)\.[^.]+$/i
   );
   return sanitizeAssetName(match?.[1] || "");
 }
@@ -376,6 +403,23 @@ function getGalleryEntryLogoPath(entry) {
 
   const baseName = getGalleryEntryBaseName(entry);
   return baseName ? `assets/vscimage/generated/${baseName}-logo-240.png` : "";
+}
+
+function getGalleryEntryFeaturedThumbPath(entry) {
+  const explicitFeaturedThumb = String(entry?.featuredThumb || "").trim();
+  if (explicitFeaturedThumb) {
+    return explicitFeaturedThumb;
+  }
+
+  if (!entry?.featured) {
+    return "";
+  }
+
+  const baseName = getGalleryEntryBaseName(entry);
+  return baseName
+    ? "assets/vscimage/generated/" +
+        `${baseName}-featured-thumb-2400x570.webp`
+    : "";
 }
 
 function getGalleryEntryById(entryId) {
@@ -532,6 +576,15 @@ function renderThumbEditorAssetList(entry) {
     appendGeneratedOutputLine("Original", entry.original, "", true, thumbEditorAssetList);
   }
   appendGeneratedOutputLine("Thumb", entry.thumb, "", true, thumbEditorAssetList);
+  if (entry.featured || entry.featuredThumb) {
+    appendGeneratedOutputLine(
+      "Featured",
+      getGalleryEntryFeaturedThumbPath(entry),
+      "",
+      true,
+      thumbEditorAssetList
+    );
+  }
   appendGeneratedOutputLine("Large", entry.large, "", true, thumbEditorAssetList);
   appendGeneratedOutputLine("Fullscreen", entry.fullscreen, "", true, thumbEditorAssetList);
 
@@ -555,6 +608,7 @@ function openGalleryEditor(entryId) {
   thumbEditorTitle.value = entry.title || "";
   thumbEditorCardDescription.value = entry.cardDescription || "";
   thumbEditorDescription.value = entry.description || "";
+  thumbEditorFeatured.checked = Boolean(entry.featured);
   thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
   thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
   thumbEditorDelete.dataset.entryId = entryId;
@@ -681,6 +735,7 @@ async function saveGalleryEditor() {
   formData.append("title", nextTitle);
   formData.append("cardDescription", nextCardDescription);
   formData.append("description", nextDescription);
+  formData.append("featured", thumbEditorFeatured?.checked ? "true" : "false");
   formData.append("backgroundColor", nextBackgroundColor);
 
   const replacementFile = thumbEditorImage?.files?.[0];
@@ -743,7 +798,9 @@ function getThumbBatchSize() {
 function renderThumbAccordion() {
   if (!thumbAccordion || !state.config) return;
 
-  const entries = normalizeGalleryEntries(state.config.gallery);
+  const entries = sortGalleryEntriesForDisplay(
+    normalizeGalleryEntries(state.config.gallery)
+  );
   thumbAccordion.innerHTML = "";
 
   if (!entries.length) {
