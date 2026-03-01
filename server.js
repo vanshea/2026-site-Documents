@@ -110,6 +110,14 @@ if (multer) {
   });
 }
 
+const galleryEditUploadFields = [
+  { name: "image", maxCount: 1 },
+  { name: "thumbImage", maxCount: 1 },
+  { name: "largeImage", maxCount: 1 },
+  { name: "fullscreenImage", maxCount: 1 },
+  { name: "logoImage", maxCount: 1 }
+];
+
 function toBool(value, defaultValue = false) {
   if (value === undefined || value === null || value === "") {
     return defaultValue;
@@ -169,6 +177,7 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 120);
+      const displayCardDescription = normalizeCardDescription(entry?.cardDescription || "", 120);
       const displayDescription =
         String(entry?.description || "")
           .trim()
@@ -179,6 +188,7 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const escapedThumb = escapeHtml(thumb);
       const escapedLarge = escapeHtml(large);
       const escapedFullscreen = escapeHtml(fullscreen);
+      const escapedCardDescription = escapeHtml(displayCardDescription);
       const escapedDescription = escapeHtml(displayDescription);
 
       return [
@@ -186,13 +196,15 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
         `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}">`,
         `              <img class="card-image" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
-        `              <p>${escapedDescription}</p>`,
+        displayCardDescription ? `              <p>${escapedCardDescription}</p>` : "",
         "            </a>",
         '            <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">',
         '              <span aria-hidden="true">⤢</span>',
         "            </button>",
         "          </article>"
-      ].join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
     })
     .filter(Boolean)
     .join("\n");
@@ -258,6 +270,10 @@ function normalizeTextField(value, maxLength) {
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
+}
+
+function normalizeCardDescription(value, maxLength = 120) {
+  return normalizeTextField(value, maxLength);
 }
 
 function normalizeHexColor(value) {
@@ -463,6 +479,16 @@ function buildGeneratedAssetPaths(baseName) {
   };
 }
 
+function buildGeneratedAssetWebPaths(baseName) {
+  const localPaths = buildGeneratedAssetPaths(baseName);
+  return {
+    logo: toWebPath(localPaths.logo),
+    thumb: toWebPath(localPaths.thumb),
+    large: toWebPath(localPaths.large),
+    fullscreen: toWebPath(localPaths.fullscreen)
+  };
+}
+
 async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
   const baseName = sanitizeName(options.baseName) || `image-${Date.now()}`;
   const requestedOutputs = Array.isArray(options.outputs) ? options.outputs : [];
@@ -540,6 +566,86 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
   return generated;
 }
 
+async function copyManagedGalleryAsset(sourceAssetPath, targetFilePath, label) {
+  const sourceLocalPath = resolveVscimageLocalPath(sourceAssetPath);
+  if (!sourceLocalPath || !fsSync.existsSync(sourceLocalPath)) {
+    const missingAssetError = new Error(
+      `${label} image is unavailable. Upload a replacement ${label.toLowerCase()} image or replace the source image.`
+    );
+    missingAssetError.code = "VSCIMAGE_ASSET_MISSING";
+    throw missingAssetError;
+  }
+
+  if (sourceLocalPath === targetFilePath) {
+    return;
+  }
+
+  await fs.copyFile(sourceLocalPath, targetFilePath);
+}
+
+async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, options = {}) {
+  const backgroundColor = toSharpColor(options.backgroundColor);
+  const pipeline = sharp(inputBuffer).rotate();
+
+  if (outputKey === "logo") {
+    await pipeline
+      .resize(240, 240, {
+        fit: "contain",
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png()
+      .toFile(targetFilePath);
+    return;
+  }
+
+  if (outputKey === "thumb") {
+    let outputPipeline = pipeline.clone();
+    if (backgroundColor) {
+      outputPipeline = outputPipeline.flatten({ background: backgroundColor });
+    }
+    await outputPipeline
+      .resize(760, 570, {
+        fit: "cover",
+        position: "attention"
+      })
+      .webp({ quality: 88 })
+      .toFile(targetFilePath);
+    return;
+  }
+
+  if (outputKey === "large") {
+    let outputPipeline = pipeline.clone();
+    if (backgroundColor) {
+      outputPipeline = outputPipeline.flatten({ background: backgroundColor });
+    }
+    await outputPipeline
+      .resize(1900, 1600, {
+        fit: "cover",
+        position: "attention"
+      })
+      .webp({ quality: 90 })
+      .toFile(targetFilePath);
+    return;
+  }
+
+  if (outputKey === "fullscreen") {
+    let outputPipeline = pipeline.clone();
+    if (backgroundColor) {
+      outputPipeline = outputPipeline.flatten({ background: backgroundColor });
+    }
+    await outputPipeline
+      .resize(3200, 1800, {
+        fit: "contain",
+        background: backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 }
+      })
+      .webp({ quality: 92 })
+      .toFile(targetFilePath);
+    return;
+  }
+
+  throw new Error(`Unsupported gallery asset output: ${outputKey}`);
+}
+
 async function saveOriginalImageBuffer(inputBuffer, originalName, baseName) {
   const inputExt = path.extname(originalName || "").toLowerCase() || ".bin";
   const originalPath = path.join(vscimageOriginalsDir, `${baseName}-${Date.now()}${inputExt}`);
@@ -615,6 +721,10 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextBaseName = sanitizeName(options.name) || currentBaseName;
   const nextTitle =
     normalizeTextField(options.title ?? currentEntry.title ?? nextBaseName, 120) || nextBaseName;
+  const nextCardDescription = normalizeCardDescription(
+    options.cardDescription ?? currentEntry.cardDescription ?? "",
+    120
+  );
   const nextDescription =
     normalizeTextField(options.description ?? currentEntry.description ?? "", 320) ||
     "Generated in VSCimage.";
@@ -622,6 +732,19 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextBackgroundColor = Object.prototype.hasOwnProperty.call(options, "backgroundColor")
     ? normalizeHexColor(options.backgroundColor)
     : currentBackgroundColor;
+  const directReplacementFiles = {
+    thumb: options.thumbImageBuffer,
+    large: options.largeImageBuffer,
+    fullscreen: options.fullscreenImageBuffer,
+    logo: options.logoImageBuffer
+  };
+  const hasDirectReplacements = Object.values(directReplacementFiles).some(
+    (buffer) => Buffer.isBuffer(buffer) && buffer.length > 0
+  );
+  const replacesBackgroundSensitiveOutputs = ["thumb", "large", "fullscreen"].every(
+    (key) =>
+      Buffer.isBuffer(directReplacementFiles[key]) && directReplacementFiles[key].length > 0
+  );
 
   if (
     Object.prototype.hasOwnProperty.call(options, "backgroundColor") &&
@@ -634,19 +757,33 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   }
 
   const hasReplacementImage = Buffer.isBuffer(options.imageBuffer) && options.imageBuffer.length > 0;
-  const requiresRegeneration =
+  const requiresFullRegeneration =
     hasReplacementImage ||
-    nextBaseName !== currentBaseName ||
-    nextBackgroundColor !== currentBackgroundColor;
-
-  let nextOriginalPath = sanitizeAssetPath(currentEntry.original);
-  let nextLogoPath = getGalleryEntryLogoPath(currentEntry);
-  let nextThumbPath = sanitizeAssetPath(currentEntry.thumb);
-  let nextLargePath = sanitizeAssetPath(currentEntry.large);
-  let nextFullscreenPath = sanitizeAssetPath(currentEntry.fullscreen);
+    (nextBackgroundColor !== currentBackgroundColor && !replacesBackgroundSensitiveOutputs);
+  const requiresPathRefresh = nextBaseName !== currentBaseName;
+  const nextManagedPaths = buildGeneratedAssetWebPaths(nextBaseName);
+  const currentThumbPath = sanitizeAssetPath(currentEntry.thumb) || nextManagedPaths.thumb;
+  const currentLargePath = sanitizeAssetPath(currentEntry.large) || nextManagedPaths.large;
+  const currentFullscreenPath =
+    sanitizeAssetPath(currentEntry.fullscreen) || currentLargePath || nextManagedPaths.fullscreen;
+  const currentLogoPath = sanitizeAssetPath(currentEntry.logo);
   const previousManagedPaths = collectGalleryManagedAssetPaths(currentEntry);
 
-  if (requiresRegeneration) {
+  let nextOriginalPath = sanitizeAssetPath(currentEntry.original);
+  let nextThumbPath = currentThumbPath;
+  let nextLargePath = currentLargePath;
+  let nextFullscreenPath = currentFullscreenPath;
+  let nextLogoPath = currentLogoPath;
+
+  if ((requiresFullRegeneration || hasDirectReplacements) && !sharp) {
+    const dependencyError = new Error(
+      "Image generation dependency is missing. Run npm install to enable editing."
+    );
+    dependencyError.code = "VSCIMAGE_EDITING_UNAVAILABLE";
+    throw dependencyError;
+  }
+
+  if (requiresFullRegeneration) {
     if (!sharp) {
       const dependencyError = new Error(
         "Image generation dependency is missing. Run npm install to enable editing."
@@ -687,24 +824,105 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
       nextOriginalPath = toWebPath(existingOriginalPath);
     }
 
+    const outputsToGenerate = ["thumb", "large", "fullscreen"];
+    if (currentLogoPath || directReplacementFiles.logo) {
+      outputsToGenerate.push("logo");
+    }
     const generated = await generateVscimageOutputsFromBuffer(sourceBuffer, {
       baseName: nextBaseName,
       backgroundColor: nextBackgroundColor,
-      outputs: ["logo", "thumb", "large", "fullscreen"]
+      outputs: outputsToGenerate
     });
 
-    nextLogoPath = sanitizeAssetPath(generated.logo);
-    nextThumbPath = sanitizeAssetPath(generated.thumb);
-    nextLargePath = sanitizeAssetPath(generated.large);
-    nextFullscreenPath = sanitizeAssetPath(generated.fullscreen);
+    nextThumbPath = sanitizeAssetPath(generated.thumb) || nextManagedPaths.thumb;
+    nextLargePath = sanitizeAssetPath(generated.large) || nextManagedPaths.large;
+    nextFullscreenPath = sanitizeAssetPath(generated.fullscreen) || nextManagedPaths.fullscreen;
+    nextLogoPath = sanitizeAssetPath(generated.logo) || currentLogoPath || "";
+  } else if (requiresPathRefresh) {
+    const nextLocalPaths = buildGeneratedAssetPaths(nextBaseName);
 
-    replaceConfigAssetReferences(config, {
-      [sanitizeAssetPath(currentEntry.thumb)]: nextThumbPath,
-      [sanitizeAssetPath(currentEntry.large)]: nextLargePath,
-      [sanitizeAssetPath(currentEntry.fullscreen)]: nextFullscreenPath,
-      [sanitizeAssetPath(getGalleryEntryLogoPath(currentEntry))]: nextLogoPath
-    });
+    await copyManagedGalleryAsset(currentThumbPath, nextLocalPaths.thumb, "Thumb");
+    await copyManagedGalleryAsset(currentLargePath, nextLocalPaths.large, "Large");
+    await copyManagedGalleryAsset(currentFullscreenPath, nextLocalPaths.fullscreen, "Fullscreen");
 
+    nextThumbPath = nextManagedPaths.thumb;
+    nextLargePath = nextManagedPaths.large;
+    nextFullscreenPath = nextManagedPaths.fullscreen;
+
+    if (currentLogoPath) {
+      await copyManagedGalleryAsset(currentLogoPath, nextLocalPaths.logo, "Logo");
+      nextLogoPath = nextManagedPaths.logo;
+    }
+  }
+
+  for (const [key, fileBuffer] of Object.entries(directReplacementFiles)) {
+    if (!Buffer.isBuffer(fileBuffer) || fileBuffer.length === 0) {
+      continue;
+    }
+
+    if (key === "thumb") {
+      nextThumbPath = nextManagedPaths.thumb;
+      await writeManagedGalleryAsset(
+        "thumb",
+        fileBuffer,
+        resolveVscimageLocalPath(nextThumbPath),
+        { backgroundColor: nextBackgroundColor }
+      );
+      continue;
+    }
+
+    if (key === "large") {
+      nextLargePath = nextManagedPaths.large;
+      await writeManagedGalleryAsset(
+        "large",
+        fileBuffer,
+        resolveVscimageLocalPath(nextLargePath),
+        { backgroundColor: nextBackgroundColor }
+      );
+      continue;
+    }
+
+    if (key === "fullscreen") {
+      nextFullscreenPath = nextManagedPaths.fullscreen;
+      await writeManagedGalleryAsset(
+        "fullscreen",
+        fileBuffer,
+        resolveVscimageLocalPath(nextFullscreenPath),
+        { backgroundColor: nextBackgroundColor }
+      );
+      continue;
+    }
+
+    if (key === "logo") {
+      nextLogoPath = nextManagedPaths.logo;
+      await writeManagedGalleryAsset(
+        "logo",
+        fileBuffer,
+        resolveVscimageLocalPath(nextLogoPath)
+      );
+    }
+  }
+
+  const pathReplacements = {};
+  if (currentThumbPath && nextThumbPath && currentThumbPath !== nextThumbPath) {
+    pathReplacements[currentThumbPath] = nextThumbPath;
+  }
+  if (currentLargePath && nextLargePath && currentLargePath !== nextLargePath) {
+    pathReplacements[currentLargePath] = nextLargePath;
+  }
+  if (
+    currentFullscreenPath &&
+    nextFullscreenPath &&
+    currentFullscreenPath !== nextFullscreenPath
+  ) {
+    pathReplacements[currentFullscreenPath] = nextFullscreenPath;
+  }
+  if (currentLogoPath && nextLogoPath && currentLogoPath !== nextLogoPath) {
+    pathReplacements[currentLogoPath] = nextLogoPath;
+  }
+  replaceConfigAssetReferences(config, pathReplacements);
+
+  if (requiresFullRegeneration || requiresPathRefresh || hasDirectReplacements) {
     await deleteSupersededGeneratedAssets(previousManagedPaths, [
       nextThumbPath,
       nextLargePath,
@@ -716,6 +934,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   gallery[entryIndex] = {
     ...currentEntry,
     title: nextTitle,
+    cardDescription: nextCardDescription,
     description: nextDescription,
     thumb: nextThumbPath,
     large: nextLargePath,
@@ -745,6 +964,12 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextTitleInput = Object.prototype.hasOwnProperty.call(updates || {}, "title")
     ? updates.title
     : currentEntry.title;
+  const nextCardDescriptionInput = Object.prototype.hasOwnProperty.call(
+    updates || {},
+    "cardDescription"
+  )
+    ? updates.cardDescription
+    : currentEntry.cardDescription;
   const nextDescriptionInput = Object.prototype.hasOwnProperty.call(
     updates || {},
     "description"
@@ -753,6 +978,7 @@ async function updateVscimageGalleryEntry(entryId, updates) {
     : currentEntry.description;
   const nextTitle =
     normalizeTextField(nextTitleInput || entryId, 120) || entryId;
+  const nextCardDescription = normalizeCardDescription(nextCardDescriptionInput || "", 120);
   const nextDescription =
     normalizeTextField(nextDescriptionInput || "", 320) ||
     "Generated in VSCimage.";
@@ -760,6 +986,7 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   gallery[entryIndex] = {
     ...currentEntry,
     title: nextTitle,
+    cardDescription: nextCardDescription,
     description: nextDescription,
     logo: currentEntry.logo || getGalleryEntryLogoPath(currentEntry),
     assetBaseName: currentEntry.assetBaseName || getGalleryEntryBaseName(currentEntry),
@@ -1479,6 +1706,7 @@ app.get("/api/vscimage/files", async (req, res) => {
 app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   const entryId = String(req.params.entryId || "").trim();
   const title = normalizeTextField(req.body?.title, 120);
+  const cardDescription = normalizeCardDescription(req.body?.cardDescription, 120);
   const description = normalizeTextField(req.body?.description, 320);
 
   if (!entryId) {
@@ -1490,7 +1718,11 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   }
 
   try {
-    const updatedEntry = await updateVscimageGalleryEntry(entryId, { title, description });
+    const updatedEntry = await updateVscimageGalleryEntry(entryId, {
+      title,
+      cardDescription,
+      description
+    });
     if (!updatedEntry) {
       return res.status(404).json({ error: "Gallery entry was not found." });
     }
@@ -1526,29 +1758,43 @@ app.post("/api/vscimage/gallery/:entryId/delete", async (req, res) => {
 });
 
 if (upload) {
-  app.post("/api/vscimage/gallery/:entryId/edit", upload.single("image"), async (req, res) => {
+  app.post("/api/vscimage/gallery/:entryId/edit", upload.fields(galleryEditUploadFields), async (req, res) => {
     const entryId = String(req.params.entryId || "").trim();
+    const uploadedFiles = Object.values(req.files || {})
+      .flat()
+      .filter(Boolean);
 
     if (!entryId) {
       return res.status(400).json({ error: "Gallery entry id is required." });
     }
 
-    if (req.file) {
-      const mime = String(req.file.mimetype || "").trim().toLowerCase();
-      const ext = path.extname(req.file.originalname || "").toLowerCase();
+    for (const file of uploadedFiles) {
+      const mime = String(file.mimetype || "").trim().toLowerCase();
+      const ext = path.extname(file.originalname || "").toLowerCase();
       if (!mime.startsWith("image/") && !acceptedImageExt.has(ext)) {
         return res.status(400).json({ error: "Only image files are supported." });
       }
     }
 
+    const sourceImage = req.files?.image?.[0];
+    const thumbImage = req.files?.thumbImage?.[0];
+    const largeImage = req.files?.largeImage?.[0];
+    const fullscreenImage = req.files?.fullscreenImage?.[0];
+    const logoImage = req.files?.logoImage?.[0];
+
     try {
       const editedEntry = await editVscimageGalleryEntry(entryId, {
         title: req.body?.title,
+        cardDescription: req.body?.cardDescription,
         description: req.body?.description,
         name: req.body?.name,
         backgroundColor: req.body?.backgroundColor,
-        imageBuffer: req.file?.buffer,
-        originalName: req.file?.originalname
+        imageBuffer: sourceImage?.buffer,
+        originalName: sourceImage?.originalname,
+        thumbImageBuffer: thumbImage?.buffer,
+        largeImageBuffer: largeImage?.buffer,
+        fullscreenImageBuffer: fullscreenImage?.buffer,
+        logoImageBuffer: logoImage?.buffer
       });
 
       if (!editedEntry) {
@@ -1560,6 +1806,7 @@ if (upload) {
       if (
         [
           "VSCIMAGE_ORIGINAL_MISSING",
+          "VSCIMAGE_ASSET_MISSING",
           "VSCIMAGE_INVALID_BACKGROUND",
           "VSCIMAGE_EDITING_UNAVAILABLE"
         ].includes(error.code)
@@ -1637,6 +1884,7 @@ if (upload) {
         galleryEntry = {
           id: entryId,
           title: displayTitle || baseName,
+          cardDescription: normalizeCardDescription(req.body.cardDescription || "", 120),
           description:
             String(req.body.description || "")
               .trim()

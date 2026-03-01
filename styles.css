@@ -985,7 +985,6 @@ textarea:focus {
 .lightbox-close {
   position: absolute;
   top: 18px;
-  right: 18px;
   width: calc(42px * var(--control-scale));
   height: calc(42px * var(--control-scale));
   border: 0;
@@ -998,7 +997,20 @@ textarea:focus {
   z-index: 4;
 }
 
+.lightbox-close {
+  right: 18px;
+}
+
+.lightbox-fullscreen {
+  top: 18px;
+  right: 70px;
+  width: calc(42px * var(--control-scale));
+  height: calc(42px * var(--control-scale));
+  z-index: 4;
+}
+
 .lightbox-close:focus-visible,
+.lightbox-fullscreen:focus-visible,
 .lightbox-nav:focus-visible,
 .nav a:focus-visible,
 .brand:focus-visible {
@@ -1098,6 +1110,13 @@ textarea:focus {
   .lightbox-close {
     top: 10px;
     right: 10px;
+    width: calc(38px * var(--control-scale));
+    height: calc(38px * var(--control-scale));
+  }
+
+  .lightbox-fullscreen {
+    top: 10px;
+    right: 58px;
     width: calc(38px * var(--control-scale));
     height: calc(38px * var(--control-scale));
   }

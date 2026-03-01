@@ -392,6 +392,8 @@ const lightbox = document.getElementById("lightbox");
 const lightboxImage = document.getElementById("lightboxImage");
 const lightboxCaption = document.getElementById("lightboxCaption");
 const lightboxClose = document.getElementById("lightboxClose");
+const lightboxFullscreen = document.getElementById("lightboxFullscreen");
+const lightboxFullscreenIcon = document.getElementById("lightboxFullscreenIcon");
 const lightboxPrev = document.getElementById("lightboxPrev");
 const lightboxNext = document.getElementById("lightboxNext");
 let activeLightboxIndex = 0;
@@ -413,6 +415,21 @@ function exitFullscreenSafely() {
 
   if (document.webkitExitFullscreen) {
     document.webkitExitFullscreen();
+  }
+}
+
+function updateLightboxFullscreenButton() {
+  if (!lightboxFullscreen) return;
+
+  const active = isFullscreenActive();
+  lightboxFullscreen.setAttribute(
+    "aria-label",
+    active ? "Exit fullscreen" : "Enter fullscreen"
+  );
+  lightboxFullscreen.setAttribute("aria-pressed", active ? "true" : "false");
+
+  if (lightboxFullscreenIcon) {
+    lightboxFullscreenIcon.textContent = "⤢";
   }
 }
 
@@ -456,6 +473,7 @@ function openLightbox(index, useFullscreenVersion = false) {
   lightbox.classList.add("is-open");
   lightbox.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
+  updateLightboxFullscreenButton();
 }
 
 function requestElementFullscreen(element) {
@@ -482,6 +500,7 @@ function closeLightbox() {
   lightbox.classList.remove("is-open");
   lightbox.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
+  updateLightboxFullscreenButton();
 }
 
 if (lightbox && lightboxImage && lightboxCaption) {
@@ -515,6 +534,25 @@ if (lightbox && lightboxImage && lightboxCaption) {
 
   if (lightboxClose) {
     lightboxClose.addEventListener("click", closeLightbox);
+  }
+
+  if (lightboxFullscreen) {
+    lightboxFullscreen.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!lightbox.classList.contains("is-open")) return;
+
+      if (isFullscreenActive()) {
+        exitFullscreenSafely();
+        return;
+      }
+
+      useFullscreenAssets = true;
+      renderLightboxImage(activeLightboxIndex);
+      requestElementFullscreen(lightbox);
+      updateLightboxFullscreenButton();
+    });
   }
 
   if (lightboxPrev) {
@@ -558,6 +596,28 @@ if (lightbox && lightboxImage && lightboxCaption) {
       activeLightboxIndex = (activeLightboxIndex + 1) % workLinks.length;
       renderLightboxImage(activeLightboxIndex);
     }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    if (!lightbox.classList.contains("is-open")) {
+      updateLightboxFullscreenButton();
+      return;
+    }
+
+    useFullscreenAssets = isFullscreenActive();
+    renderLightboxImage(activeLightboxIndex);
+    updateLightboxFullscreenButton();
+  });
+
+  document.addEventListener("webkitfullscreenchange", () => {
+    if (!lightbox.classList.contains("is-open")) {
+      updateLightboxFullscreenButton();
+      return;
+    }
+
+    useFullscreenAssets = isFullscreenActive();
+    renderLightboxImage(activeLightboxIndex);
+    updateLightboxFullscreenButton();
   });
 }
 

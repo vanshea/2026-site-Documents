@@ -49,6 +49,7 @@ const generatedList = document.getElementById("generatedList");
 const imageFileInput = document.getElementById("imageFile");
 const imageFolderInput = document.getElementById("imageFolder");
 const assetNameInput = document.getElementById("assetName");
+const uploadCardDescriptionInput = document.getElementById("uploadCardDescription");
 const uploadButton = document.getElementById("uploadButton");
 const configForm = document.getElementById("configForm");
 const configMsg = document.getElementById("configMsg");
@@ -64,8 +65,13 @@ const thumbEditorClose = document.getElementById("thumbEditorClose");
 const thumbEditorSave = document.getElementById("thumbEditorSave");
 const thumbEditorDelete = document.getElementById("thumbEditorDelete");
 const thumbEditorImage = document.getElementById("thumbEditorImage");
+const thumbEditorThumbImage = document.getElementById("thumbEditorThumbImage");
+const thumbEditorLargeImage = document.getElementById("thumbEditorLargeImage");
+const thumbEditorFullscreenImage = document.getElementById("thumbEditorFullscreenImage");
+const thumbEditorLogoImage = document.getElementById("thumbEditorLogoImage");
 const thumbEditorName = document.getElementById("thumbEditorName");
 const thumbEditorTitle = document.getElementById("thumbEditorTitle");
+const thumbEditorCardDescription = document.getElementById("thumbEditorCardDescription");
 const thumbEditorDescription = document.getElementById("thumbEditorDescription");
 const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
 const thumbEditorBgColor = document.getElementById("thumbEditorBgColor");
@@ -77,6 +83,13 @@ const thumbEditorMsg = document.getElementById("thumbEditorMsg");
 const uploadOutputInputs = Array.from(
   uploadForm?.querySelectorAll('input[type="checkbox"]') || []
 );
+const thumbEditorReplacementInputs = [
+  { key: "image", label: "Source", element: thumbEditorImage },
+  { key: "large", label: "Large", element: thumbEditorLargeImage },
+  { key: "fullscreen", label: "Fullscreen", element: thumbEditorFullscreenImage },
+  { key: "thumb", label: "Thumb", element: thumbEditorThumbImage },
+  { key: "logo", label: "Logo", element: thumbEditorLogoImage }
+].filter((item) => item.element);
 
 function collectSelectedOutputs() {
   return uploadOutputInputs.filter((input) => input.checked).map((input) => input.value);
@@ -128,6 +141,13 @@ function sanitizeAssetName(value) {
 }
 
 function normalizeDescription(value, maxLength = 320) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, maxLength);
+}
+
+function normalizeCardDescription(value, maxLength = 120) {
   return String(value || "")
     .trim()
     .replace(/\s+/g, " ")
@@ -301,6 +321,7 @@ function normalizeGalleryEntries(entries) {
       const description = normalizeDescription(
         entry?.description || "Generated in VSCimage."
       );
+      const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
       const large = String(entry?.large || thumb).trim() || thumb;
       const fullscreen = String(entry?.fullscreen || large || thumb).trim() || large;
       const logo = String(entry?.logo || "").trim();
@@ -318,6 +339,7 @@ function normalizeGalleryEntries(entries) {
         id,
         title: title || id,
         description,
+        cardDescription,
         thumb,
         large,
         fullscreen,
@@ -482,14 +504,15 @@ function updateThumbEditorBackgroundState() {
 function updateThumbEditorPreview(entry) {
   if (!thumbEditorPreviewImage || !thumbEditorPreviewLabel) return;
 
-  const replacementFile = thumbEditorImage?.files?.[0];
+  const replacement = thumbEditorReplacementInputs.find((item) => item.element?.files?.[0]);
+  const replacementFile = replacement?.element?.files?.[0];
   cleanupEditorPreviewUrl();
 
   if (replacementFile) {
     state.editorPreviewUrl = URL.createObjectURL(replacementFile);
     thumbEditorPreviewImage.src = state.editorPreviewUrl;
     thumbEditorPreviewImage.alt = replacementFile.name;
-    thumbEditorPreviewLabel.textContent = `Replacement preview: ${replacementFile.name}`;
+    thumbEditorPreviewLabel.textContent = `${replacement?.label || "Replacement"} preview: ${replacementFile.name}`;
   } else {
     thumbEditorPreviewImage.src = toAssetUrl(entry.large || entry.thumb);
     thumbEditorPreviewImage.alt = entry.title;
@@ -530,6 +553,7 @@ function openGalleryEditor(entryId) {
   thumbEditorForm.reset();
   thumbEditorName.value = getGalleryEntryBaseName(entry) || sanitizeAssetName(entry.title) || "";
   thumbEditorTitle.value = entry.title || "";
+  thumbEditorCardDescription.value = entry.cardDescription || "";
   thumbEditorDescription.value = entry.description || "";
   thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
   thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
@@ -634,6 +658,7 @@ async function saveGalleryEditor() {
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, 120);
+  const nextCardDescription = normalizeCardDescription(thumbEditorCardDescription?.value || "");
   const nextDescription = normalizeDescription(thumbEditorDescription?.value || "", 320);
   const nextBackgroundColor = thumbEditorUseBg?.checked
     ? normalizeHexColor(thumbEditorBgColor?.value || "#ffffff")
@@ -654,12 +679,29 @@ async function saveGalleryEditor() {
   const formData = new FormData();
   formData.append("name", nextName);
   formData.append("title", nextTitle);
+  formData.append("cardDescription", nextCardDescription);
   formData.append("description", nextDescription);
   formData.append("backgroundColor", nextBackgroundColor);
 
   const replacementFile = thumbEditorImage?.files?.[0];
   if (replacementFile) {
     formData.append("image", replacementFile);
+  }
+  const replacementThumbFile = thumbEditorThumbImage?.files?.[0];
+  if (replacementThumbFile) {
+    formData.append("thumbImage", replacementThumbFile);
+  }
+  const replacementLargeFile = thumbEditorLargeImage?.files?.[0];
+  if (replacementLargeFile) {
+    formData.append("largeImage", replacementLargeFile);
+  }
+  const replacementFullscreenFile = thumbEditorFullscreenImage?.files?.[0];
+  if (replacementFullscreenFile) {
+    formData.append("fullscreenImage", replacementFullscreenFile);
+  }
+  const replacementLogoFile = thumbEditorLogoImage?.files?.[0];
+  if (replacementLogoFile) {
+    formData.append("logoImage", replacementLogoFile);
   }
 
   state.galleryBusyId = entryId;
@@ -991,6 +1033,10 @@ if (uploadForm) {
 
     const selectedFiles = collectUploadFiles();
     const namePrefix = sanitizeAssetName(assetNameInput?.value || "");
+    const uploadCardDescription = normalizeCardDescription(
+      uploadCardDescriptionInput?.value || "",
+      120
+    );
     const checked = collectSelectedOutputs();
 
     if (!selectedFiles.length) {
@@ -1022,6 +1068,7 @@ if (uploadForm) {
         const formData = new FormData();
         formData.append("image", currentFile);
         formData.append("name", generatedName);
+        formData.append("cardDescription", uploadCardDescription);
         formData.append("outputs", checked.join(","));
 
         setStatus(
@@ -1136,13 +1183,13 @@ if (thumbEditorDialog) {
   });
 }
 
-if (thumbEditorImage) {
-  thumbEditorImage.addEventListener("change", () => {
+thumbEditorReplacementInputs.forEach(({ element }) => {
+  element.addEventListener("change", () => {
     const entry = getGalleryEntryById(state.editorEntryId);
     if (!entry) return;
     updateThumbEditorPreview(entry);
   });
-}
+});
 
 if (thumbEditorUseBg) {
   thumbEditorUseBg.addEventListener("change", () => {

@@ -56,6 +56,19 @@
               placeholder="example: summer-campaign"
             />
           </label>
+          <label>
+            Card Description (Optional)
+            <input
+              id="uploadCardDescription"
+              name="cardDescription"
+              type="text"
+              maxlength="120"
+              placeholder="Short one-line text for the homepage card"
+            />
+            <span class="field-note">
+              Optional one-line text shown on the homepage card image. Applied to each image in a batch.
+            </span>
+          </label>
           <fieldset class="output-set">
             <legend>Generate Outputs</legend>
             <label><input type="checkbox" value="logo" checked />Logo (240x240 PNG)</label>
@@ -147,6 +160,35 @@
               </span>
             </label>
 
+            <fieldset class="editor-replacements">
+              <legend>Replace Individual Outputs</legend>
+              <label>
+                Thumb Image
+                <input id="thumbEditorThumbImage" name="thumbImage" type="file" accept="image/*" />
+              </label>
+              <label>
+                Large Image
+                <input id="thumbEditorLargeImage" name="largeImage" type="file" accept="image/*" />
+              </label>
+              <label>
+                Fullscreen Image
+                <input
+                  id="thumbEditorFullscreenImage"
+                  name="fullscreenImage"
+                  type="file"
+                  accept="image/*"
+                />
+              </label>
+              <label>
+                Logo Image
+                <input id="thumbEditorLogoImage" name="logoImage" type="file" accept="image/*" />
+              </label>
+              <p class="field-note">
+                Upload only the versions you want to override. These files replace the managed
+                Thumb, Large, Fullscreen, and Logo outputs for this gallery item.
+              </p>
+            </fieldset>
+
             <label>
               Asset Name / Filename Prefix
               <input id="thumbEditorName" name="name" type="text" maxlength="64" />
@@ -155,6 +197,20 @@
             <label>
               Display Title
               <input id="thumbEditorTitle" name="title" type="text" maxlength="120" />
+            </label>
+
+            <label>
+              Card Description
+              <input
+                id="thumbEditorCardDescription"
+                name="cardDescription"
+                type="text"
+                maxlength="120"
+                placeholder="Short one-line text for the homepage card"
+              />
+              <span class="field-note">
+                Optional short line shown under the title on the homepage card image.
+              </span>
             </label>
 
             <label>
