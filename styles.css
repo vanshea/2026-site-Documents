@@ -383,6 +383,7 @@ main {
 }
 
 .eyebrow {
+  width: 80%;
   font-size: 0.88rem;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -391,7 +392,7 @@ main {
 
 h1 {
   font-size: clamp(2rem, 4.6vw, 4rem);
-  max-width: 16ch;
+  max-width: 80%;
   margin: 16px 0 18px;
 }
 

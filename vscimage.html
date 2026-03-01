@@ -75,6 +75,18 @@
               Optional one-line text shown on the homepage card image. Applied to each image in a batch.
             </span>
           </label>
+          <label>
+            Homepage Category
+            <select id="uploadCategory" name="category">
+              <option value="all">All</option>
+              <option value="branding">Branding</option>
+              <option value="web">Web</option>
+              <option value="illustration">Illustration</option>
+            </select>
+            <span class="field-note">
+              Applied to each image in a batch so homepage filters can place the generated cards correctly.
+            </span>
+          </label>
           <fieldset class="output-set">
             <legend>Generate Outputs</legend>
             <label><input type="checkbox" value="logo" checked />Logo (240x240 PNG)</label>
@@ -216,6 +228,19 @@
               />
               <span class="field-note">
                 Optional short line shown under the title on the homepage card image.
+              </span>
+            </label>
+
+            <label>
+              Homepage Category
+              <select id="thumbEditorCategory" name="category">
+                <option value="all">All</option>
+                <option value="branding">Branding</option>
+                <option value="web">Web</option>
+                <option value="illustration">Illustration</option>
+              </select>
+              <span class="field-note">
+                Controls which homepage filter tab this generated card appears in.
               </span>
             </label>
 

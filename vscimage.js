@@ -50,6 +50,7 @@ const imageFileInput = document.getElementById("imageFile");
 const imageFolderInput = document.getElementById("imageFolder");
 const assetNameInput = document.getElementById("assetName");
 const uploadCardDescriptionInput = document.getElementById("uploadCardDescription");
+const uploadCategoryInput = document.getElementById("uploadCategory");
 const uploadButton = document.getElementById("uploadButton");
 const configForm = document.getElementById("configForm");
 const configMsg = document.getElementById("configMsg");
@@ -72,6 +73,7 @@ const thumbEditorLogoImage = document.getElementById("thumbEditorLogoImage");
 const thumbEditorName = document.getElementById("thumbEditorName");
 const thumbEditorTitle = document.getElementById("thumbEditorTitle");
 const thumbEditorCardDescription = document.getElementById("thumbEditorCardDescription");
+const thumbEditorCategory = document.getElementById("thumbEditorCategory");
 const thumbEditorDescription = document.getElementById("thumbEditorDescription");
 const thumbEditorFeatured = document.getElementById("thumbEditorFeatured");
 const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
@@ -153,6 +155,15 @@ function normalizeCardDescription(value, maxLength = 120) {
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
+}
+
+function normalizeGalleryCategory(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  return ["branding", "web", "illustration", "all"].includes(normalized)
+    ? normalized
+    : "all";
 }
 
 function normalizeHexColor(value) {
@@ -324,6 +335,7 @@ function normalizeGalleryEntries(entries) {
         entry?.description || "Generated in VSCimage."
       );
       const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
+      const category = normalizeGalleryCategory(entry?.category);
       const featured =
         ["1", "true", "yes", "on"].includes(
           String(entry?.featured || "")
@@ -349,6 +361,7 @@ function normalizeGalleryEntries(entries) {
         title: title || id,
         description,
         cardDescription,
+        category,
         featured,
         thumb,
         featuredThumb,
@@ -471,6 +484,10 @@ function buildThumbnailCard(entry) {
   description.className = "thumb-card-description";
   description.textContent = entry.description || "Generated in VSCimage.";
 
+  const category = document.createElement("p");
+  category.className = "path";
+  category.textContent = `Category: ${entry.category || "all"}`;
+
   const path = document.createElement("p");
   path.className = "path";
   path.textContent = entry.thumb;
@@ -506,6 +523,7 @@ function buildThumbnailCard(entry) {
   card.appendChild(image);
   card.appendChild(title);
   card.appendChild(description);
+  card.appendChild(category);
   card.appendChild(path);
   card.appendChild(link);
   card.appendChild(actions);
@@ -607,6 +625,7 @@ function openGalleryEditor(entryId) {
   thumbEditorName.value = getGalleryEntryBaseName(entry) || sanitizeAssetName(entry.title) || "";
   thumbEditorTitle.value = entry.title || "";
   thumbEditorCardDescription.value = entry.cardDescription || "";
+  thumbEditorCategory.value = normalizeGalleryCategory(entry.category);
   thumbEditorDescription.value = entry.description || "";
   thumbEditorFeatured.checked = Boolean(entry.featured);
   thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
@@ -713,6 +732,7 @@ async function saveGalleryEditor() {
     .replace(/\s+/g, " ")
     .slice(0, 120);
   const nextCardDescription = normalizeCardDescription(thumbEditorCardDescription?.value || "");
+  const nextCategory = normalizeGalleryCategory(thumbEditorCategory?.value || "all");
   const nextDescription = normalizeDescription(thumbEditorDescription?.value || "", 320);
   const nextBackgroundColor = thumbEditorUseBg?.checked
     ? normalizeHexColor(thumbEditorBgColor?.value || "#ffffff")
@@ -734,6 +754,7 @@ async function saveGalleryEditor() {
   formData.append("name", nextName);
   formData.append("title", nextTitle);
   formData.append("cardDescription", nextCardDescription);
+  formData.append("category", nextCategory);
   formData.append("description", nextDescription);
   formData.append("featured", thumbEditorFeatured?.checked ? "true" : "false");
   formData.append("backgroundColor", nextBackgroundColor);
@@ -1094,6 +1115,7 @@ if (uploadForm) {
       uploadCardDescriptionInput?.value || "",
       120
     );
+    const uploadCategory = normalizeGalleryCategory(uploadCategoryInput?.value || "all");
     const checked = collectSelectedOutputs();
 
     if (!selectedFiles.length) {
@@ -1126,6 +1148,7 @@ if (uploadForm) {
         formData.append("image", currentFile);
         formData.append("name", generatedName);
         formData.append("cardDescription", uploadCardDescription);
+        formData.append("category", uploadCategory);
         formData.append("outputs", checked.join(","));
 
         setStatus(
