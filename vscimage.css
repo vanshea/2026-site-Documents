@@ -284,6 +284,21 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+}
+
+.thumb-card-order-label {
+  width: 100%;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.thumb-card-move {
+  min-width: 0;
+  width: calc(36px * var(--control-scale));
+  padding-inline: 0;
+  text-align: center;
 }
 
 .thumb-card-edit {

@@ -14,7 +14,8 @@ const state = {
   apiOrigin: window.location.origin,
   editorEntryId: "",
   editorPreviewUrl: "",
-  galleryBusyId: ""
+  galleryBusyId: "",
+  galleryBusyAction: ""
 };
 
 const THUMB_CARD_MIN_WIDTH = 210;
@@ -378,7 +379,7 @@ function normalizeGalleryEntries(entries) {
     .filter(Boolean);
 }
 
-function sortGalleryEntriesForDisplay(entries) {
+function splitGalleryEntriesByFeatured(entries) {
   const featuredEntries = [];
   const standardEntries = [];
 
@@ -391,6 +392,11 @@ function sortGalleryEntriesForDisplay(entries) {
     standardEntries.push(entry);
   });
 
+  return { featuredEntries, standardEntries };
+}
+
+function sortGalleryEntriesForDisplay(entries) {
+  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(entries);
   return [...featuredEntries, ...standardEntries];
 }
 
@@ -464,13 +470,14 @@ function ensureConfigShape(config) {
   return merged;
 }
 
-function buildThumbnailCard(entry) {
+function buildThumbnailCard(entry, options = {}) {
   const card = document.createElement("article");
   card.className = "thumb-card";
   card.dataset.entryId = entry.id;
 
   const actionsDisabled = !state.apiAvailable || Boolean(state.galleryBusyId);
   const isBusy = state.galleryBusyId === entry.id;
+  const busyAction = isBusy ? state.galleryBusyAction : "";
 
   const image = document.createElement("img");
   image.src = toAssetUrl(entry.thumb);
@@ -504,7 +511,7 @@ function buildThumbnailCard(entry) {
   const editButton = document.createElement("button");
   editButton.type = "button";
   editButton.className = "btn btn-secondary";
-  editButton.textContent = isBusy ? "Opening..." : "Edit";
+  editButton.textContent = busyAction === "edit" ? "Opening..." : "Edit";
   editButton.dataset.thumbAction = "edit";
   editButton.dataset.entryId = entry.id;
   editButton.disabled = actionsDisabled;
@@ -512,10 +519,45 @@ function buildThumbnailCard(entry) {
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
   deleteButton.className = "btn btn-danger";
-  deleteButton.textContent = isBusy ? "Deleting..." : "Delete";
+  deleteButton.textContent = busyAction === "delete" ? "Deleting..." : "Delete";
   deleteButton.dataset.thumbAction = "delete";
   deleteButton.dataset.entryId = entry.id;
   deleteButton.disabled = actionsDisabled;
+
+  if (entry.featured || entry.featuredThumb) {
+    const pinnedLabel = document.createElement("span");
+    pinnedLabel.className = "thumb-card-order-label";
+    pinnedLabel.textContent = "Featured card stays pinned";
+    actions.appendChild(pinnedLabel);
+  } else if (options.standardCount > 1) {
+    const orderLabel = document.createElement("span");
+    orderLabel.className = "thumb-card-order-label";
+    orderLabel.textContent = `Homepage order: ${options.standardIndex + 1}`;
+
+    const moveEarlierButton = document.createElement("button");
+    moveEarlierButton.type = "button";
+    moveEarlierButton.className = "btn btn-secondary thumb-card-move";
+    moveEarlierButton.textContent = "-";
+    moveEarlierButton.dataset.thumbAction = "move-up";
+    moveEarlierButton.dataset.entryId = entry.id;
+    moveEarlierButton.setAttribute("aria-label", "Move earlier");
+    moveEarlierButton.title = "Move earlier";
+    moveEarlierButton.disabled = actionsDisabled || !options.canMoveUp;
+
+    const moveLaterButton = document.createElement("button");
+    moveLaterButton.type = "button";
+    moveLaterButton.className = "btn btn-secondary thumb-card-move";
+    moveLaterButton.textContent = "+";
+    moveLaterButton.dataset.thumbAction = "move-down";
+    moveLaterButton.dataset.entryId = entry.id;
+    moveLaterButton.setAttribute("aria-label", "Move later");
+    moveLaterButton.title = "Move later";
+    moveLaterButton.disabled = actionsDisabled || !options.canMoveDown;
+
+    actions.appendChild(orderLabel);
+    actions.appendChild(moveEarlierButton);
+    actions.appendChild(moveLaterButton);
+  }
 
   actions.appendChild(editButton);
   actions.appendChild(deleteButton);
@@ -681,6 +723,7 @@ async function deleteGalleryEntry(entryId) {
   }
 
   state.galleryBusyId = entryId;
+  state.galleryBusyAction = "delete";
   renderThumbAccordion();
   setThumbStatus(`Deleting ${label}...`, "");
   if (state.editorEntryId === entryId) {
@@ -702,6 +745,7 @@ async function deleteGalleryEntry(entryId) {
     setThumbStatus(error.message, "error");
   } finally {
     state.galleryBusyId = "";
+    state.galleryBusyAction = "";
     renderThumbAccordion();
     if (state.editorEntryId === entryId) {
       thumbEditorSave.disabled = !state.apiAvailable;
@@ -781,6 +825,7 @@ async function saveGalleryEditor() {
   }
 
   state.galleryBusyId = entryId;
+  state.galleryBusyAction = "save";
   renderThumbAccordion();
   thumbEditorSave.disabled = true;
   thumbEditorDelete.disabled = true;
@@ -798,9 +843,50 @@ async function saveGalleryEditor() {
     setThumbEditorStatus(error.message, "error");
   } finally {
     state.galleryBusyId = "";
+    state.galleryBusyAction = "";
     renderThumbAccordion();
     thumbEditorSave.disabled = !state.apiAvailable;
     thumbEditorDelete.disabled = !state.apiAvailable;
+  }
+}
+
+async function reorderGalleryEntry(entryId, direction) {
+  if (!state.apiAvailable) {
+    setThumbStatus(
+      "Reordering is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
+      "error"
+    );
+    return;
+  }
+
+  const entry = getGalleryEntryById(entryId);
+  if (!entry) {
+    setThumbStatus("Thumbnail entry was not found.", "error");
+    return;
+  }
+
+  const label = entry.title || entryId;
+  const statusVerb = direction === "up" ? "Moving earlier" : "Moving later";
+
+  state.galleryBusyId = entryId;
+  state.galleryBusyAction = direction === "up" ? "move-up" : "move-down";
+  renderThumbAccordion();
+  setThumbStatus(`${statusVerb}: ${label}...`, "");
+
+  try {
+    await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entryId)}/reorder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ direction })
+    });
+    await reloadData();
+    setThumbStatus("Thumbnail order updated.", "ok");
+  } catch (error) {
+    setThumbStatus(error.message, "error");
+  } finally {
+    state.galleryBusyId = "";
+    state.galleryBusyAction = "";
+    renderThumbAccordion();
   }
 }
 
@@ -819,8 +905,11 @@ function getThumbBatchSize() {
 function renderThumbAccordion() {
   if (!thumbAccordion || !state.config) return;
 
-  const entries = sortGalleryEntriesForDisplay(
-    normalizeGalleryEntries(state.config.gallery)
+  const normalizedEntries = normalizeGalleryEntries(state.config.gallery);
+  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(normalizedEntries);
+  const entries = [...featuredEntries, ...standardEntries];
+  const standardOrderById = new Map(
+    standardEntries.map((entry, index) => [entry.id, index])
   );
   thumbAccordion.innerHTML = "";
 
@@ -842,7 +931,16 @@ function renderThumbAccordion() {
   const firstBatch = document.createElement("div");
   firstBatch.className = "thumb-grid";
   batches[0].forEach((entry) => {
-    firstBatch.appendChild(buildThumbnailCard(entry));
+    const standardIndex = standardOrderById.get(entry.id);
+    firstBatch.appendChild(
+      buildThumbnailCard(entry, {
+        standardIndex: Number.isInteger(standardIndex) ? standardIndex : -1,
+        standardCount: standardEntries.length,
+        canMoveUp: Number.isInteger(standardIndex) && standardIndex > 0,
+        canMoveDown:
+          Number.isInteger(standardIndex) && standardIndex < standardEntries.length - 1
+      })
+    );
   });
   thumbAccordion.appendChild(firstBatch);
 
@@ -859,7 +957,16 @@ function renderThumbAccordion() {
     const grid = document.createElement("div");
     grid.className = "thumb-grid";
     batch.forEach((entry) => {
-      grid.appendChild(buildThumbnailCard(entry));
+      const standardIndex = standardOrderById.get(entry.id);
+      grid.appendChild(
+        buildThumbnailCard(entry, {
+          standardIndex: Number.isInteger(standardIndex) ? standardIndex : -1,
+          standardCount: standardEntries.length,
+          canMoveUp: Number.isInteger(standardIndex) && standardIndex > 0,
+          canMoveDown:
+            Number.isInteger(standardIndex) && standardIndex < standardEntries.length - 1
+        })
+      );
     });
 
     details.appendChild(grid);
@@ -1240,6 +1347,16 @@ if (thumbAccordion) {
     if (action === "edit") {
       setThumbStatus("", "");
       openGalleryEditor(entryId);
+      return;
+    }
+
+    if (action === "move-up") {
+      await reorderGalleryEntry(entryId, "up");
+      return;
+    }
+
+    if (action === "move-down") {
+      await reorderGalleryEntry(entryId, "down");
       return;
     }
 

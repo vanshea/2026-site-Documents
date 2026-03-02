@@ -167,7 +167,7 @@ function sanitizeAssetPath(value) {
   return raw.replace(/^\/+/, "");
 }
 
-function sortGalleryEntriesForDisplay(entries) {
+function splitGalleryEntriesByFeatured(entries) {
   const featuredEntries = [];
   const standardEntries = [];
 
@@ -180,6 +180,11 @@ function sortGalleryEntriesForDisplay(entries) {
     standardEntries.push(entry);
   });
 
+  return { featuredEntries, standardEntries };
+}
+
+function sortGalleryEntriesForDisplay(entries) {
+  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(entries);
   return [...featuredEntries, ...standardEntries];
 }
 
@@ -1196,6 +1201,56 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   return gallery[entryIndex];
 }
 
+async function reorderVscimageGalleryEntry(entryId, direction) {
+  const config = await readVscimageConfig();
+  const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+  const normalizedDirection = String(direction || "").trim().toLowerCase();
+  const offset = normalizedDirection === "up" ? -1 : normalizedDirection === "down" ? 1 : 0;
+
+  if (!offset) {
+    const invalidDirectionError = new Error("Reorder direction must be up or down.");
+    invalidDirectionError.code = "VSCIMAGE_REORDER_INVALID";
+    throw invalidDirectionError;
+  }
+
+  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(gallery);
+  const standardIndex = standardEntries.findIndex(
+    (entry) => String(entry?.id || "").trim() === entryId
+  );
+
+  if (standardIndex === -1) {
+    const featuredIndex = featuredEntries.findIndex(
+      (entry) => String(entry?.id || "").trim() === entryId
+    );
+
+    if (featuredIndex !== -1) {
+      const featuredPinnedError = new Error(
+        "Featured images stay pinned and cannot be reordered from the standard list."
+      );
+      featuredPinnedError.code = "VSCIMAGE_REORDER_FEATURED";
+      throw featuredPinnedError;
+    }
+
+    return null;
+  }
+
+  const targetIndex = standardIndex + offset;
+  if (targetIndex < 0 || targetIndex >= standardEntries.length) {
+    return standardEntries[standardIndex];
+  }
+
+  const reorderedStandardEntries = [...standardEntries];
+  [reorderedStandardEntries[standardIndex], reorderedStandardEntries[targetIndex]] = [
+    reorderedStandardEntries[targetIndex],
+    reorderedStandardEntries[standardIndex]
+  ];
+
+  config.gallery = [...featuredEntries, ...reorderedStandardEntries];
+  await writeVscimageConfig(config);
+
+  return reorderedStandardEntries[targetIndex];
+}
+
 async function deleteVscimageGalleryEntry(entryId) {
   const config = await readVscimageConfig();
   const gallery = Array.isArray(config.gallery) ? config.gallery : [];
@@ -1929,6 +1984,33 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   } catch (error) {
     console.error("Unable to update VSCimage gallery entry:", error);
     return res.status(500).json({ error: "Unable to update thumbnail entry." });
+  }
+});
+
+app.post("/api/vscimage/gallery/:entryId/reorder", async (req, res) => {
+  const entryId = String(req.params.entryId || "").trim();
+  const direction = String(req.body?.direction || "").trim().toLowerCase();
+
+  if (!entryId) {
+    return res.status(400).json({ error: "Gallery entry id is required." });
+  }
+
+  try {
+    const reorderedEntry = await reorderVscimageGalleryEntry(entryId, direction);
+    if (!reorderedEntry) {
+      return res.status(404).json({ error: "Gallery entry was not found." });
+    }
+
+    return res.status(200).json({ ok: true, entry: reorderedEntry });
+  } catch (error) {
+    if (
+      ["VSCIMAGE_REORDER_INVALID", "VSCIMAGE_REORDER_FEATURED"].includes(error.code)
+    ) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    console.error("Unable to reorder VSCimage gallery entry:", error);
+    return res.status(500).json({ error: "Unable to reorder thumbnail entry." });
   }
 });
 
