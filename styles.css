@@ -254,6 +254,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 @font-face {
   font-family: "Pinot Grigio Modern";
   src: local("Pinot Grigio Modern"), local("PinotGrigioModern");
@@ -271,6 +275,9 @@ body {
   background: radial-gradient(circle at 12% 8%, var(--bg-wash-a) 0, transparent 38%),
     radial-gradient(circle at 86% 0%, var(--bg-wash-b) 0, transparent 33%),
     var(--bg);
+  background-size: 128% 128%, 133% 133%, auto;
+  background-position: 0% 0%, 100% 0%, 0 0;
+  animation: page-gradient-drift 24s ease-in-out infinite alternate;
   font-family: "Space Grotesk", sans-serif;
   line-height: var(--type-line-height);
   font-weight: var(--type-body-weight);
@@ -280,7 +287,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: "Lexend Deca", sans-serif;
   letter-spacing: var(--type-heading-letter-spacing);
   font-weight: var(--type-heading-weight);
   line-height: var(--type-heading-line-height);
@@ -307,6 +314,7 @@ p {
   background: var(--shape-a);
   top: 22%;
   left: -100px;
+  animation: shape-drift-a 18s ease-in-out infinite alternate;
 }
 
 .bg-shape-b {
@@ -315,6 +323,37 @@ p {
   background: var(--shape-b);
   right: -120px;
   bottom: 10%;
+  animation: shape-drift-b 22s ease-in-out infinite alternate;
+}
+
+@keyframes page-gradient-drift {
+  0% {
+    background-position: 0% 0%, 100% 0%, 0 0;
+  }
+
+  100% {
+    background-position: 10% 8%, 90% 7%, 0 0;
+  }
+}
+
+@keyframes shape-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate3d(26px, -20px, 0) scale(1.06);
+  }
+}
+
+@keyframes shape-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate3d(-24px, 18px, 0) scale(1.05);
+  }
 }
 
 .site-header {
@@ -352,8 +391,8 @@ p {
 }
 
 .brand-name {
-  color: var(--ink);
-  font-family: "Pinot Grigio Modern", "Bricolage Grotesque", sans-serif;
+  color: #fff;
+  font-family: "Pinot Grigio Modern", "Lexend Deca", sans-serif;
   font-weight: 700;
   font-size: 1.1rem;
   line-height: 1;
@@ -421,7 +460,7 @@ p {
 
 .nav a {
   text-decoration: none;
-  color: var(--ink);
+  color: #fff;
   font-weight: 500;
 }
 
@@ -444,12 +483,15 @@ main {
 }
 
 h1 {
-  font-size: clamp(2rem, 4.6vw, 4rem);
+  font-size: clamp(1.62rem, 3.42vw, 3.24rem);
   max-width: 80%;
   margin: 16px 0 18px;
+  text-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
 .lead {
+  font-size: clamp(0.81rem, 1.71vw, 1.62rem);
+  font-weight: 500;
   max-width: 54ch;
   margin-bottom: 26px;
 }
@@ -497,6 +539,7 @@ h1 {
 
 h2 {
   font-size: clamp(1.6rem, 3.3vw, 2.4rem);
+  letter-spacing: calc(var(--type-heading-letter-spacing) + 0.03em);
   margin-bottom: 10px;
 }
 
@@ -507,10 +550,10 @@ h2 {
 }
 
 .filter-btn {
-  border: 1px solid var(--line);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   border-radius: 999px;
-  background: var(--paper);
-  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  color: #fff;
   padding: calc(7px * var(--control-scale)) calc(14px * var(--control-scale));
   font-family: "Space Grotesk", sans-serif;
   font-weight: 500;
@@ -806,6 +849,7 @@ textarea:focus {
 }
 
 .contact-intro {
+  width: 80%;
   max-width: 60ch;
   margin-bottom: calc(14px * 1.05);
   font-family: "Open Sans", sans-serif;
@@ -1102,14 +1146,14 @@ textarea:focus {
 }
 
 .reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  opacity: 1;
+  transform: none;
+  transition: none;
 }
 
 .reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

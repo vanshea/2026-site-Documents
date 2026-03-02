@@ -159,6 +159,7 @@ function refreshWorkCardState() {
   });
 
   sortWorkGridCards();
+  syncProjectFilters();
 }
 
 async function readSiteImageConfig() {
@@ -409,19 +410,88 @@ if (projectInquiryForm) {
   });
 }
 
+const filterGroup = document.querySelector("#work .filters");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const workLoadMoreButton = document.getElementById("workLoadMore");
 const WORK_ROWS_PER_PAGE = 2;
 let visibleWorkCards = 0;
 let featuredCardHeightFrame = 0;
+const REGULAR_CARD_IMAGE_ASPECT_RATIO = 4 / 3;
 
-function getWorkCardsPerPage() {
-  if (!workGrid) return 6;
+function getWorkGridColumnCount() {
+  if (!workGrid) return 3;
 
   const computed = window.getComputedStyle(workGrid);
   const template = String(computed.gridTemplateColumns || "").trim();
   const columns = template ? template.split(/\s+/).filter(Boolean).length : 3;
-  return Math.max(1, columns) * WORK_ROWS_PER_PAGE;
+  return Math.max(1, columns);
+}
+
+function getWorkCardsPerPage() {
+  return getWorkGridColumnCount() * WORK_ROWS_PER_PAGE;
+}
+
+function normalizeWorkCategory(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function getAvailableWorkFilters() {
+  const categories = new Set();
+  const cards = getWorkCardElements().filter(
+    (card) => !card.classList.contains("is-placeholder")
+  );
+
+  cards.forEach((card) => {
+    const category = normalizeWorkCategory(card.dataset.category);
+    if (!category || category === "all") return;
+    categories.add(category);
+  });
+
+  return categories;
+}
+
+function syncProjectFilters() {
+  if (!filterGroup || !filterButtons.length) return;
+
+  const availableFilters = getAvailableWorkFilters();
+  const shouldShowFilters = availableFilters.size > 0;
+
+  filterButtons.forEach((button) => {
+    const filterValue = normalizeWorkCategory(button.dataset.filter);
+    const showButton =
+      shouldShowFilters &&
+      (filterValue === "all" || availableFilters.has(filterValue));
+
+    button.hidden = !showButton;
+    button.setAttribute("aria-hidden", showButton ? "false" : "true");
+
+    if (!showButton) {
+      button.classList.remove("active");
+    }
+  });
+
+  filterGroup.hidden = !shouldShowFilters;
+  filterGroup.setAttribute("aria-hidden", shouldShowFilters ? "false" : "true");
+
+  if (!shouldShowFilters) return;
+
+  const activeVisibleButton = Array.from(filterButtons).find(
+    (button) => !button.hidden && button.classList.contains("active")
+  );
+  if (activeVisibleButton) return;
+
+  const allButton = Array.from(filterButtons).find(
+    (button) => !button.hidden && normalizeWorkCategory(button.dataset.filter) === "all"
+  );
+  const fallbackButton = allButton || Array.from(filterButtons).find((button) => !button.hidden);
+
+  if (!fallbackButton) return;
+
+  filterButtons.forEach((button) => {
+    button.classList.toggle("active", button === fallbackButton);
+  });
 }
 
 function getFilteredCards() {
@@ -460,16 +530,13 @@ function updateFeaturedCardHeight() {
     return;
   }
 
-  const referenceImage = Array.from(
-    workGrid.querySelectorAll(".card:not(.hide):not(.is-featured) .card-image")
-  ).find((image) => image.getBoundingClientRect().height > 0);
+  const computed = window.getComputedStyle(workGrid);
+  const columns = getWorkGridColumnCount();
+  const gap = Number.parseFloat(computed.columnGap || computed.gap || "0") || 0;
+  const gridWidth = workGrid.getBoundingClientRect().width;
+  const referenceWidth = (gridWidth - gap * Math.max(0, columns - 1)) / columns;
+  const referenceHeight = Math.round(referenceWidth / REGULAR_CARD_IMAGE_ASPECT_RATIO);
 
-  if (!referenceImage) {
-    workGrid.style.removeProperty("--featured-card-image-height");
-    return;
-  }
-
-  const referenceHeight = Math.round(referenceImage.getBoundingClientRect().height);
   if (referenceHeight > 0) {
     const featuredHeight = Math.round(referenceHeight * getFeaturedCardHeightScale());
     workGrid.style.setProperty("--featured-card-image-height", `${featuredHeight}px`);
@@ -491,7 +558,7 @@ function scheduleFeaturedCardHeightUpdate() {
 }
 
 function applyActiveFilter() {
-  const cards = Array.from(document.querySelectorAll(".card"));
+  const cards = getWorkCardElements();
   const filteredCards = getFilteredCards();
   const maxVisible = Math.max(0, visibleWorkCards || getWorkCardsPerPage());
   const visibleSet = new Set(filteredCards.slice(0, maxVisible));
