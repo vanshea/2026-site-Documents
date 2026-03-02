@@ -439,11 +439,12 @@ function normalizeWorkCategory(value) {
 
 function getAvailableWorkFilters() {
   const categories = new Set();
-  const cards = getWorkCardElements().filter(
-    (card) => !card.classList.contains("is-placeholder")
-  );
+  const cards = getWorkCardElements();
+  const displayCards = cards.some((card) => !card.classList.contains("is-placeholder"))
+    ? cards.filter((card) => !card.classList.contains("is-placeholder"))
+    : cards;
 
-  cards.forEach((card) => {
+  displayCards.forEach((card) => {
     const category = normalizeWorkCategory(card.dataset.category);
     if (!category || category === "all") return;
     categories.add(category);
@@ -497,11 +498,12 @@ function syncProjectFilters() {
 function getFilteredCards() {
   const activeButton = document.querySelector(".filter-btn.active");
   const target = activeButton?.dataset?.filter || "all";
-  const cards = getWorkCardElements().filter(
-    (card) => !card.classList.contains("is-placeholder")
-  );
+  const cards = getWorkCardElements();
+  const displayCards = cards.some((card) => !card.classList.contains("is-placeholder"))
+    ? cards.filter((card) => !card.classList.contains("is-placeholder"))
+    : cards;
 
-  return cards.filter((card) => {
+  return displayCards.filter((card) => {
     const category = card.dataset.category;
     return target === "all" || category === target;
   });

@@ -167,6 +167,86 @@ function sanitizeAssetPath(value) {
   return raw.replace(/^\/+/, "");
 }
 
+function siteAssetExists(assetPath) {
+  const normalized = sanitizeAssetPath(assetPath);
+  if (!normalized) return false;
+
+  if (/^(https?:)?\/\//.test(normalized)) {
+    return true;
+  }
+
+  return fsSync.existsSync(path.join(rootDir, normalized));
+}
+
+function resolveExistingSiteAssetPath(...candidates) {
+  for (const candidate of candidates) {
+    const normalized = sanitizeAssetPath(candidate);
+    if (!normalized) continue;
+    if (siteAssetExists(normalized)) {
+      return normalized;
+    }
+  }
+
+  return "";
+}
+
+function normalizeGalleryStem(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/-\d{10,}$/, "");
+
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized;
+}
+
+function collectGalleryFallbackStems(entry) {
+  const stems = new Set();
+  const addStem = (value) => {
+    const stem = normalizeGalleryStem(value);
+    if (!stem) return;
+    stems.add(stem);
+
+    if (stem.startsWith("large-web-portfolio-")) {
+      stems.add(stem.slice("large-web-portfolio-".length));
+    }
+  };
+
+  addStem(entry?.assetBaseName);
+  addStem(entry?.title);
+  addStem(entry?.id);
+
+  const originalPath = sanitizeAssetPath(entry?.original);
+  if (originalPath) {
+    addStem(path.basename(originalPath));
+  }
+
+  return Array.from(stems);
+}
+
+function resolveGalleryEntryAssetPath(entry, ...preferredCandidates) {
+  const configuredPath = resolveExistingSiteAssetPath(...preferredCandidates);
+  if (configuredPath) {
+    return configuredPath;
+  }
+
+  const stems = collectGalleryFallbackStems(entry);
+  const fallbackCandidates = [];
+  const extensions = [".webp", ".png", ".jpg", ".jpeg", ".svg", ".avif", ".gif"];
+
+  stems.forEach((stem) => {
+    extensions.forEach((extension) => {
+      fallbackCandidates.push(`large_web_portfolio/${stem}${extension}`);
+    });
+  });
+
+  return resolveExistingSiteAssetPath(entry?.original, ...fallbackCandidates);
+}
+
 function splitGalleryEntriesByFeatured(entries) {
   const featuredEntries = [];
   const standardEntries = [];
@@ -193,14 +273,15 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
 
   return entries
     .map((entry, index) => {
-      const thumb = sanitizeAssetPath(entry?.thumb);
+      const thumb = resolveGalleryEntryAssetPath(entry, entry?.thumb);
       if (!thumb) return "";
 
-      const large = sanitizeAssetPath(entry?.large) || thumb;
-      const fullscreen = sanitizeAssetPath(entry?.fullscreen) || large;
+      const large = resolveGalleryEntryAssetPath(entry, entry?.large, thumb) || thumb;
+      const fullscreen =
+        resolveGalleryEntryAssetPath(entry, entry?.fullscreen, large, thumb) || large;
       const category = normalizeGalleryCategory(entry?.category);
       const featured = toBool(entry?.featured, Boolean(entry?.featuredThumb));
-      const featuredThumb = sanitizeAssetPath(entry?.featuredThumb) || thumb;
+      const featuredThumb = resolveGalleryEntryAssetPath(entry, entry?.featuredThumb, thumb) || thumb;
       const previewThumb = featured ? featuredThumb : thumb;
       const displayTitle = String(entry?.title || entry?.id || `Generated ${index + 1}`)
         .trim()
