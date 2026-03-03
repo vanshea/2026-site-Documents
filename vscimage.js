@@ -12,21 +12,37 @@ const state = {
   files: [],
   apiAvailable: true,
   apiOrigin: window.location.origin,
+  uploadDroppedFiles: [],
   editorEntryId: "",
   editorMode: "single",
   editorBatchIds: [],
+  editorDraftKey: "",
   editorPreviewUrl: "",
   galleryBusyId: "",
   galleryBusyAction: "",
   thumbSectionOpen: {
-    process: false
+    process: false,
+    archived: false
   },
   thumbBatchOpen: {},
-  selectedEntryIds: new Set()
+  selectedEntryIds: new Set(),
+  galleryFilters: {
+    query: "",
+    status: "all",
+    category: "all",
+    featured: "all",
+    sort: "homepage"
+  },
+  dragEntryId: "",
+  dropTargetEntryId: "",
+  undoAction: null
 };
 
 const THUMB_CARD_MIN_WIDTH = 210;
 const THUMB_ROWS_PER_BATCH = 3;
+const UPLOAD_DRAFT_KEY = "vscimage.uploadDraft";
+const FILTER_DRAFT_KEY = "vscimage.galleryFilters";
+const EDITOR_DRAFT_PREFIX = "vscimage.editorDraft.";
 
 const API_ORIGIN_CANDIDATES = (() => {
   const origins = [window.location.origin];
@@ -43,6 +59,40 @@ function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function readLocalStorageJson(key, fallbackValue) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return fallbackValue;
+    return JSON.parse(raw);
+  } catch (error) {
+    return fallbackValue;
+  }
+}
+
+function writeLocalStorageJson(key, value) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    return;
+  }
+}
+
+function removeLocalStorageKey(key) {
+  try {
+    window.localStorage.removeItem(key);
+  } catch (error) {
+    return;
+  }
+}
+
+function announce(message) {
+  if (!a11yAnnouncer) return;
+  a11yAnnouncer.textContent = "";
+  window.requestAnimationFrame(() => {
+    a11yAnnouncer.textContent = message || "";
+  });
+}
+
 function toAssetUrl(filePath) {
   if (!filePath) return "";
   if (/^(https?:)?\/\//.test(filePath)) return filePath;
@@ -54,6 +104,7 @@ const IMAGE_FILE_EXT_PATTERN = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
 const uploadForm = document.getElementById("uploadForm");
 const uploadMsg = document.getElementById("uploadMsg");
 const generatedList = document.getElementById("generatedList");
+const uploadDropzone = document.getElementById("uploadDropzone");
 const imageFileInput = document.getElementById("imageFile");
 const imageFolderInput = document.getElementById("imageFolder");
 const assetNameInput = document.getElementById("assetName");
@@ -61,6 +112,12 @@ const uploadCardDescriptionInput = document.getElementById("uploadCardDescriptio
 const uploadCategoryInput = document.getElementById("uploadCategory");
 const uploadHomepageVisibleInput = document.getElementById("uploadHomepageVisible");
 const uploadButton = document.getElementById("uploadButton");
+const gallerySearchInput = document.getElementById("gallerySearch");
+const galleryStatusFilter = document.getElementById("galleryStatusFilter");
+const galleryCategoryFilter = document.getElementById("galleryCategoryFilter");
+const galleryFeaturedFilter = document.getElementById("galleryFeaturedFilter");
+const gallerySortSelect = document.getElementById("gallerySort");
+const thumbUndoBar = document.getElementById("thumbUndoBar");
 const configForm = document.getElementById("configForm");
 const configMsg = document.getElementById("configMsg");
 const logoLightSelect = document.getElementById("logoLightSelect");
@@ -87,6 +144,11 @@ const thumbEditorTitle = document.getElementById("thumbEditorTitle");
 const thumbEditorCardDescription = document.getElementById("thumbEditorCardDescription");
 const thumbEditorCategory = document.getElementById("thumbEditorCategory");
 const thumbEditorDescription = document.getElementById("thumbEditorDescription");
+const thumbEditorBatchTools = document.getElementById("thumbEditorBatchTools");
+const thumbEditorBatchRenameMode = document.getElementById("thumbEditorBatchRenameMode");
+const thumbEditorBatchRenameValue = document.getElementById("thumbEditorBatchRenameValue");
+const thumbEditorBatchDescriptionMode = document.getElementById("thumbEditorBatchDescriptionMode");
+const thumbEditorBatchPreview = document.getElementById("thumbEditorBatchPreview");
 const thumbEditorHomepageVisible = document.getElementById("thumbEditorHomepageVisible");
 const thumbEditorFeatured = document.getElementById("thumbEditorFeatured");
 const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
@@ -96,6 +158,7 @@ const thumbEditorPreviewImage = document.getElementById("thumbEditorPreviewImage
 const thumbEditorPreviewLabel = document.getElementById("thumbEditorPreviewLabel");
 const thumbEditorAssetList = document.getElementById("thumbEditorAssetList");
 const thumbEditorMsg = document.getElementById("thumbEditorMsg");
+const a11yAnnouncer = document.getElementById("a11yAnnouncer");
 const thumbEditorSingleOnlyElements = Array.from(
   thumbEditorForm?.querySelectorAll("[data-editor-single-only]") || []
 );
@@ -114,6 +177,15 @@ function collectSelectedOutputs() {
   return uploadOutputInputs.filter((input) => input.checked).map((input) => input.value);
 }
 
+function setUploadDroppedFiles(files) {
+  state.uploadDroppedFiles = Array.from(files || []).filter(isImageFile);
+  if (state.uploadDroppedFiles.length) {
+    if (imageFileInput) imageFileInput.value = "";
+    if (imageFolderInput) imageFolderInput.value = "";
+  }
+  updateUploadButtonState();
+}
+
 function updateUploadButtonState() {
   if (!uploadButton) return;
 
@@ -125,6 +197,7 @@ function updateUploadButtonState() {
 if (imageFileInput && imageFolderInput) {
   imageFileInput.addEventListener("change", () => {
     if (imageFileInput.files?.length) {
+      state.uploadDroppedFiles = [];
       imageFolderInput.value = "";
     }
     updateUploadButtonState();
@@ -132,6 +205,7 @@ if (imageFileInput && imageFolderInput) {
 
   imageFolderInput.addEventListener("change", () => {
     if (imageFolderInput.files?.length) {
+      state.uploadDroppedFiles = [];
       imageFileInput.value = "";
     }
     updateUploadButtonState();
@@ -144,10 +218,79 @@ uploadOutputInputs.forEach((input) => {
   });
 });
 
+[
+  assetNameInput,
+  uploadCardDescriptionInput,
+  uploadCategoryInput,
+  uploadHomepageVisibleInput,
+  ...uploadOutputInputs
+].forEach((element) => {
+  element?.addEventListener("input", persistUploadDraft);
+  element?.addEventListener("change", persistUploadDraft);
+});
+
+if (uploadDropzone) {
+  uploadDropzone.addEventListener("click", () => {
+    imageFileInput?.click();
+  });
+  uploadDropzone.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      imageFileInput?.click();
+    }
+  });
+  ["dragenter", "dragover"].forEach((eventName) => {
+    uploadDropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      uploadDropzone.classList.add("is-dragover");
+    });
+  });
+  ["dragleave", "dragend", "drop"].forEach((eventName) => {
+    uploadDropzone.addEventListener(eventName, () => {
+      uploadDropzone.classList.remove("is-dragover");
+    });
+  });
+  uploadDropzone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    const droppedFiles = Array.from(event.dataTransfer?.files || []).filter(isImageFile);
+    setUploadDroppedFiles(droppedFiles);
+    persistUploadDraft();
+    if (droppedFiles.length) {
+      setStatus(uploadMsg, `${droppedFiles.length} dropped image${droppedFiles.length === 1 ? "" : "s"} ready to upload.`, "ok");
+    }
+  });
+}
+
+restoreUploadDraft();
+restoreGalleryFilters();
+if (gallerySearchInput) gallerySearchInput.value = state.galleryFilters.query;
+if (galleryStatusFilter) galleryStatusFilter.value = state.galleryFilters.status;
+if (galleryCategoryFilter) galleryCategoryFilter.value = state.galleryFilters.category;
+if (galleryFeaturedFilter) galleryFeaturedFilter.value = state.galleryFilters.featured;
+if (gallerySortSelect) gallerySortSelect.value = state.galleryFilters.sort;
+
+[
+  [gallerySearchInput, "query"],
+  [galleryStatusFilter, "status"],
+  [galleryCategoryFilter, "category"],
+  [galleryFeaturedFilter, "featured"],
+  [gallerySortSelect, "sort"]
+].forEach(([element, key]) => {
+  element?.addEventListener(key === "query" ? "input" : "change", () => {
+    state.galleryFilters[key] = element.value;
+    persistGalleryFilters();
+    syncSelectedEntriesWithConfig();
+    renderThumbAccordion();
+  });
+});
+
 function setStatus(element, message, type = "") {
   element.textContent = message;
   element.classList.remove("ok", "error");
   if (type) element.classList.add(type);
+  if (message) {
+    announce(message);
+  }
 }
 
 function sanitizeAssetName(value) {
@@ -338,6 +481,13 @@ function toDisplaySourceName(file, index = 0) {
 }
 
 function collectUploadFiles() {
+  const droppedFiles = Array.from(state.uploadDroppedFiles || []).filter(isImageFile);
+  if (droppedFiles.length) {
+    return droppedFiles.sort((left, right) =>
+      toDisplaySourceName(left).localeCompare(toDisplaySourceName(right))
+    );
+  }
+
   const folderFiles = Array.from(imageFolderInput?.files || []).filter(isImageFile);
   if (folderFiles.length) {
     return folderFiles.sort((left, right) =>
@@ -410,7 +560,10 @@ async function fetchJson(url, options) {
 
   const payload = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(payload?.error || `Request failed (${response.status})`);
+    const error = new Error(payload?.error || `Request failed (${response.status})`);
+    error.payload = payload;
+    error.status = response.status;
+    throw error;
   }
   return payload;
 }
@@ -489,6 +642,9 @@ function normalizeGalleryEntries(entries) {
       const original = String(entry?.original || "").trim();
       const assetBaseName = sanitizeAssetName(entry?.assetBaseName || "");
       const backgroundColor = normalizeHexColor(entry?.backgroundColor);
+      const archived = isGalleryEntryArchived(entry);
+      const archivedAt = String(entry?.archivedAt || "").trim();
+      const sourceHash = String(entry?.sourceHash || "").trim();
       const createdAt = String(entry?.createdAt || "").trim();
       const updatedAt = String(entry?.updatedAt || "").trim();
 
@@ -512,6 +668,9 @@ function normalizeGalleryEntries(entries) {
         original,
         assetBaseName,
         backgroundColor,
+        archived,
+        archivedAt,
+        sourceHash,
         createdAt,
         updatedAt
       };
@@ -520,6 +679,9 @@ function normalizeGalleryEntries(entries) {
 }
 
 function isGalleryEntryHomepageVisible(entry) {
+  if (isGalleryEntryArchived(entry)) {
+    return false;
+  }
   return normalizeHomepageVisible(entry?.homepageVisible);
 }
 
@@ -527,12 +689,26 @@ function isGalleryEntryHomepageFeatured(entry) {
   return isGalleryEntryHomepageVisible(entry) && Boolean(entry?.featured || entry?.featuredThumb);
 }
 
+function isGalleryEntryArchived(entry) {
+  return ["1", "true", "yes", "on"].includes(
+    String(entry?.archived || "")
+      .trim()
+      .toLowerCase()
+  );
+}
+
 function splitGalleryEntriesBySection(entries) {
   const homepageFeaturedEntries = [];
   const homepageStandardEntries = [];
   const processEntries = [];
+  const archivedEntries = [];
 
   (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    if (isGalleryEntryArchived(entry)) {
+      archivedEntries.push(entry);
+      return;
+    }
+
     if (!isGalleryEntryHomepageVisible(entry)) {
       processEntries.push(entry);
       return;
@@ -546,7 +722,7 @@ function splitGalleryEntriesBySection(entries) {
     homepageStandardEntries.push(entry);
   });
 
-  return { homepageFeaturedEntries, homepageStandardEntries, processEntries };
+  return { homepageFeaturedEntries, homepageStandardEntries, processEntries, archivedEntries };
 }
 
 function sortGalleryEntriesForDisplay(entries) {
@@ -639,6 +815,252 @@ function ensureConfigShape(config) {
   return merged;
 }
 
+function formatDateLabel(value) {
+  const time = Date.parse(value || "");
+  if (!time) return "Unknown";
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(new Date(time));
+}
+
+function getGalleryEntryStatusKey(entry) {
+  if (isGalleryEntryArchived(entry)) {
+    return "archived";
+  }
+  return isGalleryEntryHomepageVisible(entry) ? "homepage" : "hidden";
+}
+
+function parseDimensionsFromAssetPath(filePath) {
+  const match = String(filePath || "").match(/-(\d+)x(\d+)\.[^.]+$/i);
+  if (!match) return "";
+  return `${match[1]}x${match[2]}`;
+}
+
+function getGalleryEntryOutputSummaries(entry) {
+  const outputs = [];
+  if (entry.thumb) {
+    outputs.push(`Thumb ${parseDimensionsFromAssetPath(entry.thumb) || "760x570"}`);
+  }
+  if (entry.featured || entry.featuredThumb) {
+    outputs.push(`Featured ${parseDimensionsFromAssetPath(getGalleryEntryFeaturedThumbPath(entry)) || "2400x570"}`);
+  }
+  if (entry.large) {
+    outputs.push(`Large ${parseDimensionsFromAssetPath(entry.large) || "1900x1600"}`);
+  }
+  if (entry.fullscreen) {
+    outputs.push(`Fullscreen ${parseDimensionsFromAssetPath(entry.fullscreen) || "3200x1800"}`);
+  }
+  if (getGalleryEntryLogoPath(entry)) {
+    outputs.push(`Logo ${parseDimensionsFromAssetPath(getGalleryEntryLogoPath(entry)) || "240x240"}`);
+  }
+  return outputs;
+}
+
+function entryMatchesGalleryFilters(entry) {
+  const { query, status, category, featured } = state.galleryFilters;
+  const normalizedQuery = String(query || "").trim().toLowerCase();
+
+  if (status !== "all" && getGalleryEntryStatusKey(entry) !== status) {
+    return false;
+  }
+
+  if (category !== "all" && normalizeGalleryCategory(entry.category) !== category) {
+    return false;
+  }
+
+  if (featured === "featured" && !Boolean(entry.featured || entry.featuredThumb)) {
+    return false;
+  }
+
+  if (featured === "standard" && Boolean(entry.featured || entry.featuredThumb)) {
+    return false;
+  }
+
+  if (normalizedQuery) {
+    const haystack = [
+      entry.title,
+      entry.id,
+      entry.description,
+      entry.cardDescription,
+      entry.thumb,
+      entry.large,
+      entry.fullscreen,
+      entry.original,
+      entry.assetBaseName
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    if (!haystack.includes(normalizedQuery)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function sortEntriesForCurrentView(entries, section) {
+  const sortMode = state.galleryFilters.sort;
+  const rows = [...(Array.isArray(entries) ? entries : [])];
+
+  if (sortMode === "homepage" && section === "homepage") {
+    return rows;
+  }
+
+  if (sortMode === "oldest") {
+    return rows.sort((left, right) => compareIsoDateDesc(right, left));
+  }
+
+  if (sortMode === "title-asc") {
+    return rows.sort((left, right) =>
+      String(left?.title || left?.id || "").localeCompare(String(right?.title || right?.id || ""))
+    );
+  }
+
+  if (sortMode === "title-desc") {
+    return rows.sort((left, right) =>
+      String(right?.title || right?.id || "").localeCompare(String(left?.title || left?.id || ""))
+    );
+  }
+
+  return rows.sort(compareIsoDateDesc);
+}
+
+function getFilteredGallerySections() {
+  const normalizedEntries = normalizeGalleryEntries(state.config?.gallery);
+  const filteredEntries = normalizedEntries.filter(entryMatchesGalleryFilters);
+  const {
+    homepageFeaturedEntries,
+    homepageStandardEntries,
+    processEntries,
+    archivedEntries
+  } = splitGalleryEntriesBySection(filteredEntries);
+
+  const homepageEntries = state.galleryFilters.sort === "homepage"
+    ? [...homepageFeaturedEntries, ...homepageStandardEntries]
+    : sortEntriesForCurrentView(
+        [...homepageFeaturedEntries, ...homepageStandardEntries],
+        "homepage"
+      );
+
+  return {
+    homepageEntries,
+    homepageFeaturedEntries,
+    homepageStandardEntries:
+      state.galleryFilters.sort === "homepage"
+        ? homepageStandardEntries
+        : homepageEntries.filter((entry) => !isGalleryEntryHomepageFeatured(entry)),
+    hiddenEntries: sortEntriesForCurrentView(processEntries, "hidden"),
+    archivedEntries: sortEntriesForCurrentView(archivedEntries, "archived"),
+    filteredEntries
+  };
+}
+
+function getVisibleEntries() {
+  const sections = getFilteredGallerySections();
+  return [...sections.homepageEntries, ...sections.hiddenEntries, ...sections.archivedEntries];
+}
+
+function setSelectedEntries(entryIds, { rerender = true } = {}) {
+  state.selectedEntryIds = new Set(
+    (Array.isArray(entryIds) ? entryIds : []).map((entryId) => String(entryId || "").trim()).filter(Boolean)
+  );
+  if (rerender) {
+    renderThumbAccordion();
+  }
+}
+
+function captureUndoEntrySnapshots(entries) {
+  return (Array.isArray(entries) ? entries : []).map((entry) => ({
+    id: entry.id,
+    archived: isGalleryEntryArchived(entry),
+    homepageVisible: isGalleryEntryHomepageVisible(entry),
+    title: entry.title,
+    cardDescription: entry.cardDescription,
+    category: entry.category,
+    description: entry.description
+  }));
+}
+
+function setUndoAction(action) {
+  state.undoAction = action || null;
+  renderUndoBar();
+}
+
+function clearUndoAction() {
+  if (!state.undoAction) return;
+  state.undoAction = null;
+  renderUndoBar();
+}
+
+function renderUndoBar() {
+  if (!thumbUndoBar) return;
+
+  if (!state.undoAction) {
+    thumbUndoBar.hidden = true;
+    thumbUndoBar.innerHTML = "";
+    return;
+  }
+
+  thumbUndoBar.hidden = false;
+  thumbUndoBar.innerHTML = "";
+
+  const text = document.createElement("p");
+  text.textContent = state.undoAction.label;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "btn btn-secondary";
+  button.dataset.thumbAction = "undo-last-action";
+  button.textContent = "Undo";
+
+  thumbUndoBar.appendChild(text);
+  thumbUndoBar.appendChild(button);
+}
+
+async function undoLastAction() {
+  if (!state.undoAction || !state.apiAvailable) {
+    return;
+  }
+
+  const undoAction = state.undoAction;
+  clearUndoAction();
+
+  if (undoAction.kind !== "entry-state") {
+    return;
+  }
+
+  setThumbStatus(`Undoing ${undoAction.label.toLowerCase()}...`, "");
+
+  for (const snapshot of undoAction.entries) {
+    if (snapshot.archived !== isGalleryEntryArchived(getGalleryEntryById(snapshot.id))) {
+      await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(snapshot.id)}/archive`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ archived: snapshot.archived })
+      });
+    }
+
+    await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(snapshot.id)}/update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: snapshot.title,
+        cardDescription: snapshot.cardDescription,
+        category: snapshot.category,
+        description: snapshot.description,
+        homepageVisible: snapshot.homepageVisible
+      })
+    });
+  }
+
+  await reloadData();
+  setThumbStatus("Last action undone.", "ok");
+}
+
 function createThumbBadge(label, className = "") {
   const badge = document.createElement("span");
   badge.className = `thumb-card-badge${className ? ` ${className}` : ""}`;
@@ -649,20 +1071,40 @@ function createThumbBadge(label, className = "") {
 function buildThumbnailCard(entry, options = {}) {
   const card = document.createElement("article");
   card.className = "thumb-card";
-  if (options.section === "process") {
+  if (options.section === "hidden") {
     card.classList.add("thumb-card-compact");
   }
   if (isEntrySelected(entry.id)) {
     card.classList.add("is-selected");
   }
+  if (state.dragEntryId === entry.id) {
+    card.classList.add("is-dragging");
+  }
+  if (state.dropTargetEntryId === entry.id) {
+    card.classList.add("is-drop-target");
+  }
   card.dataset.entryId = entry.id;
+  card.tabIndex = 0;
+  card.setAttribute("aria-selected", isEntrySelected(entry.id) ? "true" : "false");
 
   const actionsDisabled = !state.apiAvailable || Boolean(state.galleryBusyId);
   const isBusy = state.galleryBusyId === entry.id;
   const busyAction = isBusy ? state.galleryBusyAction : "";
   const homepageVisible = isGalleryEntryHomepageVisible(entry);
   const homepageFeatured = isGalleryEntryHomepageFeatured(entry);
+  const archived = isGalleryEntryArchived(entry);
   const hasSelection = state.selectedEntryIds.size > 0;
+  const canDragReorder =
+    !archived &&
+    homepageVisible &&
+    !homepageFeatured &&
+    !hasSelection &&
+    state.galleryFilters.sort === "homepage";
+
+  if (canDragReorder) {
+    card.draggable = true;
+    card.dataset.thumbDraggable = "true";
+  }
 
   const selectionRow = document.createElement("label");
   selectionRow.className = "thumb-card-selection";
@@ -689,8 +1131,8 @@ function buildThumbnailCard(entry, options = {}) {
   badges.className = "thumb-card-badges";
   badges.appendChild(
     createThumbBadge(
-      homepageVisible ? "Homepage live" : "Process thumbnail",
-      homepageVisible ? "is-live" : "is-process"
+      archived ? "Archived asset" : homepageVisible ? "Homepage live" : "Hidden asset",
+      archived ? "is-archived" : homepageVisible ? "is-live" : "is-process"
     )
   );
   badges.appendChild(createThumbBadge(`Category: ${entry.category || "all"}`));
@@ -711,6 +1153,29 @@ function buildThumbnailCard(entry, options = {}) {
   path.className = "path";
   path.textContent = entry.thumb;
 
+  const meta = document.createElement("div");
+  meta.className = "thumb-card-meta";
+
+  const updatedMeta = document.createElement("p");
+  updatedMeta.className = "thumb-card-meta-item";
+  updatedMeta.textContent = `Updated ${formatDateLabel(entry.updatedAt || entry.createdAt)}`;
+  meta.appendChild(updatedMeta);
+
+  const sourceMeta = document.createElement("p");
+  sourceMeta.className = "thumb-card-meta-item";
+  sourceMeta.textContent = entry.original ? "Original source saved" : "No original source file";
+  meta.appendChild(sourceMeta);
+
+  const outputsMeta = document.createElement("div");
+  outputsMeta.className = "thumb-card-output-list";
+  getGalleryEntryOutputSummaries(entry).forEach((label) => {
+    const token = document.createElement("span");
+    token.className = "thumb-card-output";
+    token.textContent = label;
+    outputsMeta.appendChild(token);
+  });
+  meta.appendChild(outputsMeta);
+
   const link = document.createElement("a");
   link.href = toAssetUrl(entry.large || entry.thumb);
   link.target = "_blank";
@@ -727,30 +1192,64 @@ function buildThumbnailCard(entry, options = {}) {
   editButton.dataset.thumbAction = "edit";
   editButton.dataset.entryId = entry.id;
   editButton.disabled = actionsDisabled;
+  editButton.setAttribute("aria-label", `Edit ${entry.title}`);
 
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
   deleteButton.className = "btn btn-danger";
-  deleteButton.textContent = busyAction === "delete" ? "Deleting..." : "Delete";
-  deleteButton.dataset.thumbAction = "delete";
+  deleteButton.textContent = archived
+    ? busyAction === "purge"
+      ? "Deleting..."
+      : "Delete Permanently"
+    : busyAction === "archive"
+      ? "Archiving..."
+      : "Archive";
+  deleteButton.dataset.thumbAction = archived ? "purge" : "archive";
   deleteButton.dataset.entryId = entry.id;
   deleteButton.disabled = actionsDisabled;
+  deleteButton.setAttribute(
+    "aria-label",
+    archived ? `Delete ${entry.title} permanently` : `Archive ${entry.title}`
+  );
 
   const visibilityButton = document.createElement("button");
   visibilityButton.type = "button";
   visibilityButton.className = "btn btn-secondary";
-  visibilityButton.textContent = homepageVisible
+  visibilityButton.textContent = archived
+    ? busyAction === "restore"
+      ? "Restoring..."
+      : "Restore"
+    : homepageVisible
     ? busyAction === "hide-homepage"
       ? "Moving..."
       : "Hide"
     : busyAction === "show-homepage"
       ? "Publishing..."
       : "Show On Homepage";
-  visibilityButton.dataset.thumbAction = homepageVisible ? "hide-homepage" : "show-homepage";
+  visibilityButton.dataset.thumbAction = archived
+    ? "restore"
+    : homepageVisible
+      ? "hide-homepage"
+      : "show-homepage";
   visibilityButton.dataset.entryId = entry.id;
   visibilityButton.disabled = actionsDisabled;
+  visibilityButton.setAttribute(
+    "aria-label",
+    archived
+      ? `Restore ${entry.title}`
+      : homepageVisible
+        ? `Hide ${entry.title} from homepage`
+        : `Show ${entry.title} on homepage`
+  );
 
-  if (homepageFeatured) {
+  if (archived) {
+    const archivedLabel = document.createElement("span");
+    archivedLabel.className = "thumb-card-order-label";
+    archivedLabel.textContent = entry.archivedAt
+      ? `Archived ${formatDateLabel(entry.archivedAt)}`
+      : "Archived asset";
+    actions.appendChild(archivedLabel);
+  } else if (homepageFeatured) {
     const pinnedLabel = document.createElement("span");
     pinnedLabel.className = "thumb-card-order-label";
     pinnedLabel.textContent = "Featured card stays pinned";
@@ -768,7 +1267,8 @@ function buildThumbnailCard(entry, options = {}) {
     moveEarlierButton.dataset.entryId = entry.id;
     moveEarlierButton.setAttribute("aria-label", "Move earlier");
     moveEarlierButton.title = "Move earlier";
-    moveEarlierButton.disabled = actionsDisabled || hasSelection || !options.canMoveUp;
+    moveEarlierButton.disabled =
+      actionsDisabled || hasSelection || state.galleryFilters.sort !== "homepage" || !options.canMoveUp;
 
     const moveLaterButton = document.createElement("button");
     moveLaterButton.type = "button";
@@ -778,7 +1278,8 @@ function buildThumbnailCard(entry, options = {}) {
     moveLaterButton.dataset.entryId = entry.id;
     moveLaterButton.setAttribute("aria-label", "Move later");
     moveLaterButton.title = "Move later";
-    moveLaterButton.disabled = actionsDisabled || hasSelection || !options.canMoveDown;
+    moveLaterButton.disabled =
+      actionsDisabled || hasSelection || state.galleryFilters.sort !== "homepage" || !options.canMoveDown;
 
     actions.appendChild(orderLabel);
     actions.appendChild(moveEarlierButton);
@@ -804,6 +1305,7 @@ function buildThumbnailCard(entry, options = {}) {
   card.appendChild(badges);
   card.appendChild(title);
   card.appendChild(description);
+  card.appendChild(meta);
   card.appendChild(path);
   card.appendChild(link);
   card.appendChild(actions);
@@ -892,6 +1394,58 @@ function renderThumbEditorAssetList(entry) {
   }
 }
 
+function updateBatchPreview() {
+  if (!thumbEditorBatchPreview) return;
+  if (state.editorMode !== "batch") {
+    thumbEditorBatchPreview.textContent = "";
+    return;
+  }
+
+  const notes = [];
+  const renameMode = String(thumbEditorBatchRenameMode?.value || "keep");
+  const renameValue = String(thumbEditorBatchRenameValue?.value || "").trim();
+  const descriptionMode = String(thumbEditorBatchDescriptionMode?.value || "keep");
+  const descriptionValue = String(thumbEditorDescription?.value || "").trim();
+
+  if (renameMode !== "keep" && renameValue) {
+    notes.push(`${renameMode === "prefix" ? "Adds" : "Appends"} rename text "${renameValue}" to titles and filenames.`);
+  }
+
+  if (descriptionMode !== "keep" && descriptionValue) {
+    const verb =
+      descriptionMode === "replace"
+        ? "Replaces"
+        : descriptionMode === "prepend"
+          ? "Prepends"
+          : "Appends";
+    notes.push(`${verb} description text for each selected image.`);
+  }
+
+  if (String(thumbEditorCategory?.value || "__keep__") !== "__keep__") {
+    notes.push(`Moves selected images into the ${thumbEditorCategory.value} category.`);
+  }
+
+  if (thumbEditorHomepageVisible?.indeterminate === false) {
+    notes.push(thumbEditorHomepageVisible.checked ? "Shows selected images on the homepage." : "Keeps selected images in Hidden Assetts.");
+  }
+
+  if (thumbEditorFeatured?.indeterminate === false) {
+    notes.push(thumbEditorFeatured.checked ? "Features selected images on the homepage." : "Removes homepage feature state.");
+  }
+
+  if (thumbEditorUseBg?.indeterminate === false) {
+    notes.push(
+      thumbEditorUseBg.checked
+        ? `Applies background color ${thumbEditorBgColor?.value || "#ffffff"} to regenerated transparent assets.`
+        : "Removes custom background color."
+    );
+  }
+
+  thumbEditorBatchPreview.textContent = notes.length
+    ? notes.join(" ")
+    : "Choose at least one batch change. Blank text fields keep current values.";
+}
+
 function setGalleryEditorMode(mode, entries = []) {
   const isBatchMode = mode === "batch";
   state.editorMode = isBatchMode ? "batch" : "single";
@@ -902,19 +1456,23 @@ function setGalleryEditorMode(mode, entries = []) {
   });
 
   thumbEditorDelete.classList.toggle("is-hidden", isBatchMode);
+  thumbEditorBatchTools?.classList.toggle("is-hidden", !isBatchMode);
 
   if (isBatchMode) {
-    thumbEditorKicker.textContent = "Processed Thumbnails";
+    thumbEditorKicker.textContent = "Selected Assets";
     thumbEditorHeading.textContent = `Edit ${entries.length} Images`;
     thumbEditorModeNote.hidden = false;
     thumbEditorModeNote.textContent =
-      "Blank text fields keep their current values. Homepage, feature, and background toggles start in a neutral keep-current state.";
+      "Blank text fields keep their current values. Use the batch rename and description controls to apply structured changes across the current selection.";
     thumbEditorCardDescription.value = "";
     thumbEditorCardDescription.placeholder = "Leave blank to keep current card descriptions";
     ensureBatchCategoryOption();
     thumbEditorCategory.value = "__keep__";
     thumbEditorDescription.value = "";
     thumbEditorDescription.placeholder = "Leave blank to keep current descriptions";
+    if (thumbEditorBatchRenameMode) thumbEditorBatchRenameMode.value = "keep";
+    if (thumbEditorBatchRenameValue) thumbEditorBatchRenameValue.value = "";
+    if (thumbEditorBatchDescriptionMode) thumbEditorBatchDescriptionMode.value = "keep";
     setBatchCheckboxState(thumbEditorHomepageVisible, "keep");
     setBatchCheckboxState(thumbEditorFeatured, "keep");
     setBatchCheckboxState(thumbEditorUseBg, "keep");
@@ -924,6 +1482,7 @@ function setGalleryEditorMode(mode, entries = []) {
     thumbEditorPreviewLabel.textContent = `${entries.length} selected images`;
     thumbEditorAssetList.innerHTML = "";
     updateThumbEditorBackgroundState();
+    updateBatchPreview();
     return;
   }
 
@@ -931,12 +1490,15 @@ function setGalleryEditorMode(mode, entries = []) {
   thumbEditorHeading.textContent = "Edit Image";
   thumbEditorModeNote.hidden = true;
   thumbEditorModeNote.textContent = "";
+  thumbEditorDelete.textContent = "Archive";
+  thumbEditorDelete.dataset.editorAction = "archive";
   thumbEditorCardDescription.placeholder = "Short one-line text for the homepage card";
   thumbEditorDescription.placeholder = "";
   removeBatchCategoryOption();
   thumbEditorHomepageVisible.indeterminate = false;
   thumbEditorFeatured.indeterminate = false;
   thumbEditorUseBg.indeterminate = false;
+  if (thumbEditorBatchPreview) thumbEditorBatchPreview.textContent = "";
 }
 
 function openGalleryEditor(entryId) {
@@ -950,6 +1512,7 @@ function openGalleryEditor(entryId) {
 
   thumbEditorForm.reset();
   thumbEditorDelete.dataset.entryId = targetEntries[0].id;
+  thumbEditorDelete.dataset.editorAction = "archive";
   thumbEditorSave.disabled = !state.apiAvailable;
   thumbEditorDelete.disabled = !state.apiAvailable;
   setThumbEditorStatus("", "");
@@ -968,8 +1531,15 @@ function openGalleryEditor(entryId) {
     thumbEditorFeatured.checked = Boolean(entry.featured);
     thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
     thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
+    thumbEditorDelete.textContent = isGalleryEntryArchived(entry) ? "Delete Permanently" : "Archive";
+    thumbEditorDelete.dataset.editorAction = isGalleryEntryArchived(entry) ? "purge" : "archive";
     updateThumbEditorPreview(entry);
     renderThumbEditorAssetList(entry);
+  }
+
+  state.editorDraftKey = getEditorDraftKey();
+  if (restoreEditorDraft()) {
+    setThumbEditorStatus("Restored unsaved draft changes from this browser.", "ok");
   }
 
   if (thumbEditorDialog.open) {
@@ -995,9 +1565,87 @@ function closeGalleryEditor() {
   state.editorEntryId = "";
   state.editorMode = "single";
   state.editorBatchIds = [];
+  state.editorDraftKey = "";
   cleanupEditorPreviewUrl();
   removeBatchCategoryOption();
   setThumbEditorStatus("", "");
+}
+
+async function archiveGalleryEntry(entryId, archived = true) {
+  if (!state.apiAvailable) {
+    setThumbStatus(
+      "Archive is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
+      "error"
+    );
+    return;
+  }
+
+  const targetEntries = getActionTargetEntries(entryId).filter((entry) =>
+    archived ? !isGalleryEntryArchived(entry) : isGalleryEntryArchived(entry)
+  );
+  if (!targetEntries.length) {
+    setThumbStatus("Thumbnail entry was not found.", "error");
+    return;
+  }
+
+  const snapshots = captureUndoEntrySnapshots(targetEntries);
+  const failedLabels = [];
+  let updatedCount = 0;
+
+  try {
+    for (const entry of targetEntries) {
+      state.galleryBusyId = entry.id;
+      state.galleryBusyAction = archived ? "archive" : "restore";
+      renderThumbAccordion();
+
+      try {
+        await fetchJson(
+          `${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entry.id)}/archive`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ archived })
+          }
+        );
+        updatedCount += 1;
+      } catch (error) {
+        failedLabels.push(`${entry.title || entry.id}: ${error.message}`);
+      }
+    }
+
+    await reloadData();
+    if (
+      updatedCount > 0 &&
+      (state.editorMode === "batch" ||
+        targetEntries.some((entry) => entry.id === state.editorEntryId))
+    ) {
+      closeGalleryEditor();
+    }
+    if (updatedCount > 0) {
+      setUndoAction({
+        kind: "entry-state",
+        label: archived
+          ? `Archived ${updatedCount} image${updatedCount === 1 ? "" : "s"}`
+          : `Restored ${updatedCount} image${updatedCount === 1 ? "" : "s"}`,
+        entries: snapshots
+      });
+    }
+    if (failedLabels.length) {
+      setThumbStatus(
+        `${archived ? "Archived" : "Restored"} ${updatedCount} image${updatedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
+        "error"
+      );
+    } else {
+      setThumbStatus(
+        `${archived ? "Archived" : "Restored"} ${updatedCount} image${updatedCount === 1 ? "" : "s"}.`,
+        "ok"
+      );
+    }
+  } finally {
+    state.galleryBusyId = "";
+    state.galleryBusyAction = "";
+    renderThumbAccordion();
+  }
 }
 
 async function deleteGalleryEntry(entryId) {
@@ -1009,7 +1657,7 @@ async function deleteGalleryEntry(entryId) {
     return;
   }
 
-  const targetEntries = getActionTargetEntries(entryId);
+  const targetEntries = getActionTargetEntries(entryId).filter((entry) => isGalleryEntryArchived(entry));
   if (!targetEntries.length) {
     setThumbStatus("Thumbnail entry was not found.", "error");
     return;
@@ -1020,8 +1668,8 @@ async function deleteGalleryEntry(entryId) {
     : `${targetEntries.length} selected images`;
   const confirmed = window.confirm(
     targetEntries.length === 1
-      ? `Delete "${label}" from Hidden Assetts? Generated files tied to this card will be removed from VSCimage.`
-      : `Delete ${targetEntries.length} selected thumbnails from Hidden Assetts? Generated files tied to those cards will be removed from VSCimage.`
+      ? `Delete "${label}" permanently from Archived Assets? This cannot be undone.`
+      : `Delete ${targetEntries.length} selected archived thumbnails permanently? This cannot be undone.`
   );
   if (!confirmed) {
     return;
@@ -1034,7 +1682,7 @@ async function deleteGalleryEntry(entryId) {
     for (const entry of targetEntries) {
       const currentLabel = entry.title || entry.id;
       state.galleryBusyId = entry.id;
-      state.galleryBusyAction = "delete";
+      state.galleryBusyAction = "purge";
       renderThumbAccordion();
       setThumbStatus(`Deleting ${currentLabel}...`, "");
       if (state.editorEntryId === entry.id || state.editorMode === "batch") {
@@ -1057,17 +1705,18 @@ async function deleteGalleryEntry(entryId) {
     }
 
     if (deletedCount > 0) {
+      clearEditorDraft();
       closeGalleryEditor();
     }
     await reloadData();
     if (failedLabels.length) {
       setThumbStatus(
-        `Deleted ${deletedCount} image${deletedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
+        `Deleted ${deletedCount} archived image${deletedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
         "error"
       );
     } else {
       setThumbStatus(
-        `Deleted ${deletedCount} image${deletedCount === 1 ? "" : "s"}.`,
+        `Deleted ${deletedCount} archived image${deletedCount === 1 ? "" : "s"}.`,
         "ok"
       );
     }
@@ -1102,15 +1751,29 @@ async function saveGalleryEditor() {
     const batchCardDescription = normalizeCardDescription(thumbEditorCardDescription?.value || "");
     const batchCategory = String(thumbEditorCategory?.value || "__keep__").trim();
     const batchDescription = normalizeDescription(thumbEditorDescription?.value || "", 320);
+    const batchRenameMode = String(thumbEditorBatchRenameMode?.value || "keep");
+    const batchRenameText = String(thumbEditorBatchRenameValue?.value || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .slice(0, 40);
+    const batchRenameAssetToken = sanitizeAssetName(batchRenameText);
+    const batchDescriptionMode = String(thumbEditorBatchDescriptionMode?.value || "keep");
     const batchHomepageVisible = getBatchCheckboxValue(thumbEditorHomepageVisible);
     const batchFeatured = getBatchCheckboxValue(thumbEditorFeatured);
     const batchUseBackground = getBatchCheckboxValue(thumbEditorUseBg);
     const batchBackgroundColor = normalizeHexColor(thumbEditorBgColor?.value || "#ffffff");
 
+    if (batchRenameMode !== "keep" && !batchRenameAssetToken) {
+      setThumbEditorStatus("Enter rename text for the selected rename pattern.", "error");
+      thumbEditorBatchRenameValue?.focus();
+      return;
+    }
+
     const hasBatchEdits =
       Boolean(batchCardDescription) ||
       batchCategory !== "__keep__" ||
-      Boolean(batchDescription) ||
+      (batchDescriptionMode !== "keep" && Boolean(batchDescription)) ||
+      (batchRenameMode !== "keep" && Boolean(batchRenameAssetToken)) ||
       batchHomepageVisible !== undefined ||
       batchFeatured !== undefined ||
       batchUseBackground !== undefined;
@@ -1130,6 +1793,12 @@ async function saveGalleryEditor() {
     try {
       for (const entry of targetEntries) {
         const formData = new FormData();
+        const currentBaseName =
+          getGalleryEntryBaseName(entry) || sanitizeAssetName(entry.title) || sanitizeAssetName(entry.id);
+        const currentTitle = String(entry.title || entry.id || "Image")
+          .trim()
+          .replace(/\s+/g, " ")
+          .slice(0, 120);
 
         if (batchCardDescription) {
           formData.append("cardDescription", batchCardDescription);
@@ -1137,8 +1806,23 @@ async function saveGalleryEditor() {
         if (batchCategory !== "__keep__") {
           formData.append("category", batchCategory);
         }
-        if (batchDescription) {
-          formData.append("description", batchDescription);
+        if (batchRenameMode !== "keep" && batchRenameAssetToken) {
+          const nextName = batchRenameMode === "prefix"
+            ? sanitizeAssetName(`${batchRenameAssetToken}-${currentBaseName}`)
+            : sanitizeAssetName(`${currentBaseName}-${batchRenameAssetToken}`);
+          const nextTitle = batchRenameMode === "prefix"
+            ? `${batchRenameText} ${currentTitle}`.trim()
+            : `${currentTitle} ${batchRenameText}`.trim();
+          formData.append("name", nextName);
+          formData.append("title", nextTitle.slice(0, 120));
+        }
+        if (batchDescriptionMode !== "keep" && batchDescription) {
+          const nextDescription = batchDescriptionMode === "replace"
+            ? batchDescription
+            : batchDescriptionMode === "prepend"
+              ? normalizeDescription(`${batchDescription} ${entry.description || ""}`, 320)
+              : normalizeDescription(`${entry.description || ""} ${batchDescription}`, 320);
+          formData.append("description", nextDescription);
         }
         if (batchHomepageVisible !== undefined) {
           formData.append("homepageVisible", batchHomepageVisible ? "true" : "false");
@@ -1172,6 +1856,7 @@ async function saveGalleryEditor() {
       }
 
       await reloadData();
+      clearEditorDraft();
       closeGalleryEditor();
       if (failedLabels.length) {
         setThumbStatus(
@@ -1270,6 +1955,7 @@ async function saveGalleryEditor() {
       body: formData
     });
     await reloadData();
+    clearEditorDraft();
     closeGalleryEditor();
     setThumbStatus("Thumbnail updated.", "ok");
   } catch (error) {
@@ -1323,6 +2009,36 @@ async function reorderGalleryEntry(entryId, direction) {
   }
 }
 
+async function moveGalleryEntryToTarget(entryId, targetEntryId) {
+  if (!state.apiAvailable || !entryId || !targetEntryId || entryId === targetEntryId) {
+    return;
+  }
+
+  state.galleryBusyId = entryId;
+  state.galleryBusyAction = "move-down";
+  state.dropTargetEntryId = targetEntryId;
+  renderThumbAccordion();
+  setThumbStatus("Reordering homepage cards...", "");
+
+  try {
+    await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entryId)}/reorder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ targetEntryId })
+    });
+    await reloadData();
+    setThumbStatus("Homepage order updated.", "ok");
+  } catch (error) {
+    setThumbStatus(error.message, "error");
+  } finally {
+    state.galleryBusyId = "";
+    state.galleryBusyAction = "";
+    state.dragEntryId = "";
+    state.dropTargetEntryId = "";
+    renderThumbAccordion();
+  }
+}
+
 function getThumbBatchSize() {
   if (!thumbAccordion) return 12;
 
@@ -1354,6 +2070,7 @@ async function toggleGalleryHomepageVisibility(entryId, homepageVisible) {
     targetEntries.length === 1
       ? targetEntries[0].title || targetEntries[0].id
       : `${targetEntries.length} selected images`;
+  const snapshots = captureUndoEntrySnapshots(targetEntries);
   const nextAction = homepageVisible ? "show-homepage" : "hide-homepage";
   const statusMessage = homepageVisible
     ? `Adding ${label} to the homepage...`
@@ -1392,6 +2109,15 @@ async function toggleGalleryHomepageVisibility(entryId, homepageVisible) {
     }
 
     await reloadData();
+    if (updatedCount > 0) {
+      setUndoAction({
+        kind: "entry-state",
+        label: homepageVisible
+          ? `Showed ${updatedCount} image${updatedCount === 1 ? "" : "s"}`
+          : `Hid ${updatedCount} image${updatedCount === 1 ? "" : "s"}`,
+        entries: snapshots
+      });
+    }
     if (state.editorEntryId === entryId && updatedCount === 1) {
       openGalleryEditor(entryId);
     }
@@ -1467,9 +2193,20 @@ function appendThumbnailBatches(target, entries, options = {}) {
   });
 }
 
+function createToolbarButton(label, action, disabled = false) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "btn btn-secondary";
+  button.dataset.thumbAction = action;
+  button.textContent = label;
+  button.disabled = disabled;
+  return button;
+}
+
 function buildSelectionToolbar() {
   const selectedEntries = getSelectedEntries();
-  if (!selectedEntries.length) {
+  const visibleEntries = getVisibleEntries();
+  if (!selectedEntries.length && !visibleEntries.length) {
     return null;
   }
 
@@ -1478,19 +2215,37 @@ function buildSelectionToolbar() {
 
   const summary = document.createElement("p");
   summary.className = "thumb-selection-summary";
-  summary.textContent =
-    selectedEntries.length === 1
-      ? `1 image selected. Hide, Edit, or Delete on that card will use the selection. Reordering is disabled while selected.`
-      : `${selectedEntries.length} images selected. Hide, Edit, or Delete on a selected card will apply to all selected images. Reordering is disabled while selected.`;
+  const selectedHomepageCount = selectedEntries.filter((entry) => getGalleryEntryStatusKey(entry) === "homepage").length;
+  const selectedHiddenCount = selectedEntries.filter((entry) => getGalleryEntryStatusKey(entry) === "hidden").length;
+  const selectedArchivedCount = selectedEntries.filter((entry) => getGalleryEntryStatusKey(entry) === "archived").length;
+  const allSelectedArchived = selectedEntries.length > 0 && selectedArchivedCount === selectedEntries.length;
+  summary.textContent = selectedEntries.length
+    ? `${selectedEntries.length} selected: ${selectedHomepageCount} homepage, ${selectedHiddenCount} hidden, ${selectedArchivedCount} archived. Reordering is disabled while a selection is active.`
+    : `${visibleEntries.length} images in the current view.`;
 
-  const clearButton = document.createElement("button");
-  clearButton.type = "button";
-  clearButton.className = "btn btn-secondary";
-  clearButton.dataset.thumbAction = "clear-selection";
-  clearButton.textContent = "Clear Selection";
+  const actions = document.createElement("div");
+  actions.className = "thumb-selection-actions";
+  actions.appendChild(createToolbarButton("Select All Visible", "select-all-visible", !visibleEntries.length));
+  actions.appendChild(createToolbarButton("Select Homepage", "select-homepage", !visibleEntries.length));
+  actions.appendChild(createToolbarButton("Select Hidden", "select-hidden", !visibleEntries.length));
+  actions.appendChild(createToolbarButton("Select Archived", "select-archived", !visibleEntries.length));
+  actions.appendChild(createToolbarButton("Clear", "clear-selection", !selectedEntries.length));
+
+  if (selectedEntries.length) {
+    actions.appendChild(createToolbarButton("Edit Selected", "edit-selection"));
+    if (selectedEntries.some((entry) => getGalleryEntryStatusKey(entry) !== "archived")) {
+      actions.appendChild(createToolbarButton("Hide Selected", "hide-selection"));
+      actions.appendChild(createToolbarButton("Show Selected", "show-selection"));
+      actions.appendChild(createToolbarButton("Archive Selected", "archive-selection"));
+    }
+    if (allSelectedArchived) {
+      actions.appendChild(createToolbarButton("Restore Selected", "restore-selection"));
+      actions.appendChild(createToolbarButton("Delete Selected", "purge-selection"));
+    }
+  }
 
   toolbar.appendChild(summary);
-  toolbar.appendChild(clearButton);
+  toolbar.appendChild(actions);
   return toolbar;
 }
 
@@ -1530,7 +2285,12 @@ function createThumbSection({
   } else {
     appendThumbnailBatches(content, entries, {
       section,
-      batchLabel: section === "homepage" ? "homepage cards" : "hidden assetts",
+      batchLabel:
+        section === "homepage"
+          ? "homepage cards"
+          : section === "archived"
+            ? "archived assets"
+            : "hidden assetts",
       standardOrderById: new Map(standardEntries.map((entry, index) => [entry.id, index])),
       standardCount: standardEntries.length
     });
@@ -1579,20 +2339,23 @@ function createThumbSection({
 function renderThumbAccordion() {
   if (!thumbAccordion || !state.config) return;
 
-  const normalizedEntries = normalizeGalleryEntries(state.config.gallery);
+  const allEntries = normalizeGalleryEntries(state.config.gallery);
   const {
-    homepageFeaturedEntries,
+    homepageEntries,
     homepageStandardEntries,
-    processEntries
-  } = splitGalleryEntriesBySection(normalizedEntries);
-  const homepageEntries = [...homepageFeaturedEntries, ...homepageStandardEntries];
-  const sortedProcessEntries = sortProcessEntries(processEntries);
+    hiddenEntries,
+    archivedEntries
+  } = getFilteredGallerySections();
   thumbAccordion.innerHTML = "";
 
-  if (!homepageEntries.length && !sortedProcessEntries.length) {
+  renderUndoBar();
+
+  if (!homepageEntries.length && !hiddenEntries.length && !archivedEntries.length) {
     const empty = document.createElement("p");
     empty.className = "thumb-empty";
-    empty.textContent = "No generated thumbnails yet. Upload an image to start the gallery.";
+    empty.textContent = allEntries.length
+      ? "No images match the current filters. Adjust the search or upload a new image."
+      : "No generated thumbnails yet. Upload an image to start the gallery.";
     thumbAccordion.appendChild(empty);
     return;
   }
@@ -1620,10 +2383,24 @@ function renderThumbAccordion() {
       title: "Hidden Assetts",
       description:
         "Stored in VSCimage only. Expand this section when you want to review or publish stored-only images.",
-      entries: sortedProcessEntries,
+      entries: hiddenEntries,
       emptyMessage:
         "No stored-only thumbnails yet. Hide a homepage card or upload a new image with homepage visibility turned off.",
-      section: "process",
+      section: "hidden",
+      collapsible: true,
+      collapsedByDefault: true
+    })
+  );
+
+  thumbAccordion.appendChild(
+    createThumbSection({
+      title: "Archived Assets",
+      description:
+        "Archived images stay in storage and can be restored later. Permanent delete is only available here.",
+      entries: archivedEntries,
+      emptyMessage:
+        "No archived images yet. Archive a card when you want to remove it from active use without deleting files.",
+      section: "archived",
       collapsible: true,
       collapsedByDefault: true
     })
@@ -1768,7 +2545,7 @@ function collectConfigFromForm() {
   return nextConfig;
 }
 
-function renderGeneratedOutputs(successfulEntries, failedEntries = []) {
+function renderGeneratedOutputs(successfulEntries, failedEntries = [], skippedEntries = []) {
   generatedList.innerHTML = "";
 
   successfulEntries.forEach((entry, index) => {
@@ -1796,6 +2573,191 @@ function renderGeneratedOutputs(successfulEntries, failedEntries = []) {
       false
     );
   });
+
+  skippedEntries.forEach((skippedEntry) => {
+    appendGeneratedOutputLine(
+      skippedEntry.sourceName,
+      skippedEntry.message,
+      "generated-skip",
+      false
+    );
+  });
+}
+
+function persistUploadDraft() {
+  writeLocalStorageJson(UPLOAD_DRAFT_KEY, {
+    assetName: assetNameInput?.value || "",
+    cardDescription: uploadCardDescriptionInput?.value || "",
+    category: uploadCategoryInput?.value || "all",
+    homepageVisible: uploadHomepageVisibleInput?.checked !== false,
+    outputs: collectSelectedOutputs()
+  });
+}
+
+function restoreUploadDraft() {
+  const draft = readLocalStorageJson(UPLOAD_DRAFT_KEY, null);
+  if (!draft) return;
+
+  if (assetNameInput) assetNameInput.value = draft.assetName || "";
+  if (uploadCardDescriptionInput) uploadCardDescriptionInput.value = draft.cardDescription || "";
+  if (uploadCategoryInput) uploadCategoryInput.value = draft.category || "all";
+  if (uploadHomepageVisibleInput) uploadHomepageVisibleInput.checked = draft.homepageVisible !== false;
+
+  const selectedOutputs = new Set(Array.isArray(draft.outputs) ? draft.outputs : []);
+  uploadOutputInputs.forEach((input) => {
+    input.checked = selectedOutputs.size ? selectedOutputs.has(input.value) : input.checked;
+  });
+}
+
+function persistGalleryFilters() {
+  writeLocalStorageJson(FILTER_DRAFT_KEY, state.galleryFilters);
+}
+
+function restoreGalleryFilters() {
+  const draft = readLocalStorageJson(FILTER_DRAFT_KEY, null);
+  if (!draft) return;
+
+  state.galleryFilters = {
+    ...state.galleryFilters,
+    query: String(draft.query || ""),
+    status: String(draft.status || "all"),
+    category: String(draft.category || "all"),
+    featured: String(draft.featured || "all"),
+    sort: String(draft.sort || "homepage")
+  };
+}
+
+function getEditorDraftKey() {
+  if (state.editorMode === "batch") {
+    return `${EDITOR_DRAFT_PREFIX}batch:${[...state.editorBatchIds].sort().join(",")}`;
+  }
+  return state.editorEntryId ? `${EDITOR_DRAFT_PREFIX}${state.editorEntryId}` : "";
+}
+
+function persistEditorDraft() {
+  const key = getEditorDraftKey();
+  if (!key) return;
+
+  writeLocalStorageJson(key, {
+    cardDescription: thumbEditorCardDescription?.value || "",
+    category: thumbEditorCategory?.value || "all",
+    description: thumbEditorDescription?.value || "",
+    homepageVisible: thumbEditorHomepageVisible?.checked || false,
+    homepageIndeterminate: Boolean(thumbEditorHomepageVisible?.indeterminate),
+    featured: thumbEditorFeatured?.checked || false,
+    featuredIndeterminate: Boolean(thumbEditorFeatured?.indeterminate),
+    useBg: thumbEditorUseBg?.checked || false,
+    useBgIndeterminate: Boolean(thumbEditorUseBg?.indeterminate),
+    bgColor: thumbEditorBgColor?.value || "#ffffff",
+    name: thumbEditorName?.value || "",
+    title: thumbEditorTitle?.value || "",
+    batchRenameMode: thumbEditorBatchRenameMode?.value || "keep",
+    batchRenameValue: thumbEditorBatchRenameValue?.value || "",
+    batchDescriptionMode: thumbEditorBatchDescriptionMode?.value || "keep"
+  });
+}
+
+function restoreEditorDraft() {
+  const key = getEditorDraftKey();
+  if (!key) return false;
+
+  const draft = readLocalStorageJson(key, null);
+  if (!draft) return false;
+
+  if (thumbEditorCardDescription) thumbEditorCardDescription.value = draft.cardDescription || "";
+  if (thumbEditorCategory && draft.category) thumbEditorCategory.value = draft.category;
+  if (thumbEditorDescription) thumbEditorDescription.value = draft.description || "";
+  if (thumbEditorHomepageVisible) {
+    thumbEditorHomepageVisible.checked = Boolean(draft.homepageVisible);
+    thumbEditorHomepageVisible.indeterminate = Boolean(draft.homepageIndeterminate);
+  }
+  if (thumbEditorFeatured) {
+    thumbEditorFeatured.checked = Boolean(draft.featured);
+    thumbEditorFeatured.indeterminate = Boolean(draft.featuredIndeterminate);
+  }
+  if (thumbEditorUseBg) {
+    thumbEditorUseBg.checked = Boolean(draft.useBg);
+    thumbEditorUseBg.indeterminate = Boolean(draft.useBgIndeterminate);
+  }
+  if (thumbEditorBgColor) thumbEditorBgColor.value = draft.bgColor || "#ffffff";
+  if (thumbEditorName) thumbEditorName.value = draft.name || "";
+  if (thumbEditorTitle) thumbEditorTitle.value = draft.title || "";
+  if (thumbEditorBatchRenameMode) thumbEditorBatchRenameMode.value = draft.batchRenameMode || "keep";
+  if (thumbEditorBatchRenameValue) thumbEditorBatchRenameValue.value = draft.batchRenameValue || "";
+  if (thumbEditorBatchDescriptionMode) {
+    thumbEditorBatchDescriptionMode.value = draft.batchDescriptionMode || "keep";
+  }
+
+  updateThumbEditorBackgroundState();
+  updateBatchPreview();
+  return true;
+}
+
+function clearEditorDraft() {
+  const key = getEditorDraftKey();
+  if (!key) return;
+  removeLocalStorageKey(key);
+}
+
+async function uploadSingleFile(currentFile, options = {}) {
+  const {
+    generatedName,
+    uploadCardDescription,
+    uploadCategory,
+    uploadHomepageVisible,
+    checked,
+    duplicateMode = ""
+  } = options;
+  const formData = new FormData();
+  formData.append("image", currentFile);
+  formData.append("name", generatedName);
+  formData.append("cardDescription", uploadCardDescription);
+  formData.append("category", uploadCategory);
+  formData.append("homepageVisible", uploadHomepageVisible ? "true" : "false");
+  formData.append("outputs", checked.join(","));
+  if (duplicateMode) {
+    formData.append("duplicateMode", duplicateMode);
+  }
+  return fetchJson(`${state.apiOrigin}/api/vscimage/upload`, {
+    method: "POST",
+    body: formData
+  });
+}
+
+async function uploadWithDuplicateResolution(currentFile, options = {}) {
+  try {
+    return await uploadSingleFile(currentFile, options);
+  } catch (error) {
+    if (error.status !== 409 || !error.payload?.duplicate) {
+      throw error;
+    }
+
+    const duplicate = error.payload.duplicate;
+    const replace = window.confirm(
+      `"${toDisplaySourceName(currentFile)}" matches "${duplicate.title}". Press OK to replace the existing image. Press Cancel for more options.`
+    );
+    if (replace) {
+      return uploadSingleFile(currentFile, {
+        ...options,
+        duplicateMode: "replace"
+      });
+    }
+
+    const keepBoth = window.confirm(
+      `Press OK to keep both copies of "${duplicate.title}". Press Cancel to skip this upload.`
+    );
+    if (keepBoth) {
+      return uploadSingleFile(currentFile, {
+        ...options,
+        duplicateMode: "keep-both"
+      });
+    }
+
+    return uploadSingleFile(currentFile, {
+      ...options,
+      duplicateMode: "skip"
+    });
+  }
 }
 
 async function reloadData() {
@@ -1898,6 +2860,7 @@ if (uploadForm) {
 
     const successfulEntries = [];
     const failedEntries = [];
+    const skippedEntries = [];
 
     try {
       if (uploadButton) uploadButton.disabled = true;
@@ -1912,14 +2875,6 @@ if (uploadForm) {
           selectedFiles.length
         );
 
-        const formData = new FormData();
-        formData.append("image", currentFile);
-        formData.append("name", generatedName);
-        formData.append("cardDescription", uploadCardDescription);
-        formData.append("category", uploadCategory);
-        formData.append("homepageVisible", uploadHomepageVisible ? "true" : "false");
-        formData.append("outputs", checked.join(","));
-
         setStatus(
           uploadMsg,
           `Generating ${index + 1}/${selectedFiles.length}: ${sourceName}`,
@@ -1927,34 +2882,44 @@ if (uploadForm) {
         );
 
         try {
-          const payload = await fetchJson(`${state.apiOrigin}/api/vscimage/upload`, {
-            method: "POST",
-            body: formData
+          const payload = await uploadWithDuplicateResolution(currentFile, {
+            generatedName,
+            uploadCardDescription,
+            uploadCategory,
+            uploadHomepageVisible,
+            checked
           });
-          successfulEntries.push({ sourceName, payload });
+          if (payload?.skipped) {
+            skippedEntries.push({
+              sourceName,
+              message: `Skipped duplicate: ${payload.duplicate?.title || "existing image"}`
+            });
+          } else {
+            successfulEntries.push({ sourceName, payload });
+          }
         } catch (error) {
           failedEntries.push({ sourceName, error: error.message });
         }
 
-        renderGeneratedOutputs(successfulEntries, failedEntries);
+        renderGeneratedOutputs(successfulEntries, failedEntries, skippedEntries);
       }
 
       if (successfulEntries.length) {
         await reloadData();
       }
 
-      if (successfulEntries.length && !failedEntries.length) {
+      if (successfulEntries.length && !failedEntries.length && !skippedEntries.length) {
         const label = successfulEntries.length === 1 ? "image" : "images";
         setStatus(
           uploadMsg,
           `Batch complete. ${successfulEntries.length} ${label} generated successfully.`,
           "ok"
         );
-      } else if (successfulEntries.length && failedEntries.length) {
+      } else if (successfulEntries.length || skippedEntries.length) {
         setStatus(
           uploadMsg,
-          `Batch complete with errors. ${successfulEntries.length} succeeded, ${failedEntries.length} failed.`,
-          "error"
+          `Batch complete. ${successfulEntries.length} succeeded, ${skippedEntries.length} skipped, ${failedEntries.length} failed.`,
+          failedEntries.length ? "error" : "ok"
         );
       } else {
         setStatus(uploadMsg, "Batch failed. No images were generated.", "error");
@@ -1962,6 +2927,7 @@ if (uploadForm) {
     } catch (error) {
       setStatus(uploadMsg, error.message, "error");
     } finally {
+      state.uploadDroppedFiles = [];
       updateUploadButtonState();
     }
   });
@@ -2014,9 +2980,94 @@ if (thumbAccordion) {
     const action = actionButton.dataset.thumbAction;
     const entryId = actionButton.dataset.entryId;
 
+    if (action === "undo-last-action") {
+      await undoLastAction();
+      return;
+    }
+
+    if (action === "select-all-visible") {
+      setSelectedEntries(getVisibleEntries().map((entry) => entry.id));
+      return;
+    }
+
+    if (action === "select-homepage") {
+      setSelectedEntries(
+        getVisibleEntries()
+          .filter((entry) => getGalleryEntryStatusKey(entry) === "homepage")
+          .map((entry) => entry.id)
+      );
+      return;
+    }
+
+    if (action === "select-hidden") {
+      setSelectedEntries(
+        getVisibleEntries()
+          .filter((entry) => getGalleryEntryStatusKey(entry) === "hidden")
+          .map((entry) => entry.id)
+      );
+      return;
+    }
+
+    if (action === "select-archived") {
+      setSelectedEntries(
+        getVisibleEntries()
+          .filter((entry) => getGalleryEntryStatusKey(entry) === "archived")
+          .map((entry) => entry.id)
+      );
+      return;
+    }
+
     if (action === "clear-selection") {
       clearSelectedEntries();
       setThumbStatus("", "");
+      return;
+    }
+
+    if (action === "edit-selection") {
+      const selectedEntry = getSelectedEntries()[0];
+      if (selectedEntry) {
+        openGalleryEditor(selectedEntry.id);
+      }
+      return;
+    }
+
+    if (action === "show-selection") {
+      const selectedEntry = getSelectedEntries()[0];
+      if (selectedEntry) {
+        await toggleGalleryHomepageVisibility(selectedEntry.id, true);
+      }
+      return;
+    }
+
+    if (action === "hide-selection") {
+      const selectedEntry = getSelectedEntries()[0];
+      if (selectedEntry) {
+        await toggleGalleryHomepageVisibility(selectedEntry.id, false);
+      }
+      return;
+    }
+
+    if (action === "archive-selection") {
+      const selectedEntry = getSelectedEntries()[0];
+      if (selectedEntry) {
+        await archiveGalleryEntry(selectedEntry.id, true);
+      }
+      return;
+    }
+
+    if (action === "restore-selection") {
+      const selectedEntry = getSelectedEntries()[0];
+      if (selectedEntry) {
+        await archiveGalleryEntry(selectedEntry.id, false);
+      }
+      return;
+    }
+
+    if (action === "purge-selection") {
+      const selectedEntry = getSelectedEntries()[0];
+      if (selectedEntry) {
+        await deleteGalleryEntry(selectedEntry.id);
+      }
       return;
     }
 
@@ -2048,9 +3099,74 @@ if (thumbAccordion) {
       return;
     }
 
-    if (action === "delete") {
+    if (action === "archive") {
+      await archiveGalleryEntry(entryId, true);
+      return;
+    }
+
+    if (action === "restore") {
+      await archiveGalleryEntry(entryId, false);
+      return;
+    }
+
+    if (action === "purge") {
       await deleteGalleryEntry(entryId);
     }
+  });
+
+  thumbAccordion.addEventListener("keydown", async (event) => {
+    const card = event.target.closest(".thumb-card");
+    if (!card) return;
+
+    if (event.key === " " && !event.target.closest("button, input, a, summary")) {
+      event.preventDefault();
+      setEntrySelected(card.dataset.entryId, !isEntrySelected(card.dataset.entryId));
+      return;
+    }
+
+    if (event.key === "Enter" && !event.target.closest("button, input, a, summary")) {
+      event.preventDefault();
+      openGalleryEditor(card.dataset.entryId);
+    }
+  });
+
+  thumbAccordion.addEventListener("dragstart", (event) => {
+    const card = event.target.closest("[data-thumb-draggable]");
+    if (!card) return;
+    state.dragEntryId = card.dataset.entryId || "";
+    state.dropTargetEntryId = "";
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", state.dragEntryId);
+    }
+    renderThumbAccordion();
+  });
+
+  thumbAccordion.addEventListener("dragover", (event) => {
+    const card = event.target.closest("[data-thumb-draggable]");
+    if (!card || !state.dragEntryId || card.dataset.entryId === state.dragEntryId) return;
+    event.preventDefault();
+    state.dropTargetEntryId = card.dataset.entryId || "";
+    card.classList.add("is-drop-target");
+  });
+
+  thumbAccordion.addEventListener("dragleave", (event) => {
+    const card = event.target.closest(".thumb-card");
+    if (!card) return;
+    card.classList.remove("is-drop-target");
+  });
+
+  thumbAccordion.addEventListener("drop", async (event) => {
+    const card = event.target.closest("[data-thumb-draggable]");
+    if (!card || !state.dragEntryId) return;
+    event.preventDefault();
+    await moveGalleryEntryToTarget(state.dragEntryId, card.dataset.entryId || "");
+  });
+
+  thumbAccordion.addEventListener("dragend", () => {
+    state.dragEntryId = "";
+    state.dropTargetEntryId = "";
+    renderThumbAccordion();
   });
 }
 
@@ -2060,10 +3176,23 @@ if (thumbEditorClose) {
   });
 }
 
+if (thumbUndoBar) {
+  thumbUndoBar.addEventListener("click", async (event) => {
+    const actionButton = event.target.closest("[data-thumb-action='undo-last-action']");
+    if (!actionButton) return;
+    await undoLastAction();
+  });
+}
+
 if (thumbEditorDialog) {
   thumbEditorDialog.addEventListener("close", () => {
     cleanupEditorPreviewUrl();
     state.editorEntryId = "";
+    state.editorMode = "single";
+    state.editorBatchIds = [];
+    state.editorDraftKey = "";
+    removeBatchCategoryOption();
+    thumbEditorBatchTools?.classList.add("is-hidden");
     setThumbEditorStatus("", "");
   });
 }
@@ -2088,11 +3217,39 @@ if (thumbEditorBgColor) {
   });
 }
 
+[
+  thumbEditorCardDescription,
+  thumbEditorCategory,
+  thumbEditorDescription,
+  thumbEditorHomepageVisible,
+  thumbEditorFeatured,
+  thumbEditorUseBg,
+  thumbEditorBgColor,
+  thumbEditorName,
+  thumbEditorTitle,
+  thumbEditorBatchRenameMode,
+  thumbEditorBatchRenameValue,
+  thumbEditorBatchDescriptionMode
+].forEach((element) => {
+  element?.addEventListener("input", () => {
+    updateBatchPreview();
+    persistEditorDraft();
+  });
+  element?.addEventListener("change", () => {
+    updateBatchPreview();
+    persistEditorDraft();
+  });
+});
+
 if (thumbEditorDelete) {
   thumbEditorDelete.addEventListener("click", async () => {
     const entryId = thumbEditorDelete.dataset.entryId;
     if (!entryId) return;
-    await deleteGalleryEntry(entryId);
+    if (thumbEditorDelete.dataset.editorAction === "purge") {
+      await deleteGalleryEntry(entryId);
+      return;
+    }
+    await archiveGalleryEntry(entryId, true);
   });
 }
 

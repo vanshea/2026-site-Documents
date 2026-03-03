@@ -30,95 +30,154 @@
         <a class="back-link" href="/">Back To Site</a>
       </header>
 
-      <section class="panel">
-        <h2>Upload And Generate</h2>
-        <form id="uploadForm" class="form-grid">
-          <label>
-            Source Image (Single)
-            <input id="imageFile" name="image" type="file" accept="image/*" />
-          </label>
-          <label>
-            Source Folder (Batch)
-            <input
-              id="imageFolder"
-              name="images"
-              type="file"
-              accept="image/*"
-              webkitdirectory
-              directory
-              multiple
-            />
-            <span class="field-note">
-              Select a folder of source images (recommended 3200x1800). Files are processed one
-              at a time.
-            </span>
-          </label>
-          <label>
-            Asset Name / Prefix (Optional)
-            <input
-              id="assetName"
-              name="name"
-              type="text"
-              placeholder="example: summer-campaign"
-            />
-          </label>
-          <label>
-            Card Description (Optional)
-            <input
-              id="uploadCardDescription"
-              name="cardDescription"
-              type="text"
-              maxlength="120"
-              placeholder="Short one-line text for the homepage card"
-            />
-            <span class="field-note">
-              Optional one-line text shown on the homepage card image. Applied to each image in a batch.
-            </span>
-          </label>
-          <label>
-            Homepage Category
-            <select id="uploadCategory" name="category">
-              <option value="all">All</option>
-              <option value="branding">Branding</option>
-              <option value="web">Web</option>
-              <option value="illustration">Illustration</option>
-            </select>
-            <span class="field-note">
-              Applied to each image in a batch so homepage filters can place the generated cards correctly.
-            </span>
-          </label>
-          <div class="editor-toggle-block">
-            <label class="editor-inline-toggle">
-              <input id="uploadHomepageVisible" name="homepageVisible" type="checkbox" checked />
-              Show on homepage after upload
+      <div class="top-panels">
+        <section class="panel">
+          <h2>Upload And Generate</h2>
+          <form id="uploadForm" class="form-grid">
+            <div
+              id="uploadDropzone"
+              class="upload-dropzone"
+              tabindex="0"
+              role="button"
+              aria-label="Drop images here or press Enter to choose files"
+            >
+              <strong>Drop images here</strong>
+              <span>or press Enter to choose files manually</span>
+            </div>
+            <label>
+              Source Image (Single)
+              <input id="imageFile" name="image" type="file" accept="image/*" />
             </label>
-            <p class="field-note">
-              Turn this off to store the image in Hidden Assetts only until you are ready to publish it.
-            </p>
-          </div>
-          <fieldset class="output-set">
-            <legend>Generate Outputs</legend>
-            <label><input type="checkbox" value="logo" checked />Logo (240x240 PNG)</label>
-            <label><input type="checkbox" value="thumb" checked />Thumb (760x570 WEBP)</label>
-            <label><input type="checkbox" value="large" checked />Large (1900x1600 WEBP)</label>
-            <label><input type="checkbox" value="fullscreen" checked />Fullscreen (3200x1800 WEBP)</label>
-          </fieldset>
-          <button id="uploadButton" class="btn" type="submit" disabled>Generate Files</button>
-        </form>
-        <p id="uploadMsg" class="status"></p>
-        <ul id="generatedList" class="generated-list"></ul>
-      </section>
+            <label>
+              Source Folder (Batch)
+              <input
+                id="imageFolder"
+                name="images"
+                type="file"
+                accept="image/*"
+                webkitdirectory
+                directory
+                multiple
+              />
+              <span class="field-note">
+                Select a folder of source images (recommended 3200x1800). Files are processed one
+                at a time.
+              </span>
+            </label>
+            <label>
+              Asset Name / Prefix (Optional)
+              <input
+                id="assetName"
+                name="name"
+                type="text"
+                placeholder="example: summer-campaign"
+              />
+            </label>
+            <label>
+              Card Description (Optional)
+              <input
+                id="uploadCardDescription"
+                name="cardDescription"
+                type="text"
+                maxlength="120"
+                placeholder="Short one-line text for the homepage card"
+              />
+              <span class="field-note">
+                Optional one-line text shown on the homepage card image. Applied to each image in a batch.
+              </span>
+            </label>
+            <label>
+              Homepage Category
+              <select id="uploadCategory" name="category">
+                <option value="all">All</option>
+                <option value="branding">Branding</option>
+                <option value="web">Web</option>
+                <option value="illustration">Illustration</option>
+              </select>
+              <span class="field-note">
+                Applied to each image in a batch so homepage filters can place the generated cards correctly.
+              </span>
+            </label>
+            <div class="editor-toggle-block">
+              <label class="editor-inline-toggle">
+                <input id="uploadHomepageVisible" name="homepageVisible" type="checkbox" checked />
+                Show on homepage after upload
+              </label>
+              <p class="field-note">
+                Turn this off to store the image in Hidden Assetts only until you are ready to publish it.
+              </p>
+            </div>
+            <fieldset class="output-set">
+              <legend>Generate Outputs</legend>
+              <label><input type="checkbox" value="logo" checked />Logo (240x240 PNG)</label>
+              <label><input type="checkbox" value="thumb" checked />Thumb (760x570 WEBP)</label>
+              <label><input type="checkbox" value="large" checked />Large (1900x1600 WEBP)</label>
+              <label><input type="checkbox" value="fullscreen" checked />Fullscreen (3200x1800 WEBP)</label>
+            </fieldset>
+            <button id="uploadButton" class="btn" type="submit" disabled>Generate Files</button>
+          </form>
+          <p id="uploadMsg" class="status" role="status" aria-live="polite"></p>
+          <ul id="generatedList" class="generated-list"></ul>
+        </section>
 
-      <section class="panel">
-        <h2>Processed Thumbnails</h2>
-        <p class="subhead">
-          Homepage Gallery contains the cards currently published to the portfolio. Process
-          Thumbnails stay collapsed until you open the accordion, and can be toggled onto the
-          homepage later without deleting the files.
-        </p>
-        <div id="thumbAccordion" class="thumb-accordion"></div>
-        <p id="thumbMsg" class="status"></p>
-      </section>
+        <section class="panel">
+          <h2>Processed Thumbnails</h2>
+          <p class="subhead">
+            Homepage Gallery contains the cards currently published to the portfolio. Hidden
+            Assetts stay collapsed until you open them, and Archived Assets keep removed images in
+            storage until you decide to restore or permanently delete them.
+          </p>
+          <div class="thumb-controls" aria-label="Gallery controls">
+            <label>
+              Search Assets
+              <input
+                id="gallerySearch"
+                type="search"
+                placeholder="Search by title, filename, description, or path"
+              />
+            </label>
+            <label>
+              Status
+              <select id="galleryStatusFilter">
+                <option value="all">All</option>
+                <option value="homepage">Homepage</option>
+                <option value="hidden">Hidden Assetts</option>
+                <option value="archived">Archived Assets</option>
+              </select>
+            </label>
+            <label>
+              Category
+              <select id="galleryCategoryFilter">
+                <option value="all">All</option>
+                <option value="branding">Branding</option>
+                <option value="web">Web</option>
+                <option value="illustration">Illustration</option>
+              </select>
+            </label>
+            <label>
+              Feature State
+              <select id="galleryFeaturedFilter">
+                <option value="all">All</option>
+                <option value="featured">Featured</option>
+                <option value="standard">Standard</option>
+              </select>
+            </label>
+            <label>
+              Sort
+              <select id="gallerySort">
+                <option value="homepage">Homepage Order</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="title-asc">Title A-Z</option>
+                <option value="title-desc">Title Z-A</option>
+              </select>
+            </label>
+          </div>
+          <div id="thumbUndoBar" class="thumb-undo" hidden></div>
+          <div id="thumbAccordion" class="thumb-accordion"></div>
+          <p id="thumbMsg" class="status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
 
       <section class="panel">
         <h2>Assign To Site</h2>
@@ -150,7 +209,7 @@
           </div>
 
           <button class="btn" type="submit">Save Site Config</button>
-          <p id="configMsg" class="status"></p>
+          <p id="configMsg" class="status" role="status" aria-live="polite"></p>
         </form>
       </section>
 
@@ -160,7 +219,12 @@
       </section>
     </main>
 
-    <dialog id="thumbEditorDialog" class="editor-dialog">
+    <dialog
+      id="thumbEditorDialog"
+      class="editor-dialog"
+      aria-labelledby="thumbEditorHeading"
+      aria-describedby="thumbEditorModeNote thumbEditorMsg"
+    >
       <form id="thumbEditorForm" class="editor-form" method="dialog">
         <div class="editor-header">
           <div>
@@ -265,6 +329,36 @@
               ></textarea>
             </label>
 
+            <div id="thumbEditorBatchTools" class="batch-tools is-hidden">
+              <label>
+                Batch Rename Pattern
+                <select id="thumbEditorBatchRenameMode">
+                  <option value="keep">Keep current titles and filenames</option>
+                  <option value="prefix">Add prefix</option>
+                  <option value="suffix">Add suffix</option>
+                </select>
+              </label>
+              <label>
+                Rename Text
+                <input
+                  id="thumbEditorBatchRenameValue"
+                  type="text"
+                  maxlength="40"
+                  placeholder="example: spring-launch"
+                />
+              </label>
+              <label>
+                Description Update
+                <select id="thumbEditorBatchDescriptionMode">
+                  <option value="keep">Keep current descriptions</option>
+                  <option value="replace">Replace description</option>
+                  <option value="prepend">Add text before current description</option>
+                  <option value="append">Add text after current description</option>
+                </select>
+              </label>
+              <p id="thumbEditorBatchPreview" class="field-note batch-preview"></p>
+            </div>
+
             <div class="editor-toggle-block">
               <label class="editor-inline-toggle">
                 <input id="thumbEditorHomepageVisible" name="homepageVisible" type="checkbox" />
@@ -302,14 +396,16 @@
           </div>
         </div>
 
-        <p id="thumbEditorMsg" class="status"></p>
+        <p id="thumbEditorMsg" class="status" role="status" aria-live="polite"></p>
 
         <div class="editor-actions">
           <button id="thumbEditorSave" class="btn" type="submit">Save Changes</button>
-          <button id="thumbEditorDelete" class="btn btn-danger" type="button">Delete</button>
+          <button id="thumbEditorDelete" class="btn btn-danger" type="button">Archive</button>
         </div>
       </form>
     </dialog>
+
+    <div id="a11yAnnouncer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <script src="vscimage.js"></script>
   </body>

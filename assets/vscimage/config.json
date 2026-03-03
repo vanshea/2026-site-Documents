@@ -101,8 +101,21 @@
       "description": "Generated in VSCimage.",
       "thumb": "assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-thumb-760x570.webp",
       "large": "assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-large-1900x1600.webp",
-      "fullscreen": "assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-large-1900x1600.webp",
-      "createdAt": "2026-03-01T02:41:10.266Z"
+      "fullscreen": "assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-fullscreen-3200x1800.webp",
+      "createdAt": "2026-03-01T02:41:10.266Z",
+      "cardDescription": "",
+      "category": "all",
+      "homepageVisible": true,
+      "featured": false,
+      "featuredThumb": "",
+      "logo": "",
+      "original": "assets/vscimage/originals/large-web-portfolio-airdolly23200x1800-1772332869967.webp",
+      "assetBaseName": "large-web-portfolio-airdolly23200x1800",
+      "backgroundColor": "#ffffff",
+      "archived": false,
+      "archivedAt": "",
+      "sourceHash": "",
+      "updatedAt": "2026-03-03T16:46:17.330Z"
     },
     {
       "id": "large-web-portfolio-airdolly-1772332869960",
@@ -111,7 +124,20 @@
       "thumb": "assets/vscimage/generated/large-web-portfolio-airdolly-thumb-760x570.webp",
       "large": "assets/vscimage/generated/large-web-portfolio-airdolly-large-1900x1600.webp",
       "fullscreen": "assets/vscimage/generated/large-web-portfolio-airdolly-large-1900x1600.webp",
-      "createdAt": "2026-03-01T02:41:09.961Z"
+      "createdAt": "2026-03-01T02:41:09.961Z",
+      "cardDescription": "",
+      "category": "all",
+      "homepageVisible": false,
+      "featured": false,
+      "logo": "assets/vscimage/generated/large-web-portfolio-airdolly-logo-240.png",
+      "featuredThumb": "",
+      "assetBaseName": "large-web-portfolio-airdolly",
+      "backgroundColor": "",
+      "original": "",
+      "archived": true,
+      "archivedAt": "2026-03-03T16:46:04.147Z",
+      "sourceHash": "",
+      "updatedAt": "2026-03-03T16:46:04.150Z"
     }
   ],
   "projects": {

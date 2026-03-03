@@ -251,8 +251,14 @@ function splitGalleryEntriesByFeatured(entries) {
   const featuredEntries = [];
   const standardEntries = [];
   const hiddenEntries = [];
+  const archivedEntries = [];
 
   (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    if (isGalleryEntryArchived(entry)) {
+      archivedEntries.push(entry);
+      return;
+    }
+
     if (!isGalleryEntryHomepageVisible(entry)) {
       hiddenEntries.push(entry);
       return;
@@ -266,7 +272,7 @@ function splitGalleryEntriesByFeatured(entries) {
     standardEntries.push(entry);
   });
 
-  return { featuredEntries, standardEntries, hiddenEntries };
+  return { featuredEntries, standardEntries, hiddenEntries, archivedEntries };
 }
 
 function sortGalleryEntriesForDisplay(entries) {
@@ -275,6 +281,10 @@ function sortGalleryEntriesForDisplay(entries) {
 }
 
 function isGalleryEntryHomepageVisible(entry) {
+  if (isGalleryEntryArchived(entry)) {
+    return false;
+  }
+
   if (
     entry?.homepageVisible === undefined ||
     entry?.homepageVisible === null ||
@@ -289,6 +299,71 @@ function isGalleryEntryHomepageVisible(entry) {
 function isGalleryEntryHomepageFeatured(entry) {
   return isGalleryEntryHomepageVisible(entry) &&
     toBool(entry?.featured, Boolean(entry?.featuredThumb));
+}
+
+function isGalleryEntryArchived(entry) {
+  return toBool(entry?.archived, false);
+}
+
+function createBufferHash(buffer) {
+  if (!Buffer.isBuffer(buffer) || !buffer.length) {
+    return "";
+  }
+
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
+function createUniqueAssetBaseName(gallery, requestedBaseName, excludeEntryId = "") {
+  const safeBaseName = sanitizeName(requestedBaseName) || `image-${Date.now()}`;
+  const used = new Set(
+    (Array.isArray(gallery) ? gallery : [])
+      .filter((entry) => String(entry?.id || "").trim() !== String(excludeEntryId || "").trim())
+      .map((entry) => sanitizeName(entry?.assetBaseName || getGalleryEntryBaseName(entry)))
+      .filter(Boolean)
+  );
+
+  if (!used.has(safeBaseName)) {
+    return safeBaseName;
+  }
+
+  let counter = 2;
+  let nextCandidate = `${safeBaseName}-${counter}`;
+  while (used.has(nextCandidate)) {
+    counter += 1;
+    nextCandidate = `${safeBaseName}-${counter}`;
+  }
+
+  return nextCandidate;
+}
+
+function findDuplicateGalleryEntry(gallery, options = {}) {
+  const rows = Array.isArray(gallery) ? gallery : [];
+  const nextHash = String(options.sourceHash || "").trim();
+  const nextBaseName = sanitizeName(options.baseName || "");
+
+  if (nextHash) {
+    const exactMatch = rows.find((entry) => String(entry?.sourceHash || "").trim() === nextHash);
+    if (exactMatch) {
+      return {
+        entry: exactMatch,
+        reason: "sourceHash"
+      };
+    }
+  }
+
+  if (nextBaseName) {
+    const nameMatch = rows.find(
+      (entry) => sanitizeName(entry?.assetBaseName || getGalleryEntryBaseName(entry)) === nextBaseName
+    );
+    if (nameMatch) {
+      return {
+        entry: nameMatch,
+        reason: "assetBaseName"
+      };
+    }
+  }
+
+  return null;
 }
 
 function buildGeneratedGalleryMarkup(galleryEntries) {
@@ -982,6 +1057,13 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextBackgroundColor = Object.prototype.hasOwnProperty.call(options, "backgroundColor")
     ? normalizeHexColor(options.backgroundColor)
     : currentBackgroundColor;
+  const currentArchived = isGalleryEntryArchived(currentEntry);
+  const currentArchivedAt = normalizeTextField(currentEntry.archivedAt || "", 64);
+  const nextArchived = Object.prototype.hasOwnProperty.call(options, "archived")
+    ? toBool(options.archived, currentArchived)
+    : currentArchived;
+  const nextArchivedAt = nextArchived ? currentArchivedAt || new Date().toISOString() : "";
+  const currentSourceHash = normalizeTextField(currentEntry.sourceHash || "", 128);
   const directReplacementFiles = {
     thumb: options.thumbImageBuffer,
     large: options.largeImageBuffer,
@@ -1029,6 +1111,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   let nextFullscreenPath = currentFullscreenPath;
   let nextLogoPath = currentLogoPath;
   let primarySourceBuffer = null;
+  let nextSourceHash = currentSourceHash;
 
   if ((requiresFullRegeneration || hasDirectReplacements) && !sharp) {
     const dependencyError = new Error(
@@ -1057,6 +1140,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
       sourceBuffer = options.imageBuffer;
       primarySourceBuffer = sourceBuffer;
       nextOriginalPath = toWebPath(savedOriginalPath);
+      nextSourceHash = createBufferHash(options.imageBuffer);
 
       const previousOriginalPath = resolveVscimageLocalPath(currentEntry.original);
       if (
@@ -1236,7 +1320,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     cardDescription: nextCardDescription,
     category: nextCategory,
     description: nextDescription,
-    homepageVisible: nextHomepageVisible,
+    homepageVisible: nextArchived ? false : nextHomepageVisible,
     featured: nextFeatured,
     thumb: nextThumbPath,
     featuredThumb: nextFeaturedThumbPath,
@@ -1246,6 +1330,9 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     original: nextOriginalPath,
     assetBaseName: nextBaseName,
     backgroundColor: nextBackgroundColor,
+    archived: nextArchived,
+    archivedAt: nextArchivedAt,
+    sourceHash: nextSourceHash,
     updatedAt: new Date().toISOString()
   };
 
@@ -1298,6 +1385,18 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextHomepageVisible = isGalleryEntryHomepageVisible({
     homepageVisible: nextHomepageVisibleInput
   });
+  const nextArchivedInput = Object.prototype.hasOwnProperty.call(updates || {}, "archived")
+    ? updates.archived
+    : currentEntry.archived;
+  const nextArchived = toBool(nextArchivedInput, false);
+  const nextArchivedAt = nextArchived
+    ? normalizeTextField(
+        Object.prototype.hasOwnProperty.call(updates || {}, "archivedAt")
+          ? updates.archivedAt
+          : currentEntry.archivedAt || new Date().toISOString(),
+        64
+      )
+    : "";
 
   gallery[entryIndex] = {
     ...currentEntry,
@@ -1305,13 +1404,16 @@ async function updateVscimageGalleryEntry(entryId, updates) {
     cardDescription: nextCardDescription,
     category: nextCategory,
     description: nextDescription,
-    homepageVisible: nextHomepageVisible,
+    homepageVisible: nextArchived ? false : nextHomepageVisible,
     featured: toBool(currentEntry.featured, Boolean(currentEntry.featuredThumb)),
     logo: currentEntry.logo || getGalleryEntryLogoPath(currentEntry),
     featuredThumb: sanitizeAssetPath(currentEntry.featuredThumb),
     assetBaseName: currentEntry.assetBaseName || getGalleryEntryBaseName(currentEntry),
     backgroundColor: normalizeHexColor(currentEntry.backgroundColor),
     original: sanitizeAssetPath(currentEntry.original),
+    archived: nextArchived,
+    archivedAt: nextArchivedAt,
+    sourceHash: normalizeTextField(currentEntry.sourceHash || "", 128),
     updatedAt: new Date().toISOString()
   };
   config.gallery = gallery;
@@ -1332,7 +1434,8 @@ async function reorderVscimageGalleryEntry(entryId, direction) {
     throw invalidDirectionError;
   }
 
-  const { featuredEntries, standardEntries, hiddenEntries } = splitGalleryEntriesByFeatured(gallery);
+  const { featuredEntries, standardEntries, hiddenEntries, archivedEntries } =
+    splitGalleryEntriesByFeatured(gallery);
   const standardIndex = standardEntries.findIndex(
     (entry) => String(entry?.id || "").trim() === entryId
   );
@@ -1376,10 +1479,46 @@ async function reorderVscimageGalleryEntry(entryId, direction) {
     reorderedStandardEntries[standardIndex]
   ];
 
-  config.gallery = [...featuredEntries, ...reorderedStandardEntries, ...hiddenEntries];
+  config.gallery = [...featuredEntries, ...reorderedStandardEntries, ...hiddenEntries, ...archivedEntries];
   await writeVscimageConfig(config);
 
   return reorderedStandardEntries[targetIndex];
+}
+
+async function moveVscimageGalleryEntry(entryId, targetEntryId) {
+  const config = await readVscimageConfig();
+  const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+  const { featuredEntries, standardEntries, hiddenEntries, archivedEntries } =
+    splitGalleryEntriesByFeatured(gallery);
+  const entryIndex = standardEntries.findIndex((entry) => String(entry?.id || "").trim() === entryId);
+  const targetIndex = standardEntries.findIndex(
+    (entry) => String(entry?.id || "").trim() === targetEntryId
+  );
+
+  if (entryIndex === -1 || targetIndex === -1) {
+    return null;
+  }
+
+  const reorderedStandardEntries = [...standardEntries];
+  const [movedEntry] = reorderedStandardEntries.splice(entryIndex, 1);
+  const adjustedTargetIndex = entryIndex < targetIndex ? targetIndex - 1 : targetIndex;
+  reorderedStandardEntries.splice(adjustedTargetIndex, 0, movedEntry);
+
+  config.gallery = [...featuredEntries, ...reorderedStandardEntries, ...hiddenEntries, ...archivedEntries];
+  await writeVscimageConfig(config);
+
+  return movedEntry;
+}
+
+async function setVscimageGalleryEntryArchived(entryId, archived = true) {
+  const updates = {
+    archived,
+    archivedAt: archived ? new Date().toISOString() : ""
+  };
+  if (archived) {
+    updates.homepageVisible = false;
+  }
+  return updateVscimageGalleryEntry(entryId, updates);
 }
 
 async function deleteVscimageGalleryEntry(entryId) {
@@ -1392,6 +1531,13 @@ async function deleteVscimageGalleryEntry(entryId) {
   }
 
   const [deletedEntry] = gallery.splice(entryIndex, 1);
+  if (!isGalleryEntryArchived(deletedEntry)) {
+    const archiveFirstError = new Error(
+      "Archive the image first. Permanent delete is only available from Archived Assets."
+    );
+    archiveFirstError.code = "VSCIMAGE_ARCHIVE_FIRST";
+    throw archiveFirstError;
+  }
   const blockingUsages = [...new Set([
     ...collectAssignedAssetUsages(config, deletedEntry?.thumb),
     ...collectAssignedAssetUsages(config, deletedEntry?.large),
@@ -2092,6 +2238,7 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   const category = normalizeGalleryCategory(req.body?.category);
   const description = normalizeTextField(req.body?.description, 320);
   const hasHomepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible");
+  const hasArchived = Object.prototype.hasOwnProperty.call(req.body || {}, "archived");
 
   if (!entryId) {
     return res.status(400).json({ error: "Gallery entry id is required." });
@@ -2107,7 +2254,8 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
       cardDescription,
       category,
       description,
-      ...(hasHomepageVisible ? { homepageVisible: req.body.homepageVisible } : {})
+      ...(hasHomepageVisible ? { homepageVisible: req.body.homepageVisible } : {}),
+      ...(hasArchived ? { archived: req.body.archived } : {})
     });
     if (!updatedEntry) {
       return res.status(404).json({ error: "Gallery entry was not found." });
@@ -2120,16 +2268,42 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   }
 });
 
-app.post("/api/vscimage/gallery/:entryId/reorder", async (req, res) => {
+app.post("/api/vscimage/gallery/:entryId/archive", async (req, res) => {
   const entryId = String(req.params.entryId || "").trim();
-  const direction = String(req.body?.direction || "").trim().toLowerCase();
+  const archived = Object.prototype.hasOwnProperty.call(req.body || {}, "archived")
+    ? toBool(req.body.archived, true)
+    : true;
 
   if (!entryId) {
     return res.status(400).json({ error: "Gallery entry id is required." });
   }
 
   try {
-    const reorderedEntry = await reorderVscimageGalleryEntry(entryId, direction);
+    const updatedEntry = await setVscimageGalleryEntryArchived(entryId, archived);
+    if (!updatedEntry) {
+      return res.status(404).json({ error: "Gallery entry was not found." });
+    }
+
+    return res.status(200).json({ ok: true, entry: updatedEntry });
+  } catch (error) {
+    console.error("Unable to archive VSCimage gallery entry:", error);
+    return res.status(500).json({ error: "Unable to update thumbnail archive state." });
+  }
+});
+
+app.post("/api/vscimage/gallery/:entryId/reorder", async (req, res) => {
+  const entryId = String(req.params.entryId || "").trim();
+  const direction = String(req.body?.direction || "").trim().toLowerCase();
+  const targetEntryId = String(req.body?.targetEntryId || "").trim();
+
+  if (!entryId) {
+    return res.status(400).json({ error: "Gallery entry id is required." });
+  }
+
+  try {
+    const reorderedEntry = targetEntryId
+      ? await moveVscimageGalleryEntry(entryId, targetEntryId)
+      : await reorderVscimageGalleryEntry(entryId, direction);
     if (!reorderedEntry) {
       return res.status(404).json({ error: "Gallery entry was not found." });
     }
@@ -2166,7 +2340,7 @@ app.post("/api/vscimage/gallery/:entryId/delete", async (req, res) => {
 
     return res.status(200).json({ ok: true, entry: deletedEntry });
   } catch (error) {
-    if (error.code === "VSCIMAGE_ENTRY_IN_USE") {
+    if (["VSCIMAGE_ENTRY_IN_USE", "VSCIMAGE_ARCHIVE_FIRST"].includes(error.code)) {
       return res.status(409).json({ error: error.message });
     }
     console.error("Unable to delete VSCimage gallery entry:", error);
@@ -2259,6 +2433,7 @@ if (upload) {
     }
 
     const baseName = sanitizeName(req.body.name) || `image-${Date.now()}`;
+    const duplicateMode = String(req.body.duplicateMode || "").trim().toLowerCase();
     const backgroundColor = normalizeHexColor(req.body.backgroundColor);
     const category = normalizeGalleryCategory(req.body.category);
     const homepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible")
@@ -2281,14 +2456,92 @@ if (upload) {
 
     try {
       await ensureVscimageStorage();
+      const sourceHash = createBufferHash(req.file.buffer);
+      const config = await readVscimageConfig();
+      const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+      const duplicate = findDuplicateGalleryEntry(gallery, {
+        sourceHash,
+        baseName
+      });
+
+      if (duplicate && !["replace", "keep-both", "skip"].includes(duplicateMode)) {
+        return res.status(409).json({
+          error: "A matching image already exists in VSCimage.",
+          duplicate: {
+            id: String(duplicate.entry?.id || "").trim(),
+            title: String(duplicate.entry?.title || duplicate.entry?.id || "Existing image").trim(),
+            reason: duplicate.reason,
+            archived: isGalleryEntryArchived(duplicate.entry),
+            homepageVisible: isGalleryEntryHomepageVisible(duplicate.entry)
+          }
+        });
+      }
+
+      if (duplicate && duplicateMode === "skip") {
+        return res.status(200).json({
+          ok: true,
+          skipped: true,
+          duplicate: {
+            id: String(duplicate.entry?.id || "").trim(),
+            title: String(duplicate.entry?.title || duplicate.entry?.id || "Existing image").trim(),
+            reason: duplicate.reason
+          }
+        });
+      }
+
+      const duplicateReplacementBaseName = sanitizeName(
+        duplicate?.entry?.assetBaseName || getGalleryEntryBaseName(duplicate?.entry) || baseName
+      );
+      const resolvedBaseName = duplicate && duplicateMode === "replace"
+        ? duplicateReplacementBaseName
+        : duplicate && duplicateMode === "keep-both"
+          ? createUniqueAssetBaseName(gallery, baseName)
+          : baseName;
+      const displayTitle = String(req.body.name || baseName)
+        .trim()
+        .replace(/\s+/g, " ")
+        .slice(0, 120);
+
+      if (duplicate && duplicateMode === "replace") {
+        const galleryEntry = await editVscimageGalleryEntry(String(duplicate.entry?.id || "").trim(), {
+          title: displayTitle || duplicate.entry?.title || resolvedBaseName,
+          cardDescription: normalizeCardDescription(req.body.cardDescription || "", 120),
+          category,
+          description:
+            String(req.body.description || "")
+              .trim()
+              .replace(/\s+/g, " ")
+              .slice(0, 320) || "Generated in VSCimage.",
+          homepageVisible,
+          featured: false,
+          name: duplicateReplacementBaseName,
+          backgroundColor,
+          imageBuffer: req.file.buffer,
+          originalName: req.file.originalname,
+          archived: false
+        });
+
+        return res.status(200).json({
+          ok: true,
+          original: galleryEntry?.original || "",
+          outputs: {
+            logo: galleryEntry?.logo || "",
+            thumb: galleryEntry?.thumb || "",
+            large: galleryEntry?.large || "",
+            fullscreen: galleryEntry?.fullscreen || ""
+          },
+          galleryEntry,
+          duplicateHandled: duplicateMode
+        });
+      }
 
       const originalPath = await saveOriginalImageBuffer(
         req.file.buffer,
         req.file.originalname,
-        baseName
+        resolvedBaseName
       );
       const generated = await generateVscimageOutputsFromBuffer(req.file.buffer, {
-        baseName,
+        baseName: resolvedBaseName,
         backgroundColor,
         outputs
       });
@@ -2298,17 +2551,10 @@ if (upload) {
         generated.thumb || generated.large || generated.fullscreen || generated.logo || null;
 
       if (galleryThumb) {
-        const config = await readVscimageConfig();
-        const gallery = Array.isArray(config.gallery) ? config.gallery : [];
-        const entryId = `${baseName}-${Date.now()}`;
-        const displayTitle = String(req.body.name || baseName)
-          .trim()
-          .replace(/\s+/g, " ")
-          .slice(0, 120);
-
+        const entryId = `${resolvedBaseName}-${Date.now()}`;
         galleryEntry = {
           id: entryId,
-          title: displayTitle || baseName,
+          title: displayTitle || resolvedBaseName,
           cardDescription: normalizeCardDescription(req.body.cardDescription || "", 120),
           category,
           description:
@@ -2324,15 +2570,17 @@ if (upload) {
           fullscreen: generated.fullscreen || generated.large || galleryThumb,
           logo: generated.logo || "",
           original: toWebPath(originalPath),
-          assetBaseName: baseName,
+          assetBaseName: resolvedBaseName,
           backgroundColor,
+          archived: false,
+          archivedAt: "",
+          sourceHash,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
 
         const deduped = gallery.filter((item) => item?.thumb !== galleryThumb);
         config.gallery = [galleryEntry, ...deduped].slice(0, 300);
-
         await writeVscimageConfig(config);
       }
 
@@ -2340,7 +2588,8 @@ if (upload) {
         ok: true,
         original: toWebPath(originalPath),
         outputs: generated,
-        galleryEntry
+        galleryEntry,
+        duplicateHandled: duplicate ? duplicateMode : ""
       });
     } catch (error) {
       console.error("Unable to process uploaded image:", error);
