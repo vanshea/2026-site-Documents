@@ -13,9 +13,16 @@ const state = {
   apiAvailable: true,
   apiOrigin: window.location.origin,
   editorEntryId: "",
+  editorMode: "single",
+  editorBatchIds: [],
   editorPreviewUrl: "",
   galleryBusyId: "",
-  galleryBusyAction: ""
+  galleryBusyAction: "",
+  thumbSectionOpen: {
+    process: false
+  },
+  thumbBatchOpen: {},
+  selectedEntryIds: new Set()
 };
 
 const THUMB_CARD_MIN_WIDTH = 210;
@@ -52,6 +59,7 @@ const imageFolderInput = document.getElementById("imageFolder");
 const assetNameInput = document.getElementById("assetName");
 const uploadCardDescriptionInput = document.getElementById("uploadCardDescription");
 const uploadCategoryInput = document.getElementById("uploadCategory");
+const uploadHomepageVisibleInput = document.getElementById("uploadHomepageVisible");
 const uploadButton = document.getElementById("uploadButton");
 const configForm = document.getElementById("configForm");
 const configMsg = document.getElementById("configMsg");
@@ -63,6 +71,9 @@ const thumbAccordion = document.getElementById("thumbAccordion");
 const thumbMsg = document.getElementById("thumbMsg");
 const thumbEditorDialog = document.getElementById("thumbEditorDialog");
 const thumbEditorForm = document.getElementById("thumbEditorForm");
+const thumbEditorKicker = document.getElementById("thumbEditorKicker");
+const thumbEditorHeading = document.getElementById("thumbEditorHeading");
+const thumbEditorModeNote = document.getElementById("thumbEditorModeNote");
 const thumbEditorClose = document.getElementById("thumbEditorClose");
 const thumbEditorSave = document.getElementById("thumbEditorSave");
 const thumbEditorDelete = document.getElementById("thumbEditorDelete");
@@ -76,6 +87,7 @@ const thumbEditorTitle = document.getElementById("thumbEditorTitle");
 const thumbEditorCardDescription = document.getElementById("thumbEditorCardDescription");
 const thumbEditorCategory = document.getElementById("thumbEditorCategory");
 const thumbEditorDescription = document.getElementById("thumbEditorDescription");
+const thumbEditorHomepageVisible = document.getElementById("thumbEditorHomepageVisible");
 const thumbEditorFeatured = document.getElementById("thumbEditorFeatured");
 const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
 const thumbEditorBgColor = document.getElementById("thumbEditorBgColor");
@@ -84,8 +96,11 @@ const thumbEditorPreviewImage = document.getElementById("thumbEditorPreviewImage
 const thumbEditorPreviewLabel = document.getElementById("thumbEditorPreviewLabel");
 const thumbEditorAssetList = document.getElementById("thumbEditorAssetList");
 const thumbEditorMsg = document.getElementById("thumbEditorMsg");
+const thumbEditorSingleOnlyElements = Array.from(
+  thumbEditorForm?.querySelectorAll("[data-editor-single-only]") || []
+);
 const uploadOutputInputs = Array.from(
-  uploadForm?.querySelectorAll('input[type="checkbox"]') || []
+  uploadForm?.querySelectorAll('.output-set input[type="checkbox"]') || []
 );
 const thumbEditorReplacementInputs = [
   { key: "image", label: "Source", element: thumbEditorImage },
@@ -167,6 +182,18 @@ function normalizeGalleryCategory(value) {
     : "all";
 }
 
+function normalizeHomepageVisible(value) {
+  if (value === undefined || value === null || value === "") {
+    return true;
+  }
+
+  return ["1", "true", "yes", "on"].includes(
+    String(value)
+      .trim()
+      .toLowerCase()
+  );
+}
+
 function normalizeHexColor(value) {
   let raw = String(value || "").trim();
   if (!raw) return "";
@@ -181,6 +208,117 @@ function normalizeHexColor(value) {
   }
 
   return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : "";
+}
+
+function getSelectedEntryIds() {
+  return Array.from(state.selectedEntryIds);
+}
+
+function isEntrySelected(entryId) {
+  return state.selectedEntryIds.has(String(entryId || ""));
+}
+
+function syncSelectedEntriesWithConfig() {
+  const availableIds = new Set(
+    normalizeGalleryEntries(state.config?.gallery).map((entry) => String(entry.id || "").trim())
+  );
+
+  state.selectedEntryIds.forEach((entryId) => {
+    if (!availableIds.has(entryId)) {
+      state.selectedEntryIds.delete(entryId);
+    }
+  });
+}
+
+function clearSelectedEntries({ rerender = true } = {}) {
+  if (!state.selectedEntryIds.size) return;
+  state.selectedEntryIds.clear();
+  if (rerender) {
+    renderThumbAccordion();
+  }
+}
+
+function setEntrySelected(entryId, nextSelected) {
+  const normalizedId = String(entryId || "").trim();
+  if (!normalizedId) return;
+
+  if (nextSelected) {
+    state.selectedEntryIds.add(normalizedId);
+  } else {
+    state.selectedEntryIds.delete(normalizedId);
+  }
+
+  renderThumbAccordion();
+}
+
+function getSelectedEntries() {
+  const selectedIds = new Set(getSelectedEntryIds());
+  if (!selectedIds.size) return [];
+
+  return normalizeGalleryEntries(state.config?.gallery).filter((entry) => selectedIds.has(entry.id));
+}
+
+function getActionTargetEntries(entryId) {
+  const clickedEntry = getGalleryEntryById(entryId);
+  if (!clickedEntry) {
+    return [];
+  }
+
+  const selectedEntries = getSelectedEntries();
+  if (selectedEntries.length && isEntrySelected(entryId)) {
+    return selectedEntries;
+  }
+
+  return [clickedEntry];
+}
+
+function getEntryLabelList(entries) {
+  return (Array.isArray(entries) ? entries : [])
+    .map((entry) => entry?.title || entry?.id || "image")
+    .filter(Boolean);
+}
+
+function ensureBatchCategoryOption() {
+  if (!thumbEditorCategory) return;
+  const keepValue = "__keep__";
+  const existing = Array.from(thumbEditorCategory.options).find((option) => option.value === keepValue);
+  if (existing) return;
+
+  const option = document.createElement("option");
+  option.value = keepValue;
+  option.textContent = "Keep current categories";
+  thumbEditorCategory.insertBefore(option, thumbEditorCategory.firstChild);
+}
+
+function removeBatchCategoryOption() {
+  if (!thumbEditorCategory) return;
+  const keepOption = Array.from(thumbEditorCategory.options).find(
+    (option) => option.value === "__keep__"
+  );
+  if (keepOption) {
+    keepOption.remove();
+  }
+}
+
+function setBatchCheckboxState(element, mode) {
+  if (!element) return;
+
+  if (mode === "keep") {
+    element.checked = false;
+    element.indeterminate = true;
+    return;
+  }
+
+  element.indeterminate = false;
+  element.checked = mode === "on";
+}
+
+function getBatchCheckboxValue(element) {
+  if (!element || element.indeterminate) {
+    return undefined;
+  }
+
+  return element.checked;
 }
 
 function stripExtension(fileName) {
@@ -337,6 +475,7 @@ function normalizeGalleryEntries(entries) {
       );
       const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
       const category = normalizeGalleryCategory(entry?.category);
+      const homepageVisible = normalizeHomepageVisible(entry?.homepageVisible);
       const featured =
         ["1", "true", "yes", "on"].includes(
           String(entry?.featured || "")
@@ -363,6 +502,7 @@ function normalizeGalleryEntries(entries) {
         description,
         cardDescription,
         category,
+        homepageVisible,
         featured,
         thumb,
         featuredThumb,
@@ -379,25 +519,54 @@ function normalizeGalleryEntries(entries) {
     .filter(Boolean);
 }
 
-function splitGalleryEntriesByFeatured(entries) {
-  const featuredEntries = [];
-  const standardEntries = [];
+function isGalleryEntryHomepageVisible(entry) {
+  return normalizeHomepageVisible(entry?.homepageVisible);
+}
+
+function isGalleryEntryHomepageFeatured(entry) {
+  return isGalleryEntryHomepageVisible(entry) && Boolean(entry?.featured || entry?.featuredThumb);
+}
+
+function splitGalleryEntriesBySection(entries) {
+  const homepageFeaturedEntries = [];
+  const homepageStandardEntries = [];
+  const processEntries = [];
 
   (Array.isArray(entries) ? entries : []).forEach((entry) => {
-    if (entry?.featured || entry?.featuredThumb) {
-      featuredEntries.push(entry);
+    if (!isGalleryEntryHomepageVisible(entry)) {
+      processEntries.push(entry);
       return;
     }
 
-    standardEntries.push(entry);
+    if (isGalleryEntryHomepageFeatured(entry)) {
+      homepageFeaturedEntries.push(entry);
+      return;
+    }
+
+    homepageStandardEntries.push(entry);
   });
 
-  return { featuredEntries, standardEntries };
+  return { homepageFeaturedEntries, homepageStandardEntries, processEntries };
 }
 
 function sortGalleryEntriesForDisplay(entries) {
-  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(entries);
-  return [...featuredEntries, ...standardEntries];
+  const { homepageFeaturedEntries, homepageStandardEntries } = splitGalleryEntriesBySection(entries);
+  return [...homepageFeaturedEntries, ...homepageStandardEntries];
+}
+
+function compareIsoDateDesc(left, right) {
+  const leftTime = Date.parse(left?.updatedAt || left?.createdAt || "") || 0;
+  const rightTime = Date.parse(right?.updatedAt || right?.createdAt || "") || 0;
+
+  if (leftTime !== rightTime) {
+    return rightTime - leftTime;
+  }
+
+  return String(left?.title || left?.id || "").localeCompare(String(right?.title || right?.id || ""));
+}
+
+function sortProcessEntries(entries) {
+  return [...(Array.isArray(entries) ? entries : [])].sort(compareIsoDateDesc);
 }
 
 function getGalleryEntryBaseName(entry) {
@@ -470,19 +639,66 @@ function ensureConfigShape(config) {
   return merged;
 }
 
+function createThumbBadge(label, className = "") {
+  const badge = document.createElement("span");
+  badge.className = `thumb-card-badge${className ? ` ${className}` : ""}`;
+  badge.textContent = label;
+  return badge;
+}
+
 function buildThumbnailCard(entry, options = {}) {
   const card = document.createElement("article");
   card.className = "thumb-card";
+  if (options.section === "process") {
+    card.classList.add("thumb-card-compact");
+  }
+  if (isEntrySelected(entry.id)) {
+    card.classList.add("is-selected");
+  }
   card.dataset.entryId = entry.id;
 
   const actionsDisabled = !state.apiAvailable || Boolean(state.galleryBusyId);
   const isBusy = state.galleryBusyId === entry.id;
   const busyAction = isBusy ? state.galleryBusyAction : "";
+  const homepageVisible = isGalleryEntryHomepageVisible(entry);
+  const homepageFeatured = isGalleryEntryHomepageFeatured(entry);
+  const hasSelection = state.selectedEntryIds.size > 0;
+
+  const selectionRow = document.createElement("label");
+  selectionRow.className = "thumb-card-selection";
+
+  const selectionInput = document.createElement("input");
+  selectionInput.type = "checkbox";
+  selectionInput.checked = isEntrySelected(entry.id);
+  selectionInput.dataset.thumbSelect = "true";
+  selectionInput.dataset.entryId = entry.id;
+  selectionInput.setAttribute("aria-label", `Select ${entry.title}`);
+
+  const selectionText = document.createElement("span");
+  selectionText.textContent = selectionInput.checked ? "Selected" : "Select";
+
+  selectionRow.appendChild(selectionInput);
+  selectionRow.appendChild(selectionText);
 
   const image = document.createElement("img");
   image.src = toAssetUrl(entry.thumb);
   image.alt = entry.title;
   image.loading = "lazy";
+
+  const badges = document.createElement("div");
+  badges.className = "thumb-card-badges";
+  badges.appendChild(
+    createThumbBadge(
+      homepageVisible ? "Homepage live" : "Process thumbnail",
+      homepageVisible ? "is-live" : "is-process"
+    )
+  );
+  badges.appendChild(createThumbBadge(`Category: ${entry.category || "all"}`));
+  if (homepageFeatured) {
+    badges.appendChild(createThumbBadge("Featured", "is-featured"));
+  } else if (entry.featured || entry.featuredThumb) {
+    badges.appendChild(createThumbBadge("Featured when shown", "is-featured"));
+  }
 
   const title = document.createElement("h3");
   title.textContent = entry.title;
@@ -490,10 +706,6 @@ function buildThumbnailCard(entry, options = {}) {
   const description = document.createElement("p");
   description.className = "thumb-card-description";
   description.textContent = entry.description || "Generated in VSCimage.";
-
-  const category = document.createElement("p");
-  category.className = "path";
-  category.textContent = `Category: ${entry.category || "all"}`;
 
   const path = document.createElement("p");
   path.className = "path";
@@ -524,12 +736,26 @@ function buildThumbnailCard(entry, options = {}) {
   deleteButton.dataset.entryId = entry.id;
   deleteButton.disabled = actionsDisabled;
 
-  if (entry.featured || entry.featuredThumb) {
+  const visibilityButton = document.createElement("button");
+  visibilityButton.type = "button";
+  visibilityButton.className = "btn btn-secondary";
+  visibilityButton.textContent = homepageVisible
+    ? busyAction === "hide-homepage"
+      ? "Moving..."
+      : "Hide"
+    : busyAction === "show-homepage"
+      ? "Publishing..."
+      : "Show On Homepage";
+  visibilityButton.dataset.thumbAction = homepageVisible ? "hide-homepage" : "show-homepage";
+  visibilityButton.dataset.entryId = entry.id;
+  visibilityButton.disabled = actionsDisabled;
+
+  if (homepageFeatured) {
     const pinnedLabel = document.createElement("span");
     pinnedLabel.className = "thumb-card-order-label";
     pinnedLabel.textContent = "Featured card stays pinned";
     actions.appendChild(pinnedLabel);
-  } else if (options.standardCount > 1) {
+  } else if (homepageVisible && options.standardCount > 1) {
     const orderLabel = document.createElement("span");
     orderLabel.className = "thumb-card-order-label";
     orderLabel.textContent = `Homepage order: ${options.standardIndex + 1}`;
@@ -542,7 +768,7 @@ function buildThumbnailCard(entry, options = {}) {
     moveEarlierButton.dataset.entryId = entry.id;
     moveEarlierButton.setAttribute("aria-label", "Move earlier");
     moveEarlierButton.title = "Move earlier";
-    moveEarlierButton.disabled = actionsDisabled || !options.canMoveUp;
+    moveEarlierButton.disabled = actionsDisabled || hasSelection || !options.canMoveUp;
 
     const moveLaterButton = document.createElement("button");
     moveLaterButton.type = "button";
@@ -552,20 +778,32 @@ function buildThumbnailCard(entry, options = {}) {
     moveLaterButton.dataset.entryId = entry.id;
     moveLaterButton.setAttribute("aria-label", "Move later");
     moveLaterButton.title = "Move later";
-    moveLaterButton.disabled = actionsDisabled || !options.canMoveDown;
+    moveLaterButton.disabled = actionsDisabled || hasSelection || !options.canMoveDown;
 
     actions.appendChild(orderLabel);
     actions.appendChild(moveEarlierButton);
     actions.appendChild(moveLaterButton);
+  } else if (homepageVisible) {
+    const orderLabel = document.createElement("span");
+    orderLabel.className = "thumb-card-order-label";
+    orderLabel.textContent = "Homepage order: 1";
+    actions.appendChild(orderLabel);
+  } else {
+    const storedLabel = document.createElement("span");
+    storedLabel.className = "thumb-card-order-label";
+    storedLabel.textContent = "Stored only. This image is hidden from the homepage.";
+    actions.appendChild(storedLabel);
   }
 
+  actions.appendChild(visibilityButton);
   actions.appendChild(editButton);
   actions.appendChild(deleteButton);
 
+  card.appendChild(selectionRow);
   card.appendChild(image);
+  card.appendChild(badges);
   card.appendChild(title);
   card.appendChild(description);
-  card.appendChild(category);
   card.appendChild(path);
   card.appendChild(link);
   card.appendChild(actions);
@@ -654,30 +892,85 @@ function renderThumbEditorAssetList(entry) {
   }
 }
 
-function openGalleryEditor(entryId) {
-  const entry = getGalleryEntryById(entryId);
-  if (!entry || !thumbEditorDialog || !thumbEditorForm) {
+function setGalleryEditorMode(mode, entries = []) {
+  const isBatchMode = mode === "batch";
+  state.editorMode = isBatchMode ? "batch" : "single";
+  state.editorBatchIds = isBatchMode ? entries.map((entry) => entry.id) : [];
+
+  thumbEditorSingleOnlyElements.forEach((element) => {
+    element.classList.toggle("is-hidden", isBatchMode);
+  });
+
+  thumbEditorDelete.classList.toggle("is-hidden", isBatchMode);
+
+  if (isBatchMode) {
+    thumbEditorKicker.textContent = "Processed Thumbnails";
+    thumbEditorHeading.textContent = `Edit ${entries.length} Images`;
+    thumbEditorModeNote.hidden = false;
+    thumbEditorModeNote.textContent =
+      "Blank text fields keep their current values. Homepage, feature, and background toggles start in a neutral keep-current state.";
+    thumbEditorCardDescription.value = "";
+    thumbEditorCardDescription.placeholder = "Leave blank to keep current card descriptions";
+    ensureBatchCategoryOption();
+    thumbEditorCategory.value = "__keep__";
+    thumbEditorDescription.value = "";
+    thumbEditorDescription.placeholder = "Leave blank to keep current descriptions";
+    setBatchCheckboxState(thumbEditorHomepageVisible, "keep");
+    setBatchCheckboxState(thumbEditorFeatured, "keep");
+    setBatchCheckboxState(thumbEditorUseBg, "keep");
+    thumbEditorBgColor.value = "#ffffff";
+    thumbEditorName.value = "";
+    thumbEditorTitle.value = "";
+    thumbEditorPreviewLabel.textContent = `${entries.length} selected images`;
+    thumbEditorAssetList.innerHTML = "";
+    updateThumbEditorBackgroundState();
     return;
   }
 
-  state.editorEntryId = entryId;
+  thumbEditorKicker.textContent = "Processed Thumbnail";
+  thumbEditorHeading.textContent = "Edit Image";
+  thumbEditorModeNote.hidden = true;
+  thumbEditorModeNote.textContent = "";
+  thumbEditorCardDescription.placeholder = "Short one-line text for the homepage card";
+  thumbEditorDescription.placeholder = "";
+  removeBatchCategoryOption();
+  thumbEditorHomepageVisible.indeterminate = false;
+  thumbEditorFeatured.indeterminate = false;
+  thumbEditorUseBg.indeterminate = false;
+}
+
+function openGalleryEditor(entryId) {
+  const targetEntries = getActionTargetEntries(entryId);
+  if (!targetEntries.length || !thumbEditorDialog || !thumbEditorForm) {
+    return;
+  }
+
+  state.editorEntryId = targetEntries.length === 1 ? targetEntries[0].id : "";
   cleanupEditorPreviewUrl();
 
   thumbEditorForm.reset();
-  thumbEditorName.value = getGalleryEntryBaseName(entry) || sanitizeAssetName(entry.title) || "";
-  thumbEditorTitle.value = entry.title || "";
-  thumbEditorCardDescription.value = entry.cardDescription || "";
-  thumbEditorCategory.value = normalizeGalleryCategory(entry.category);
-  thumbEditorDescription.value = entry.description || "";
-  thumbEditorFeatured.checked = Boolean(entry.featured);
-  thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
-  thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
-  thumbEditorDelete.dataset.entryId = entryId;
+  thumbEditorDelete.dataset.entryId = targetEntries[0].id;
   thumbEditorSave.disabled = !state.apiAvailable;
   thumbEditorDelete.disabled = !state.apiAvailable;
   setThumbEditorStatus("", "");
-  updateThumbEditorPreview(entry);
-  renderThumbEditorAssetList(entry);
+
+  if (targetEntries.length > 1) {
+    setGalleryEditorMode("batch", targetEntries);
+  } else {
+    const entry = targetEntries[0];
+    setGalleryEditorMode("single", targetEntries);
+    thumbEditorName.value = getGalleryEntryBaseName(entry) || sanitizeAssetName(entry.title) || "";
+    thumbEditorTitle.value = entry.title || "";
+    thumbEditorCardDescription.value = entry.cardDescription || "";
+    thumbEditorCategory.value = normalizeGalleryCategory(entry.category);
+    thumbEditorDescription.value = entry.description || "";
+    thumbEditorHomepageVisible.checked = isGalleryEntryHomepageVisible(entry);
+    thumbEditorFeatured.checked = Boolean(entry.featured);
+    thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
+    thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
+    updateThumbEditorPreview(entry);
+    renderThumbEditorAssetList(entry);
+  }
 
   if (thumbEditorDialog.open) {
     return;
@@ -700,7 +993,10 @@ function closeGalleryEditor() {
   }
 
   state.editorEntryId = "";
+  state.editorMode = "single";
+  state.editorBatchIds = [];
   cleanupEditorPreviewUrl();
+  removeBatchCategoryOption();
   setThumbEditorStatus("", "");
 }
 
@@ -713,44 +1009,74 @@ async function deleteGalleryEntry(entryId) {
     return;
   }
 
-  const entry = normalizeGalleryEntries(state.config?.gallery).find((item) => item.id === entryId);
-  const label = entry?.title || entryId;
+  const targetEntries = getActionTargetEntries(entryId);
+  if (!targetEntries.length) {
+    setThumbStatus("Thumbnail entry was not found.", "error");
+    return;
+  }
+
+  const label = targetEntries.length === 1
+    ? targetEntries[0].title || targetEntries[0].id
+    : `${targetEntries.length} selected images`;
   const confirmed = window.confirm(
-    `Delete "${label}" from Processed Thumbnails? Generated files tied to this card will be removed from VSCimage.`
+    targetEntries.length === 1
+      ? `Delete "${label}" from Hidden Assetts? Generated files tied to this card will be removed from VSCimage.`
+      : `Delete ${targetEntries.length} selected thumbnails from Hidden Assetts? Generated files tied to those cards will be removed from VSCimage.`
   );
   if (!confirmed) {
     return;
   }
 
-  state.galleryBusyId = entryId;
-  state.galleryBusyAction = "delete";
-  renderThumbAccordion();
-  setThumbStatus(`Deleting ${label}...`, "");
-  if (state.editorEntryId === entryId) {
-    thumbEditorSave.disabled = true;
-    thumbEditorDelete.disabled = true;
-    setThumbEditorStatus(`Deleting ${label}...`, "");
-  }
+  const failedLabels = [];
+  let deletedCount = 0;
 
   try {
-    await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entryId)}/delete`, {
-      method: "POST"
-    });
-    if (state.editorEntryId === entryId) {
+    for (const entry of targetEntries) {
+      const currentLabel = entry.title || entry.id;
+      state.galleryBusyId = entry.id;
+      state.galleryBusyAction = "delete";
+      renderThumbAccordion();
+      setThumbStatus(`Deleting ${currentLabel}...`, "");
+      if (state.editorEntryId === entry.id || state.editorMode === "batch") {
+        thumbEditorSave.disabled = true;
+        thumbEditorDelete.disabled = true;
+        setThumbEditorStatus(`Deleting ${currentLabel}...`, "");
+      }
+
+      try {
+        await fetchJson(
+          `${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entry.id)}/delete`,
+          {
+            method: "POST"
+          }
+        );
+        deletedCount += 1;
+      } catch (error) {
+        failedLabels.push(`${currentLabel}: ${error.message}`);
+      }
+    }
+
+    if (deletedCount > 0) {
       closeGalleryEditor();
     }
     await reloadData();
-    setThumbStatus("Thumbnail deleted.", "ok");
-  } catch (error) {
-    setThumbStatus(error.message, "error");
+    if (failedLabels.length) {
+      setThumbStatus(
+        `Deleted ${deletedCount} image${deletedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
+        "error"
+      );
+    } else {
+      setThumbStatus(
+        `Deleted ${deletedCount} image${deletedCount === 1 ? "" : "s"}.`,
+        "ok"
+      );
+    }
   } finally {
     state.galleryBusyId = "";
     state.galleryBusyAction = "";
     renderThumbAccordion();
-    if (state.editorEntryId === entryId) {
-      thumbEditorSave.disabled = !state.apiAvailable;
-      thumbEditorDelete.disabled = !state.apiAvailable;
-    }
+    thumbEditorSave.disabled = !state.apiAvailable;
+    thumbEditorDelete.disabled = !state.apiAvailable;
   }
 }
 
@@ -760,6 +1086,112 @@ async function saveGalleryEditor() {
       "Edit is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
       "error"
     );
+    return;
+  }
+
+  if (state.editorMode === "batch") {
+    const targetEntries = normalizeGalleryEntries(state.config?.gallery).filter((entry) =>
+      state.editorBatchIds.includes(entry.id)
+    );
+
+    if (!targetEntries.length) {
+      setThumbEditorStatus("Selected thumbnails were not found.", "error");
+      return;
+    }
+
+    const batchCardDescription = normalizeCardDescription(thumbEditorCardDescription?.value || "");
+    const batchCategory = String(thumbEditorCategory?.value || "__keep__").trim();
+    const batchDescription = normalizeDescription(thumbEditorDescription?.value || "", 320);
+    const batchHomepageVisible = getBatchCheckboxValue(thumbEditorHomepageVisible);
+    const batchFeatured = getBatchCheckboxValue(thumbEditorFeatured);
+    const batchUseBackground = getBatchCheckboxValue(thumbEditorUseBg);
+    const batchBackgroundColor = normalizeHexColor(thumbEditorBgColor?.value || "#ffffff");
+
+    const hasBatchEdits =
+      Boolean(batchCardDescription) ||
+      batchCategory !== "__keep__" ||
+      Boolean(batchDescription) ||
+      batchHomepageVisible !== undefined ||
+      batchFeatured !== undefined ||
+      batchUseBackground !== undefined;
+
+    if (!hasBatchEdits) {
+      setThumbEditorStatus("Choose at least one change to apply to the selected images.", "error");
+      return;
+    }
+
+    thumbEditorSave.disabled = true;
+    thumbEditorDelete.disabled = true;
+    setThumbEditorStatus(`Saving ${targetEntries.length} selected images...`, "");
+
+    const failedLabels = [];
+    let updatedCount = 0;
+
+    try {
+      for (const entry of targetEntries) {
+        const formData = new FormData();
+
+        if (batchCardDescription) {
+          formData.append("cardDescription", batchCardDescription);
+        }
+        if (batchCategory !== "__keep__") {
+          formData.append("category", batchCategory);
+        }
+        if (batchDescription) {
+          formData.append("description", batchDescription);
+        }
+        if (batchHomepageVisible !== undefined) {
+          formData.append("homepageVisible", batchHomepageVisible ? "true" : "false");
+        }
+        if (batchFeatured !== undefined) {
+          formData.append("featured", batchFeatured ? "true" : "false");
+        }
+        if (batchUseBackground !== undefined) {
+          formData.append(
+            "backgroundColor",
+            batchUseBackground ? batchBackgroundColor || "#ffffff" : ""
+          );
+        }
+
+        state.galleryBusyId = entry.id;
+        state.galleryBusyAction = "save";
+        renderThumbAccordion();
+
+        try {
+          await fetchJson(
+            `${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entry.id)}/edit`,
+            {
+              method: "POST",
+              body: formData
+            }
+          );
+          updatedCount += 1;
+        } catch (error) {
+          failedLabels.push(`${entry.title || entry.id}: ${error.message}`);
+        }
+      }
+
+      await reloadData();
+      closeGalleryEditor();
+      if (failedLabels.length) {
+        setThumbStatus(
+          `Updated ${updatedCount} image${updatedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
+          "error"
+        );
+      } else {
+        setThumbStatus(
+          `Updated ${updatedCount} selected image${updatedCount === 1 ? "" : "s"}.`,
+          "ok"
+        );
+      }
+    } finally {
+      state.galleryBusyId = "";
+      state.galleryBusyAction = "";
+      renderThumbAccordion();
+      thumbEditorSave.disabled = !state.apiAvailable;
+      thumbEditorDelete.disabled = !state.apiAvailable;
+    }
+
     return;
   }
 
@@ -800,6 +1232,7 @@ async function saveGalleryEditor() {
   formData.append("cardDescription", nextCardDescription);
   formData.append("category", nextCategory);
   formData.append("description", nextDescription);
+  formData.append("homepageVisible", thumbEditorHomepageVisible?.checked ? "true" : "false");
   formData.append("featured", thumbEditorFeatured?.checked ? "true" : "false");
   formData.append("backgroundColor", nextBackgroundColor);
 
@@ -902,18 +1335,261 @@ function getThumbBatchSize() {
   return columnCount * THUMB_ROWS_PER_BATCH;
 }
 
+async function toggleGalleryHomepageVisibility(entryId, homepageVisible) {
+  if (!state.apiAvailable) {
+    setThumbStatus(
+      "Homepage visibility is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
+      "error"
+    );
+    return;
+  }
+
+  const targetEntries = getActionTargetEntries(entryId);
+  if (!targetEntries.length) {
+    setThumbStatus("Thumbnail entry was not found.", "error");
+    return;
+  }
+
+  const label =
+    targetEntries.length === 1
+      ? targetEntries[0].title || targetEntries[0].id
+      : `${targetEntries.length} selected images`;
+  const nextAction = homepageVisible ? "show-homepage" : "hide-homepage";
+  const statusMessage = homepageVisible
+    ? `Adding ${label} to the homepage...`
+    : `Moving ${label} to Hidden Assetts...`;
+
+  setThumbStatus(statusMessage, "");
+
+  const failedLabels = [];
+  let updatedCount = 0;
+
+  try {
+    for (const entry of targetEntries) {
+      state.galleryBusyId = entry.id;
+      state.galleryBusyAction = nextAction;
+      renderThumbAccordion();
+
+      try {
+        await fetchJson(
+          `${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entry.id)}/update`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: entry.title,
+              cardDescription: entry.cardDescription,
+              category: entry.category,
+              description: entry.description,
+              homepageVisible
+            })
+          }
+        );
+        updatedCount += 1;
+      } catch (error) {
+        failedLabels.push(`${entry.title || entry.id}: ${error.message}`);
+      }
+    }
+
+    await reloadData();
+    if (state.editorEntryId === entryId && updatedCount === 1) {
+      openGalleryEditor(entryId);
+    }
+    if (failedLabels.length) {
+      setThumbStatus(
+        `${homepageVisible ? "Updated" : "Moved"} ${updatedCount} image${updatedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
+        "error"
+      );
+    } else {
+      setThumbStatus(
+        homepageVisible
+          ? `Added ${updatedCount} image${updatedCount === 1 ? "" : "s"} to the homepage.`
+          : `Moved ${updatedCount} image${updatedCount === 1 ? "" : "s"} to Hidden Assetts.`,
+        "ok"
+      );
+    }
+  } finally {
+    state.galleryBusyId = "";
+    state.galleryBusyAction = "";
+    renderThumbAccordion();
+  }
+}
+
+function appendThumbnailBatches(target, entries, options = {}) {
+  const batchSize = Math.max(1, getThumbBatchSize());
+  const batches = [];
+
+  for (let index = 0; index < entries.length; index += batchSize) {
+    batches.push(entries.slice(index, index + batchSize));
+  }
+
+  batches.forEach((batch, batchIndex) => {
+    const grid = document.createElement("div");
+    grid.className = "thumb-grid";
+    if (options.section === "process") {
+      grid.classList.add("thumb-grid-compact");
+    }
+    batch.forEach((entry) => {
+      const standardIndex = options.standardOrderById?.get(entry.id);
+      grid.appendChild(
+        buildThumbnailCard(entry, {
+          section: options.section,
+          standardIndex: Number.isInteger(standardIndex) ? standardIndex : -1,
+          standardCount: options.standardCount || 0,
+          canMoveUp: Number.isInteger(standardIndex) && standardIndex > 0,
+          canMoveDown:
+            Number.isInteger(standardIndex) &&
+            standardIndex < (options.standardCount || 0) - 1
+        })
+      );
+    });
+
+    if (batchIndex === 0) {
+      target.appendChild(grid);
+      return;
+    }
+
+    const start = batchIndex * batchSize + 1;
+    const end = start + batch.length - 1;
+    const details = document.createElement("details");
+    details.className = "thumb-batch";
+    const batchKey = `${options.section || "gallery"}-${batchIndex}`;
+    details.dataset.thumbBatchKey = batchKey;
+    if (state.thumbBatchOpen[batchKey]) {
+      details.open = true;
+    }
+    details.addEventListener("toggle", () => {
+      state.thumbBatchOpen[batchKey] = details.open;
+    });
+    details.innerHTML = `<summary>Show more ${options.batchLabel || "thumbnails"} ${start}-${end}</summary>`;
+    details.appendChild(grid);
+    target.appendChild(details);
+  });
+}
+
+function buildSelectionToolbar() {
+  const selectedEntries = getSelectedEntries();
+  if (!selectedEntries.length) {
+    return null;
+  }
+
+  const toolbar = document.createElement("div");
+  toolbar.className = "thumb-selection-toolbar";
+
+  const summary = document.createElement("p");
+  summary.className = "thumb-selection-summary";
+  summary.textContent =
+    selectedEntries.length === 1
+      ? `1 image selected. Hide, Edit, or Delete on that card will use the selection. Reordering is disabled while selected.`
+      : `${selectedEntries.length} images selected. Hide, Edit, or Delete on a selected card will apply to all selected images. Reordering is disabled while selected.`;
+
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className = "btn btn-secondary";
+  clearButton.dataset.thumbAction = "clear-selection";
+  clearButton.textContent = "Clear Selection";
+
+  toolbar.appendChild(summary);
+  toolbar.appendChild(clearButton);
+  return toolbar;
+}
+
+function createThumbSection({
+  title,
+  description,
+  entries,
+  emptyMessage,
+  section,
+  standardEntries = [],
+  collapsible = false,
+  collapsedByDefault = false
+}) {
+  const wrapper = document.createElement("section");
+  wrapper.className = "thumb-section";
+
+  const titleElement = document.createElement("h3");
+  titleElement.className = "thumb-section-title";
+  titleElement.textContent = title;
+
+  const countElement = document.createElement("span");
+  countElement.className = "thumb-section-count";
+  countElement.textContent = `${entries.length}`;
+
+  const descriptionElement = document.createElement("p");
+  descriptionElement.className = "thumb-section-description";
+  descriptionElement.textContent = description;
+
+  const content = document.createElement("div");
+  content.className = "thumb-section-content";
+
+  if (!entries.length) {
+    const empty = document.createElement("p");
+    empty.className = "thumb-empty";
+    empty.textContent = emptyMessage;
+    content.appendChild(empty);
+  } else {
+    appendThumbnailBatches(content, entries, {
+      section,
+      batchLabel: section === "homepage" ? "homepage cards" : "hidden assetts",
+      standardOrderById: new Map(standardEntries.map((entry, index) => [entry.id, index])),
+      standardCount: standardEntries.length
+    });
+  }
+
+  if (collapsible) {
+    const details = document.createElement("details");
+    details.className = "thumb-section-accordion";
+    details.dataset.thumbSection = section;
+
+    const rememberedOpen = state.thumbSectionOpen[section];
+    if (typeof rememberedOpen === "boolean" ? rememberedOpen : !collapsedByDefault) {
+      details.open = true;
+    }
+    details.addEventListener("toggle", () => {
+      state.thumbSectionOpen[section] = details.open;
+    });
+
+    const summary = document.createElement("summary");
+    summary.className = "thumb-section-summary";
+
+    const header = document.createElement("div");
+    header.className = "thumb-section-header";
+    header.appendChild(titleElement);
+    header.appendChild(countElement);
+    header.appendChild(descriptionElement);
+
+    summary.appendChild(header);
+    details.appendChild(summary);
+    details.appendChild(content);
+    wrapper.appendChild(details);
+    return wrapper;
+  }
+
+  const header = document.createElement("div");
+  header.className = "thumb-section-header";
+  header.appendChild(titleElement);
+  header.appendChild(countElement);
+  header.appendChild(descriptionElement);
+  wrapper.appendChild(header);
+  wrapper.appendChild(content);
+
+  return wrapper;
+}
+
 function renderThumbAccordion() {
   if (!thumbAccordion || !state.config) return;
 
   const normalizedEntries = normalizeGalleryEntries(state.config.gallery);
-  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(normalizedEntries);
-  const entries = [...featuredEntries, ...standardEntries];
-  const standardOrderById = new Map(
-    standardEntries.map((entry, index) => [entry.id, index])
-  );
+  const {
+    homepageFeaturedEntries,
+    homepageStandardEntries,
+    processEntries
+  } = splitGalleryEntriesBySection(normalizedEntries);
+  const homepageEntries = [...homepageFeaturedEntries, ...homepageStandardEntries];
+  const sortedProcessEntries = sortProcessEntries(processEntries);
   thumbAccordion.innerHTML = "";
 
-  if (!entries.length) {
+  if (!homepageEntries.length && !sortedProcessEntries.length) {
     const empty = document.createElement("p");
     empty.className = "thumb-empty";
     empty.textContent = "No generated thumbnails yet. Upload an image to start the gallery.";
@@ -921,57 +1597,37 @@ function renderThumbAccordion() {
     return;
   }
 
-  const batchSize = Math.max(1, getThumbBatchSize());
-
-  const batches = [];
-  for (let i = 0; i < entries.length; i += batchSize) {
-    batches.push(entries.slice(i, i + batchSize));
+  const selectionToolbar = buildSelectionToolbar();
+  if (selectionToolbar) {
+    thumbAccordion.appendChild(selectionToolbar);
   }
 
-  const firstBatch = document.createElement("div");
-  firstBatch.className = "thumb-grid";
-  batches[0].forEach((entry) => {
-    const standardIndex = standardOrderById.get(entry.id);
-    firstBatch.appendChild(
-      buildThumbnailCard(entry, {
-        standardIndex: Number.isInteger(standardIndex) ? standardIndex : -1,
-        standardCount: standardEntries.length,
-        canMoveUp: Number.isInteger(standardIndex) && standardIndex > 0,
-        canMoveDown:
-          Number.isInteger(standardIndex) && standardIndex < standardEntries.length - 1
-      })
-    );
-  });
-  thumbAccordion.appendChild(firstBatch);
+  thumbAccordion.appendChild(
+    createThumbSection({
+      title: "Homepage Gallery",
+      description:
+        "Visible on the public homepage. Featured cards stay pinned while standard cards can be reordered.",
+      entries: homepageEntries,
+      emptyMessage:
+        "No thumbnails are currently published to the homepage. Toggle a process thumbnail on or upload a new one.",
+      section: "homepage",
+      standardEntries: homepageStandardEntries
+    })
+  );
 
-  batches.slice(1).forEach((batch, index) => {
-    const start = index * batchSize + batchSize + 1;
-    const end = start + batch.length - 1;
-
-    const details = document.createElement("details");
-    details.className = "thumb-batch";
-    details.innerHTML = `
-      <summary>Show thumbnails ${start}-${end}</summary>
-    `;
-
-    const grid = document.createElement("div");
-    grid.className = "thumb-grid";
-    batch.forEach((entry) => {
-      const standardIndex = standardOrderById.get(entry.id);
-      grid.appendChild(
-        buildThumbnailCard(entry, {
-          standardIndex: Number.isInteger(standardIndex) ? standardIndex : -1,
-          standardCount: standardEntries.length,
-          canMoveUp: Number.isInteger(standardIndex) && standardIndex > 0,
-          canMoveDown:
-            Number.isInteger(standardIndex) && standardIndex < standardEntries.length - 1
-        })
-      );
-    });
-
-    details.appendChild(grid);
-    thumbAccordion.appendChild(details);
-  });
+  thumbAccordion.appendChild(
+    createThumbSection({
+      title: "Hidden Assetts",
+      description:
+        "Stored in VSCimage only. Expand this section when you want to review or publish stored-only images.",
+      entries: sortedProcessEntries,
+      emptyMessage:
+        "No stored-only thumbnails yet. Hide a homepage card or upload a new image with homepage visibility turned off.",
+      section: "process",
+      collapsible: true,
+      collapsedByDefault: true
+    })
+  );
 }
 
 function renderSelect(selectElement, selectedValue) {
@@ -1184,10 +1840,14 @@ async function reloadData() {
 
   state.config = ensureConfigShape(config);
   state.files = files;
+  syncSelectedEntriesWithConfig();
   if (
     state.editorEntryId &&
     !state.config.gallery.some((entry) => entry.id === state.editorEntryId)
   ) {
+    closeGalleryEditor();
+  }
+  if (state.editorMode === "batch" && !state.editorBatchIds.some((entryId) => isEntrySelected(entryId))) {
     closeGalleryEditor();
   }
 
@@ -1223,6 +1883,7 @@ if (uploadForm) {
       120
     );
     const uploadCategory = normalizeGalleryCategory(uploadCategoryInput?.value || "all");
+    const uploadHomepageVisible = uploadHomepageVisibleInput?.checked !== false;
     const checked = collectSelectedOutputs();
 
     if (!selectedFiles.length) {
@@ -1256,6 +1917,7 @@ if (uploadForm) {
         formData.append("name", generatedName);
         formData.append("cardDescription", uploadCardDescription);
         formData.append("category", uploadCategory);
+        formData.append("homepageVisible", uploadHomepageVisible ? "true" : "false");
         formData.append("outputs", checked.join(","));
 
         setStatus(
@@ -1336,12 +1998,28 @@ if (configForm) {
 }
 
 if (thumbAccordion) {
+  thumbAccordion.addEventListener("change", (event) => {
+    const selectionInput = event.target.closest("[data-thumb-select]");
+    if (!selectionInput) return;
+
+    const entryId = selectionInput.dataset.entryId;
+    if (!entryId) return;
+    setEntrySelected(entryId, Boolean(selectionInput.checked));
+  });
+
   thumbAccordion.addEventListener("click", async (event) => {
     const actionButton = event.target.closest("[data-thumb-action]");
     if (!actionButton) return;
 
     const action = actionButton.dataset.thumbAction;
     const entryId = actionButton.dataset.entryId;
+
+    if (action === "clear-selection") {
+      clearSelectedEntries();
+      setThumbStatus("", "");
+      return;
+    }
+
     if (!entryId) return;
 
     if (action === "edit") {
@@ -1357,6 +2035,16 @@ if (thumbAccordion) {
 
     if (action === "move-down") {
       await reorderGalleryEntry(entryId, "down");
+      return;
+    }
+
+    if (action === "show-homepage") {
+      await toggleGalleryHomepageVisibility(entryId, true);
+      return;
+    }
+
+    if (action === "hide-homepage") {
+      await toggleGalleryHomepageVisibility(entryId, false);
       return;
     }
 

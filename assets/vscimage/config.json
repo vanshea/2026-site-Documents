@@ -6,21 +6,22 @@
   "gallery": [
     {
       "id": "large-web-portfolio-linedraw-01-3200x1800-1772332872067",
-      "title": "large-web-portfolio-linedraw-01-3200x1800",
-      "description": "Generated in VSCimage.",
+      "title": "Schematic for Medical Device",
+      "description": "Illustration to depict a low-resolution image of medical equipment and its working parts.",
       "thumb": "assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-thumb-760x570.webp",
       "large": "assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-large-1900x1600.webp",
       "fullscreen": "assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-large-1900x1600.webp",
       "createdAt": "2026-03-01T02:41:12.067Z",
       "cardDescription": "",
-      "logo": "",
+      "logo": "assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-logo-240.png",
       "original": "",
       "assetBaseName": "large-web-portfolio-linedraw-01-3200x1800",
       "backgroundColor": "",
-      "updatedAt": "2026-03-02T17:02:02.748Z",
-      "featured": true,
-      "featuredThumb": "assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-featured-thumb-2400x570.webp",
-      "category": "illustration"
+      "updatedAt": "2026-03-03T15:34:32.424Z",
+      "featured": false,
+      "featuredThumb": "",
+      "category": "illustration",
+      "homepageVisible": false
     },
     {
       "id": "large-web-portfolio-pat760x570-1772332872992",
@@ -34,17 +35,29 @@
       "original": "assets/vscimage/originals/large-web-portfolio-pat760x570-1772332872841.webp",
       "assetBaseName": "capital-one-patent-diagram",
       "backgroundColor": "",
-      "updatedAt": "2026-03-01T11:49:11.241Z",
-      "cardDescription": "Patent for gesture interfaces."
+      "updatedAt": "2026-03-03T15:21:27.416Z",
+      "cardDescription": "Patent for gesture interfaces.",
+      "category": "all",
+      "featured": false,
+      "featuredThumb": ""
     },
     {
       "id": "large-web-portfolio-greif3200x1800-1772332871783",
-      "title": "large-web-portfolio-greif3200x1800",
-      "description": "Generated in VSCimage.",
+      "title": "Grief Plus logo",
+      "description": "Branding for client portal.",
       "thumb": "assets/vscimage/generated/large-web-portfolio-greif3200x1800-thumb-760x570.webp",
       "large": "assets/vscimage/generated/large-web-portfolio-greif3200x1800-large-1900x1600.webp",
       "fullscreen": "assets/vscimage/generated/large-web-portfolio-greif3200x1800-large-1900x1600.webp",
-      "createdAt": "2026-03-01T02:41:11.783Z"
+      "createdAt": "2026-03-01T02:41:11.783Z",
+      "cardDescription": "Branding for client portal.",
+      "category": "all",
+      "featured": false,
+      "featuredThumb": "",
+      "logo": "",
+      "original": "",
+      "assetBaseName": "large-web-portfolio-greif3200x1800",
+      "backgroundColor": "",
+      "updatedAt": "2026-03-03T15:22:15.862Z"
     },
     {
       "id": "large-web-portfolio-greif-1772332871523",

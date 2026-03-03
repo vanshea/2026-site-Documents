@@ -250,9 +250,15 @@ function resolveGalleryEntryAssetPath(entry, ...preferredCandidates) {
 function splitGalleryEntriesByFeatured(entries) {
   const featuredEntries = [];
   const standardEntries = [];
+  const hiddenEntries = [];
 
   (Array.isArray(entries) ? entries : []).forEach((entry) => {
-    if (toBool(entry?.featured, Boolean(entry?.featuredThumb))) {
+    if (!isGalleryEntryHomepageVisible(entry)) {
+      hiddenEntries.push(entry);
+      return;
+    }
+
+    if (isGalleryEntryHomepageFeatured(entry)) {
       featuredEntries.push(entry);
       return;
     }
@@ -260,12 +266,29 @@ function splitGalleryEntriesByFeatured(entries) {
     standardEntries.push(entry);
   });
 
-  return { featuredEntries, standardEntries };
+  return { featuredEntries, standardEntries, hiddenEntries };
 }
 
 function sortGalleryEntriesForDisplay(entries) {
   const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(entries);
   return [...featuredEntries, ...standardEntries];
+}
+
+function isGalleryEntryHomepageVisible(entry) {
+  if (
+    entry?.homepageVisible === undefined ||
+    entry?.homepageVisible === null ||
+    entry?.homepageVisible === ""
+  ) {
+    return true;
+  }
+
+  return toBool(entry.homepageVisible, true);
+}
+
+function isGalleryEntryHomepageFeatured(entry) {
+  return isGalleryEntryHomepageVisible(entry) &&
+    toBool(entry?.featured, Boolean(entry?.featuredThumb));
 }
 
 function buildGeneratedGalleryMarkup(galleryEntries) {
@@ -280,7 +303,7 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const fullscreen =
         resolveGalleryEntryAssetPath(entry, entry?.fullscreen, large, thumb) || large;
       const category = normalizeGalleryCategory(entry?.category);
-      const featured = toBool(entry?.featured, Boolean(entry?.featuredThumb));
+      const featured = isGalleryEntryHomepageFeatured(entry);
       const featuredThumb = resolveGalleryEntryAssetPath(entry, entry?.featuredThumb, thumb) || thumb;
       const previewThumb = featured ? featuredThumb : thumb;
       const displayTitle = String(entry?.title || entry?.id || `Generated ${index + 1}`)
@@ -947,6 +970,10 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextDescription =
     normalizeTextField(options.description ?? currentEntry.description ?? "", 320) ||
     "Generated in VSCimage.";
+  const currentHomepageVisible = isGalleryEntryHomepageVisible(currentEntry);
+  const nextHomepageVisible = Object.prototype.hasOwnProperty.call(options, "homepageVisible")
+    ? toBool(options.homepageVisible, currentHomepageVisible)
+    : currentHomepageVisible;
   const currentFeatured = toBool(currentEntry.featured, Boolean(currentEntry.featuredThumb));
   const nextFeatured = Object.prototype.hasOwnProperty.call(options, "featured")
     ? toBool(options.featured, currentFeatured)
@@ -1209,6 +1236,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     cardDescription: nextCardDescription,
     category: nextCategory,
     description: nextDescription,
+    homepageVisible: nextHomepageVisible,
     featured: nextFeatured,
     thumb: nextThumbPath,
     featuredThumb: nextFeaturedThumbPath,
@@ -1261,6 +1289,15 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextDescription =
     normalizeTextField(nextDescriptionInput || "", 320) ||
     "Generated in VSCimage.";
+  const nextHomepageVisibleInput = Object.prototype.hasOwnProperty.call(
+    updates || {},
+    "homepageVisible"
+  )
+    ? updates.homepageVisible
+    : currentEntry.homepageVisible;
+  const nextHomepageVisible = isGalleryEntryHomepageVisible({
+    homepageVisible: nextHomepageVisibleInput
+  });
 
   gallery[entryIndex] = {
     ...currentEntry,
@@ -1268,6 +1305,7 @@ async function updateVscimageGalleryEntry(entryId, updates) {
     cardDescription: nextCardDescription,
     category: nextCategory,
     description: nextDescription,
+    homepageVisible: nextHomepageVisible,
     featured: toBool(currentEntry.featured, Boolean(currentEntry.featuredThumb)),
     logo: currentEntry.logo || getGalleryEntryLogoPath(currentEntry),
     featuredThumb: sanitizeAssetPath(currentEntry.featuredThumb),
@@ -1294,7 +1332,7 @@ async function reorderVscimageGalleryEntry(entryId, direction) {
     throw invalidDirectionError;
   }
 
-  const { featuredEntries, standardEntries } = splitGalleryEntriesByFeatured(gallery);
+  const { featuredEntries, standardEntries, hiddenEntries } = splitGalleryEntriesByFeatured(gallery);
   const standardIndex = standardEntries.findIndex(
     (entry) => String(entry?.id || "").trim() === entryId
   );
@@ -1312,6 +1350,18 @@ async function reorderVscimageGalleryEntry(entryId, direction) {
       throw featuredPinnedError;
     }
 
+    const hiddenIndex = hiddenEntries.findIndex(
+      (entry) => String(entry?.id || "").trim() === entryId
+    );
+
+    if (hiddenIndex !== -1) {
+      const hiddenEntryError = new Error(
+        "Images in Hidden Assetts do not appear on the homepage. Show the image on the homepage before reordering it."
+      );
+      hiddenEntryError.code = "VSCIMAGE_REORDER_HIDDEN";
+      throw hiddenEntryError;
+    }
+
     return null;
   }
 
@@ -1326,7 +1376,7 @@ async function reorderVscimageGalleryEntry(entryId, direction) {
     reorderedStandardEntries[standardIndex]
   ];
 
-  config.gallery = [...featuredEntries, ...reorderedStandardEntries];
+  config.gallery = [...featuredEntries, ...reorderedStandardEntries, ...hiddenEntries];
   await writeVscimageConfig(config);
 
   return reorderedStandardEntries[targetIndex];
@@ -2041,6 +2091,7 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   const cardDescription = normalizeCardDescription(req.body?.cardDescription, 120);
   const category = normalizeGalleryCategory(req.body?.category);
   const description = normalizeTextField(req.body?.description, 320);
+  const hasHomepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible");
 
   if (!entryId) {
     return res.status(400).json({ error: "Gallery entry id is required." });
@@ -2055,7 +2106,8 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
       title,
       cardDescription,
       category,
-      description
+      description,
+      ...(hasHomepageVisible ? { homepageVisible: req.body.homepageVisible } : {})
     });
     if (!updatedEntry) {
       return res.status(404).json({ error: "Gallery entry was not found." });
@@ -2085,7 +2137,11 @@ app.post("/api/vscimage/gallery/:entryId/reorder", async (req, res) => {
     return res.status(200).json({ ok: true, entry: reorderedEntry });
   } catch (error) {
     if (
-      ["VSCIMAGE_REORDER_INVALID", "VSCIMAGE_REORDER_FEATURED"].includes(error.code)
+      [
+        "VSCIMAGE_REORDER_INVALID",
+        "VSCIMAGE_REORDER_FEATURED",
+        "VSCIMAGE_REORDER_HIDDEN"
+      ].includes(error.code)
     ) {
       return res.status(400).json({ error: error.message });
     }
@@ -2149,6 +2205,7 @@ if (upload) {
         cardDescription: req.body?.cardDescription,
         category: req.body?.category,
         description: req.body?.description,
+        homepageVisible: req.body?.homepageVisible,
         featured: req.body?.featured,
         name: req.body?.name,
         backgroundColor: req.body?.backgroundColor,
@@ -2204,6 +2261,9 @@ if (upload) {
     const baseName = sanitizeName(req.body.name) || `image-${Date.now()}`;
     const backgroundColor = normalizeHexColor(req.body.backgroundColor);
     const category = normalizeGalleryCategory(req.body.category);
+    const homepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible")
+      ? toBool(req.body.homepageVisible, true)
+      : true;
     const requested = Array.isArray(req.body.outputs)
       ? req.body.outputs
       : String(req.body.outputs || "")
@@ -2256,6 +2316,7 @@ if (upload) {
               .trim()
               .replace(/\s+/g, " ")
               .slice(0, 320) || "Generated in VSCimage.",
+          homepageVisible,
           featured: false,
           thumb: galleryThumb,
           featuredThumb: "",

@@ -87,6 +87,15 @@
               Applied to each image in a batch so homepage filters can place the generated cards correctly.
             </span>
           </label>
+          <div class="editor-toggle-block">
+            <label class="editor-inline-toggle">
+              <input id="uploadHomepageVisible" name="homepageVisible" type="checkbox" checked />
+              Show on homepage after upload
+            </label>
+            <p class="field-note">
+              Turn this off to store the image in Hidden Assetts only until you are ready to publish it.
+            </p>
+          </div>
           <fieldset class="output-set">
             <legend>Generate Outputs</legend>
             <label><input type="checkbox" value="logo" checked />Logo (240x240 PNG)</label>
@@ -103,9 +112,9 @@
       <section class="panel">
         <h2>Processed Thumbnails</h2>
         <p class="subhead">
-          Thumbnails are shown in groups of 3 rows. Expand each accordion section to reveal
-          3 more rows. Use Earlier and Later to set homepage order for standard cards; featured
-          cards stay pinned.
+          Homepage Gallery contains the cards currently published to the portfolio. Process
+          Thumbnails stay collapsed until you open the accordion, and can be toggled onto the
+          homepage later without deleting the files.
         </p>
         <div id="thumbAccordion" class="thumb-accordion"></div>
         <p id="thumbMsg" class="status"></p>
@@ -155,14 +164,15 @@
       <form id="thumbEditorForm" class="editor-form" method="dialog">
         <div class="editor-header">
           <div>
-            <p class="kicker">Processed Thumbnail</p>
-            <h2>Edit Image</h2>
+            <p id="thumbEditorKicker" class="kicker">Processed Thumbnail</p>
+            <h2 id="thumbEditorHeading">Edit Image</h2>
+            <p id="thumbEditorModeNote" class="field-note editor-mode-note" hidden></p>
           </div>
           <button id="thumbEditorClose" class="btn btn-secondary" type="button">Close</button>
         </div>
 
         <div class="editor-grid">
-          <div class="editor-preview-panel">
+          <div class="editor-preview-panel" data-editor-single-only>
             <div id="thumbEditorPreviewFrame" class="editor-preview-frame">
               <img id="thumbEditorPreviewImage" alt="" />
             </div>
@@ -171,7 +181,7 @@
           </div>
 
           <div class="editor-fields">
-            <label>
+            <label data-editor-single-only>
               Replace Source Image
               <input id="thumbEditorImage" name="image" type="file" accept="image/*" />
               <span class="field-note">
@@ -179,7 +189,7 @@
               </span>
             </label>
 
-            <fieldset class="editor-replacements">
+            <fieldset class="editor-replacements" data-editor-single-only>
               <legend>Replace Individual Outputs</legend>
               <label>
                 Thumb Image
@@ -208,12 +218,12 @@
               </p>
             </fieldset>
 
-            <label>
+            <label data-editor-single-only>
               Asset Name / Filename Prefix
               <input id="thumbEditorName" name="name" type="text" maxlength="64" />
             </label>
 
-            <label>
+            <label data-editor-single-only>
               Display Title
               <input id="thumbEditorTitle" name="title" type="text" maxlength="120" />
             </label>
@@ -256,6 +266,13 @@
             </label>
 
             <div class="editor-toggle-block">
+              <label class="editor-inline-toggle">
+                <input id="thumbEditorHomepageVisible" name="homepageVisible" type="checkbox" />
+                Show on homepage
+              </label>
+              <p class="field-note">
+                Turn this off to keep the image stored in Hidden Assetts only.
+              </p>
               <label class="editor-inline-toggle">
                 <input id="thumbEditorFeatured" name="featured" type="checkbox" />
                 Feature on homepage as a full-width card
