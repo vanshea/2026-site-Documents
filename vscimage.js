@@ -353,6 +353,24 @@ function normalizeHexColor(value) {
   return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : "";
 }
 
+function isGifAssetPath(filePath) {
+  return /\.gif(?:[?#].*)?$/i.test(String(filePath || "").trim());
+}
+
+function getGalleryEntryPreviewPath(entry) {
+  const thumb = String(entry?.thumb || "").trim();
+  if (isGifAssetPath(thumb)) {
+    return thumb;
+  }
+
+  const original = String(entry?.original || "").trim();
+  if (isGifAssetPath(original)) {
+    return original;
+  }
+
+  return thumb || String(entry?.large || entry?.fullscreen || "").trim();
+}
+
 function getSelectedEntryIds() {
   return Array.from(state.selectedEntryIds);
 }
@@ -1094,6 +1112,8 @@ function buildThumbnailCard(entry, options = {}) {
   const homepageFeatured = isGalleryEntryHomepageFeatured(entry);
   const archived = isGalleryEntryArchived(entry);
   const hasSelection = state.selectedEntryIds.size > 0;
+  const previewPath = getGalleryEntryPreviewPath(entry);
+  const hasAnimatedPreview = isGifAssetPath(previewPath);
   const canDragReorder =
     !archived &&
     homepageVisible &&
@@ -1123,8 +1143,8 @@ function buildThumbnailCard(entry, options = {}) {
   selectionRow.appendChild(selectionText);
 
   const image = document.createElement("img");
-  image.src = toAssetUrl(entry.thumb);
-  image.alt = entry.title;
+  image.src = toAssetUrl(previewPath || entry.thumb);
+  image.alt = hasAnimatedPreview ? `${entry.title} animated preview` : entry.title;
   image.loading = "lazy";
 
   const badges = document.createElement("div");
@@ -1141,6 +1161,9 @@ function buildThumbnailCard(entry, options = {}) {
   } else if (entry.featured || entry.featuredThumb) {
     badges.appendChild(createThumbBadge("Featured when shown", "is-featured"));
   }
+  if (hasAnimatedPreview) {
+    badges.appendChild(createThumbBadge("Animated GIF", "is-live"));
+  }
 
   const title = document.createElement("h3");
   title.textContent = entry.title;
@@ -1151,7 +1174,8 @@ function buildThumbnailCard(entry, options = {}) {
 
   const path = document.createElement("p");
   path.className = "path";
-  path.textContent = entry.thumb;
+  path.textContent =
+    previewPath && previewPath !== entry.thumb ? `VSCimage preview: ${previewPath}` : entry.thumb;
 
   const meta = document.createElement("div");
   meta.className = "thumb-card-meta";
@@ -1262,7 +1286,7 @@ function buildThumbnailCard(entry, options = {}) {
     const moveEarlierButton = document.createElement("button");
     moveEarlierButton.type = "button";
     moveEarlierButton.className = "btn btn-secondary thumb-card-move";
-    moveEarlierButton.textContent = "-";
+    moveEarlierButton.textContent = "↑";
     moveEarlierButton.dataset.thumbAction = "move-up";
     moveEarlierButton.dataset.entryId = entry.id;
     moveEarlierButton.setAttribute("aria-label", "Move earlier");
@@ -1273,7 +1297,7 @@ function buildThumbnailCard(entry, options = {}) {
     const moveLaterButton = document.createElement("button");
     moveLaterButton.type = "button";
     moveLaterButton.className = "btn btn-secondary thumb-card-move";
-    moveLaterButton.textContent = "+";
+    moveLaterButton.textContent = "↓";
     moveLaterButton.dataset.thumbAction = "move-down";
     moveLaterButton.dataset.entryId = entry.id;
     moveLaterButton.setAttribute("aria-label", "Move later");
@@ -1358,11 +1382,17 @@ function updateThumbEditorPreview(entry) {
     thumbEditorPreviewImage.alt = replacementFile.name;
     thumbEditorPreviewLabel.textContent = `${replacement?.label || "Replacement"} preview: ${replacementFile.name}`;
   } else {
-    thumbEditorPreviewImage.src = toAssetUrl(entry.large || entry.thumb);
-    thumbEditorPreviewImage.alt = entry.title;
-    thumbEditorPreviewLabel.textContent = entry.original
-      ? `Source: ${entry.original}`
-      : "No stored original source path. Upload a replacement image if regeneration is needed.";
+    const previewPath = getGalleryEntryPreviewPath(entry);
+    thumbEditorPreviewImage.src = toAssetUrl(previewPath || entry.large || entry.thumb);
+    thumbEditorPreviewImage.alt = isGifAssetPath(previewPath)
+      ? `${entry.title} animated preview`
+      : entry.title;
+    thumbEditorPreviewLabel.textContent =
+      previewPath && previewPath !== entry.thumb
+        ? `VSCimage preview: ${previewPath}`
+        : entry.original
+          ? `Source: ${entry.original}`
+          : "No stored original source path. Upload a replacement image if regeneration is needed.";
   }
 
   updateThumbEditorBackgroundState();
@@ -1372,6 +1402,10 @@ function renderThumbEditorAssetList(entry) {
   if (!thumbEditorAssetList) return;
 
   thumbEditorAssetList.innerHTML = "";
+  const previewPath = getGalleryEntryPreviewPath(entry);
+  if (previewPath && previewPath !== entry.thumb) {
+    appendGeneratedOutputLine("VSCimage preview", previewPath, "", true, thumbEditorAssetList);
+  }
   if (entry.original) {
     appendGeneratedOutputLine("Original", entry.original, "", true, thumbEditorAssetList);
   }
