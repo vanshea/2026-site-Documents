@@ -56,6 +56,12 @@ const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 640px)");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
+const pointerMotionState = {
+  x: 0,
+  y: 0,
+  time: 0,
+  hasSample: false
+};
 
 function toSitePath(filePath) {
   if (!filePath) return "";
@@ -113,6 +119,48 @@ async function copyPlainText(text) {
   if (!copied) {
     throw new Error("Copy command failed");
   }
+}
+
+function updatePointerMotionState(event) {
+  if (event.pointerType && event.pointerType !== "mouse") return;
+  pointerMotionState.x = event.clientX;
+  pointerMotionState.y = event.clientY;
+  pointerMotionState.time = event.timeStamp || performance.now();
+  pointerMotionState.hasSample = true;
+}
+
+function getPointerEntrySpeed(event) {
+  if (!pointerMotionState.hasSample) return null;
+
+  const entryTime = event.timeStamp || performance.now();
+  const deltaTime = Math.max(8, entryTime - pointerMotionState.time);
+  const deltaX = event.clientX - pointerMotionState.x;
+  const deltaY = event.clientY - pointerMotionState.y;
+  return Math.hypot(deltaX, deltaY) / deltaTime;
+}
+
+function applyCardHoverTempo(card, speed) {
+  if (!card) return;
+
+  const clampedSpeed = Math.min(Math.max(speed ?? 1.4, 0.05), 1.4);
+  const fastness = (clampedSpeed - 0.05) / 1.35;
+  const entryDelay = Math.round(165 - fastness * 160);
+  const shellDuration = Math.round(520 - fastness * 250);
+  const titleDuration = Math.round(400 - fastness * 180);
+  const copyDuration = Math.round(240 - fastness * 110);
+
+  card.style.setProperty("--card-hover-entry-delay", `${entryDelay}ms`);
+  card.style.setProperty("--card-shell-duration", `${shellDuration}ms`);
+  card.style.setProperty("--card-title-duration", `${titleDuration}ms`);
+  card.style.setProperty("--card-copy-duration", `${copyDuration}ms`);
+}
+
+function clearCardHoverTempo(card) {
+  if (!card) return;
+  card.style.removeProperty("--card-hover-entry-delay");
+  card.style.removeProperty("--card-shell-duration");
+  card.style.removeProperty("--card-title-duration");
+  card.style.removeProperty("--card-copy-duration");
 }
 
 function setMobileNavState(isOpen) {
@@ -782,6 +830,10 @@ if (workLoadMoreButton) {
 }
 
 if (workGrid) {
+  document.addEventListener("pointermove", updatePointerMotionState, {
+    passive: true
+  });
+
   workGrid.addEventListener(
     "load",
     (event) => {
@@ -794,15 +846,38 @@ if (workGrid) {
   );
 
   workGrid.addEventListener("pointerover", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
     const card = event.target.closest(".card");
     if (!card || !workGrid.contains(card)) return;
+    const previousCard = event.relatedTarget?.closest?.(".card");
+    if (previousCard === card) return;
+
+    applyCardHoverTempo(card, getPointerEntrySpeed(event));
     scheduleCardImageShellMetricsUpdate();
+  });
+
+  workGrid.addEventListener("pointerout", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    const card = event.target.closest(".card");
+    if (!card || !workGrid.contains(card)) return;
+    const nextCard = event.relatedTarget?.closest?.(".card");
+    if (nextCard === card) return;
+    clearCardHoverTempo(card);
   });
 
   workGrid.addEventListener("focusin", (event) => {
     const card = event.target.closest(".card");
     if (!card || !workGrid.contains(card)) return;
+    applyCardHoverTempo(card, 1.4);
     scheduleCardImageShellMetricsUpdate();
+  });
+
+  workGrid.addEventListener("focusout", (event) => {
+    const card = event.target.closest(".card");
+    if (!card || !workGrid.contains(card)) return;
+    const nextCard = event.relatedTarget?.closest?.(".card");
+    if (nextCard === card) return;
+    clearCardHoverTempo(card);
   });
 }
 
