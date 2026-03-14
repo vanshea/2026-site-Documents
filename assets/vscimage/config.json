@@ -82,7 +82,7 @@
       "original": "",
       "assetBaseName": "large-web-portfolio-greif3200x1800",
       "backgroundColor": "",
-      "updatedAt": "2026-03-04T20:22:09.242Z",
+      "updatedAt": "2026-03-14T19:06:12.049Z",
       "homepageVisible": true,
       "archived": false,
       "archivedAt": "",
@@ -101,14 +101,14 @@
       "homepageVisible": true,
       "featured": false,
       "featuredThumb": "",
-      "logo": "",
+      "logo": "assets/vscimage/generated/large-web-portfolio-greif-logo-240.png",
       "original": "",
       "assetBaseName": "large-web-portfolio-greif",
       "backgroundColor": "",
       "archived": false,
       "archivedAt": "",
       "sourceHash": "",
-      "updatedAt": "2026-03-04T19:47:04.976Z"
+      "updatedAt": "2026-03-14T19:05:52.193Z"
     },
     {
       "id": "large-web-portfolio-gore3200x1800-1772332871171",
@@ -123,14 +123,14 @@
       "homepageVisible": true,
       "featured": false,
       "featuredThumb": "",
-      "logo": "",
+      "logo": "assets/vscimage/generated/large-web-portfolio-gore3200x1800-logo-240.png",
       "original": "",
       "assetBaseName": "large-web-portfolio-gore3200x1800",
       "backgroundColor": "",
       "archived": false,
       "archivedAt": "",
       "sourceHash": "",
-      "updatedAt": "2026-03-04T20:28:09.693Z"
+      "updatedAt": "2026-03-14T19:06:03.868Z"
     },
     {
       "id": "large-web-portfolio-airdolly23200x1800-1772332870266",
