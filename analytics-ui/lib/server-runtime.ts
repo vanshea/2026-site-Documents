@@ -3,6 +3,7 @@ import "server-only";
 import { timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 
 export const DOCUMENTS_ROOT = path.resolve(process.cwd(), "..");
 export const CLIENTS_ROOT = path.join(DOCUMENTS_ROOT, "clients");
@@ -12,6 +13,7 @@ export const DATA_ROOT = path.join(DOCUMENTS_ROOT, "data");
 export const ROOT_ENV_PATH = path.join(DOCUMENTS_ROOT, ".env");
 
 let rootEnvCachePromise: Promise<Record<string, string>> | null = null;
+let rootEnvSyncCache: Record<string, string> | null = null;
 
 export function safeCompare(left: string | Buffer, right: string | Buffer): boolean {
   const leftBuffer = Buffer.isBuffer(left) ? left : Buffer.from(left);
@@ -103,6 +105,20 @@ async function readRootEnvMap(): Promise<Record<string, string>> {
   }
 }
 
+function readRootEnvMapSync(): Record<string, string> {
+  try {
+    const raw = readFileSync(ROOT_ENV_PATH, "utf8");
+    return parseDotEnv(raw);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") {
+      return {};
+    }
+
+    throw error;
+  }
+}
+
 export async function readServerEnv(key: string): Promise<string> {
   const directValue = process.env[key];
   if (typeof directValue === "string" && directValue.length > 0) {
@@ -115,4 +131,17 @@ export async function readServerEnv(key: string): Promise<string> {
 
   const rootEnv = await rootEnvCachePromise;
   return rootEnv[key] || "";
+}
+
+export function readServerEnvSync(key: string): string {
+  const directValue = process.env[key];
+  if (typeof directValue === "string" && directValue.length > 0) {
+    return directValue;
+  }
+
+  if (!rootEnvSyncCache) {
+    rootEnvSyncCache = readRootEnvMapSync();
+  }
+
+  return rootEnvSyncCache[key] || "";
 }

@@ -13,7 +13,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init_analytics",
     "prisma:deploy": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "launch:bundle": "node scripts/create-launch-ready-bundle.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

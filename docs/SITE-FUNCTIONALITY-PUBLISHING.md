@@ -34,7 +34,8 @@ The simplest mental model is:
 This project is easiest to publish when:
 - the whole repo stays together
 - Express and Next both run from the same repo
-- the `content`, `clients`, and `data` folders stay beside the code
+- the `content` and `clients` folders stay beside the code
+- the SQLite password DB lives at the absolute path in `CLIENT_SECRETS_DB_PATH`
 
 ## Important Folders To Keep
 
@@ -42,12 +43,11 @@ Do not lose these folders in production:
 
 - `/content/clients`
 - `/clients`
-- `/data`
 
 Why:
 - `/content/clients` holds the client registry and slide files
 - `/clients` holds client images and `/http` folders
-- `/data/client-secrets.sqlite` holds hashed client passwords
+- the SQLite file at `CLIENT_SECRETS_DB_PATH` holds hashed client passwords
 
 ## Before Publishing
 
@@ -79,11 +79,14 @@ Important values:
 - `PORT=3000`
 - `DATABASE_URL=...`
 - `SESSION_SECRET=...`
+- `TRUSTED_WEB_ORIGINS=https://example.com,https://www.example.com`
 - `CLIENT_ACCESS_COOKIE_SECRET=...`
 - `ADMIN_SESSION_COOKIE_SECRET=...`
 - `CLIENT_PASSWORD_PEPPER=...`
+- `CLIENT_SECRETS_DB_PATH=/var/lib/portfolio-site/client-secrets.sqlite`
 - `ANALYTICS_UI_ENABLED=true`
 - `ANALYTICS_UI_ORIGIN=http://127.0.0.1:3001`
+- `ANALYTICS_HOME_ADMIN_PASSWORD=...`
 
 Also set your analytics login credentials:
 - `ANALYTICS_ADMIN_USERNAME`
@@ -162,10 +165,7 @@ Analytics login:
 - comes from `.env`
 
 Client admin login:
-- comes from the hard-coded password in
-  [`/Library/WebServer/Documents/analytics-ui/lib/admin-auth.ts`](/Library/WebServer/Documents/analytics-ui/lib/admin-auth.ts)
-- current value:
-  - `1013VS1#`
+- comes from `ANALYTICS_HOME_ADMIN_PASSWORD`
 
 Client passwords:
 - are created inside `/analytics/home`
@@ -174,7 +174,7 @@ Client passwords:
 
 ## Very Important Production Notes
 
-1. Keep the `data` folder persistent.
+1. Keep the SQLite file at `CLIENT_SECRETS_DB_PATH` persistent.
    - if the server is rebuilt and this file is lost, client password hashes are lost
 
 2. Keep the `content` and `clients` folders persistent.
@@ -205,7 +205,8 @@ Check these first:
 4. Is `.env` present?
 5. Did you run `npm --prefix analytics-ui run build`?
 6. Does `ANALYTICS_UI_ORIGIN` point to `http://127.0.0.1:3001`?
-7. Are the `content`, `clients`, and `data` folders still present?
+7. Does `TRUSTED_WEB_ORIGINS` include your production domain?
+8. Are the `content` and `clients` folders still present, and is `CLIENT_SECRETS_DB_PATH` reachable?
 
 ## Simple Rule For Future Changes
 

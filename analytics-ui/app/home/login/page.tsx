@@ -1,6 +1,6 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { redirect } from "next/navigation";
-import { hasValidAdminSession } from "@/lib/admin-auth";
+import { hasValidAdminSession, isAdminPasswordConfigured } from "@/lib/admin-auth";
 import { loginAdmin } from "@/app/home/actions";
 
 export const dynamic = "force-dynamic";
@@ -21,12 +21,17 @@ function getErrorMessage(errorCode: string | undefined) {
     return "Admin session expired. Sign in again.";
   }
 
+  if (errorCode === "unconfigured") {
+    return "Set ANALYTICS_HOME_ADMIN_PASSWORD before using this admin route.";
+  }
+
   return "";
 }
 
 export default async function HomeLoginPage({ searchParams }: HomeLoginPageProps) {
   noStore();
 
+  const adminConfigured = await isAdminPasswordConfigured();
   const alreadyAuthenticated = await hasValidAdminSession();
   if (alreadyAuthenticated) {
     redirect("/home");
@@ -61,6 +66,13 @@ export default async function HomeLoginPage({ searchParams }: HomeLoginPageProps
             for 12 hours.
           </p>
 
+          {!adminConfigured && (
+            <div className="mt-5 rounded-2xl border border-[#e4d8b4] bg-[#fffbeb] p-4 text-sm leading-6 text-[#7c5f13]">
+              Configure <code>ANALYTICS_HOME_ADMIN_PASSWORD</code> in the environment before this
+              dashboard can be used.
+            </div>
+          )}
+
           {errorMessage && (
             <div className="mt-5 rounded-2xl border border-[#f1d3cb] bg-[#fff4ef] p-4 text-sm leading-6 text-[#8b4a34]">
               {errorMessage}
@@ -75,6 +87,7 @@ export default async function HomeLoginPage({ searchParams }: HomeLoginPageProps
                 type="password"
                 autoComplete="current-password"
                 required
+                disabled={!adminConfigured}
                 className="mt-2 h-12 w-full rounded-2xl border border-border bg-white px-4 text-base text-ink outline-none ring-accent/20 transition focus:ring"
                 placeholder="Enter admin password"
               />
@@ -82,6 +95,7 @@ export default async function HomeLoginPage({ searchParams }: HomeLoginPageProps
 
             <button
               type="submit"
+              disabled={!adminConfigured}
               className="inline-flex h-12 w-full items-center justify-center rounded-full bg-accent px-5 text-sm font-medium text-white transition hover:opacity-90"
             >
               Open admin dashboard

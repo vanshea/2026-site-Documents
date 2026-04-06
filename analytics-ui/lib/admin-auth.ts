@@ -8,8 +8,7 @@ import { readServerEnv, safeCompare } from "@/lib/server-runtime";
 
 export const ADMIN_SESSION_COOKIE_NAME = "admin_session";
 export const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 12;
-
-const ADMIN_PASSWORD = "1013VS1#";
+export const ANALYTICS_HOME_ADMIN_PASSWORD_ENV = "ANALYTICS_HOME_ADMIN_PASSWORD";
 
 export class AdminSessionError extends Error {
   constructor(message = "Admin authentication required.") {
@@ -18,14 +17,28 @@ export class AdminSessionError extends Error {
   }
 }
 
+async function getConfiguredAdminPassword(): Promise<string> {
+  return String(await readServerEnv(ANALYTICS_HOME_ADMIN_PASSWORD_ENV)).trim();
+}
+
+export async function isAdminPasswordConfigured(): Promise<boolean> {
+  return Boolean(await getConfiguredAdminPassword());
+}
+
 async function getAdminSessionSecret(): Promise<string> {
   const configuredSecret =
     (await readServerEnv("ADMIN_SESSION_COOKIE_SECRET")) ||
-    (await readServerEnv("SESSION_SECRET")) ||
-    (await readServerEnv("CLIENT_ACCESS_COOKIE_SECRET")) ||
-    "admin-session-cookie-secret";
+    (await readServerEnv("SESSION_SECRET"));
 
-  return `${configuredSecret}:${ADMIN_PASSWORD}`;
+  if (configuredSecret) {
+    return configuredSecret;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new AdminSessionError("ADMIN_SESSION_COOKIE_SECRET or SESSION_SECRET must be configured.");
+  }
+
+  return "admin-session-cookie-secret";
 }
 
 async function signPayload(payload: string): Promise<string> {
@@ -44,7 +57,12 @@ export function getAdminSessionCookieOptions() {
 }
 
 export async function verifyAdminPassword(submittedPassword: string): Promise<boolean> {
-  return safeCompare(submittedPassword, ADMIN_PASSWORD);
+  const configuredPassword = await getConfiguredAdminPassword();
+  if (!configuredPassword) {
+    return false;
+  }
+
+  return safeCompare(submittedPassword, configuredPassword);
 }
 
 export async function createSignedAdminSessionCookieValue(): Promise<string> {
