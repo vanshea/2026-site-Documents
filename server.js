@@ -1754,6 +1754,24 @@ const publicLargePortfolioStatic = express.static(largeWebPortfolioDir, {
   redirect: false
 });
 
+function serveStaticSubpath(staticHandler, routePrefix) {
+  return (req, res, next) => {
+    const originalUrl = req.url;
+    const nextUrl = req.url === routePrefix ? "/" : req.url.slice(routePrefix.length) || "/";
+    req.url = nextUrl.startsWith("/") ? nextUrl : `/${nextUrl}`;
+    staticHandler(req, res, (error) => {
+      req.url = originalUrl;
+      next(error);
+    });
+  };
+}
+
+const serveAssetsStatic = serveStaticSubpath(publicAssetsStatic, "/assets");
+const serveLargePortfolioStatic = serveStaticSubpath(
+  publicLargePortfolioStatic,
+  "/large_web_portfolio"
+);
+
 app.use((req, res, next) => {
   if (!["GET", "HEAD"].includes(req.method)) {
     return next();
@@ -1769,11 +1787,11 @@ app.use((req, res, next) => {
       return res.status(404).send("Not found.");
     }
 
-    return publicAssetsStatic(req, res, next);
+    return serveAssetsStatic(req, res, next);
   }
 
   if (req.path.startsWith("/large_web_portfolio/")) {
-    return publicLargePortfolioStatic(req, res, next);
+    return serveLargePortfolioStatic(req, res, next);
   }
 
   return next();
