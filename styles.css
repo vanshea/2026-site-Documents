@@ -631,19 +631,20 @@ h2 {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   position: relative;
-  --card-hover-entry-delay: 0ms;
-  --card-shell-duration: 420ms;
-  --card-title-duration: 320ms;
-  --card-copy-duration: 200ms;
+  --card-shell-duration: 620ms;
+  --card-title-duration: 540ms;
+  --card-copy-duration: 260ms;
+  --card-image-return-duration: 440ms;
+  --card-image-preview-duration: 1400ms;
+  --card-image-hover-duration: 5600ms;
   transform-origin: center top;
   transition:
-    transform 0.28s ease,
+    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.28s ease,
     filter 0.28s ease,
-    background-color 0.28s ease,
-    border-color var(--card-shell-duration) ease var(--card-hover-entry-delay),
-    box-shadow 0.28s ease,
-    padding 0.28s ease;
+    background-color 0.32s ease,
+    border-color var(--card-shell-duration) ease,
+    box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .generated-card {
@@ -654,12 +655,12 @@ h2 {
   display: none;
 }
 
-.card:is(:hover, :focus-within) {
+.card.is-hover-active,
+.card:focus-within {
   transform: translateY(-4px);
   background: transparent;
   border-color: transparent;
   box-shadow: 0 22px 44px rgba(0, 0, 0, 0.28);
-  padding: 0;
 }
 
 .card.is-featured {
@@ -670,16 +671,15 @@ h2 {
   margin: 12px 0 8px;
   transition:
     color 0.24s ease,
-    transform var(--card-title-duration) cubic-bezier(0.22, 1, 0.36, 1)
-      var(--card-hover-entry-delay);
+    transform var(--card-title-duration) cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
 .card p {
   transition:
     color 0.24s ease,
-    opacity var(--card-copy-duration) ease var(--card-hover-entry-delay),
-    transform var(--card-copy-duration) ease var(--card-hover-entry-delay);
+    opacity var(--card-copy-duration) ease,
+    transform var(--card-copy-duration) ease;
 }
 
 .work-link {
@@ -698,7 +698,7 @@ h2 {
   position: relative;
   aspect-ratio: 4 / 3;
   transition:
-    transform var(--card-shell-duration) ease-in-out var(--card-hover-entry-delay),
+    transform var(--card-shell-duration) cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.28s ease;
   will-change: transform;
   transform-origin: top center;
@@ -730,32 +730,50 @@ h2 {
 
 .card .card-image {
   transition:
-    transform 10s ease-in-out var(--card-hover-entry-delay),
+    transform var(--card-image-return-duration) cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.28s ease,
     filter 0.28s ease;
   transform-origin: center center;
   will-change: transform;
 }
 
-.card:is(:hover, :focus-within) .card-image {
-  transform: scale(1.0144) translate3d(0.28%, -0.2%, 0);
+.card.is-hover-preview .card-image {
+  transition:
+    transform var(--card-image-preview-duration) cubic-bezier(0.08, 0.02, 0.2, 1),
+    border-color 0.28s ease,
+    filter 0.28s ease;
+  transform: scale(1.006) translate3d(0.06%, -0.04%, 0);
 }
 
-.card:is(:hover, :focus-within) .card-image-shell {
+.card.is-hover-active .card-image,
+.card:focus-within .card-image {
+  transition:
+    transform var(--card-image-hover-duration) cubic-bezier(0.12, 0.01, 0.24, 1),
+    border-color 0.28s ease,
+    filter 0.28s ease;
+  transform: scale(1.055) translate3d(0.4%, -0.28%, 0);
+}
+
+.card.is-hover-active .card-image-shell,
+.card:focus-within .card-image-shell {
   transform: scale(var(--card-shell-scale));
   border-radius: calc(var(--radius) - 2px);
 }
 
-.card:is(:hover, :focus-within) h3,
-.card:is(:hover, :focus-within) p {
+.card.is-hover-active h3,
+.card.is-hover-active p,
+.card:focus-within h3,
+.card:focus-within p {
   color: var(--card-hover-title-color, var(--ink));
 }
 
-.card:is(:hover, :focus-within) h3 {
+.card.is-hover-active h3,
+.card:focus-within h3 {
   transform: translateX(18px);
 }
 
-.card:is(:hover, :focus-within) p {
+.card.is-hover-active p,
+.card:focus-within p {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;

@@ -56,12 +56,8 @@ const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 640px)");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
-const pointerMotionState = {
-  x: 0,
-  y: 0,
-  time: 0,
-  hasSample: false
-};
+const CARD_HOVER_FULL_DELAY_MS = 1000;
+const cardHoverIntentState = new WeakMap();
 
 function toSitePath(filePath) {
   if (!filePath) return "";
@@ -121,46 +117,56 @@ async function copyPlainText(text) {
   }
 }
 
-function updatePointerMotionState(event) {
-  if (event.pointerType && event.pointerType !== "mouse") return;
-  pointerMotionState.x = event.clientX;
-  pointerMotionState.y = event.clientY;
-  pointerMotionState.time = event.timeStamp || performance.now();
-  pointerMotionState.hasSample = true;
+function getCardHoverIntent(card) {
+  let state = cardHoverIntentState.get(card);
+  if (state) return state;
+
+  state = { timeoutId: 0, isActive: false };
+  cardHoverIntentState.set(card, state);
+  return state;
 }
 
-function getPointerEntrySpeed(event) {
-  if (!pointerMotionState.hasSample) return null;
-
-  const entryTime = event.timeStamp || performance.now();
-  const deltaTime = Math.max(8, entryTime - pointerMotionState.time);
-  const deltaX = event.clientX - pointerMotionState.x;
-  const deltaY = event.clientY - pointerMotionState.y;
-  return Math.hypot(deltaX, deltaY) / deltaTime;
+function activateCardHoverPreview(card) {
+  if (!card) return;
+  card.classList.add("is-hover-preview");
 }
 
-function applyCardHoverTempo(card, speed) {
+function activateCardHover(card) {
+  if (!card) return;
+  const state = getCardHoverIntent(card);
+  if (state.timeoutId) {
+    window.clearTimeout(state.timeoutId);
+  }
+  state.timeoutId = 0;
+  state.isActive = true;
+  card.classList.add("is-hover-preview");
+  card.classList.add("is-hover-active");
+}
+
+function scheduleCardHoverActivation(card) {
   if (!card) return;
 
-  const clampedSpeed = Math.min(Math.max(speed ?? 1.4, 0.05), 1.4);
-  const fastness = (clampedSpeed - 0.05) / 1.35;
-  const entryDelay = Math.round(165 - fastness * 160);
-  const shellDuration = Math.round(520 - fastness * 250);
-  const titleDuration = Math.round(400 - fastness * 180);
-  const copyDuration = Math.round(240 - fastness * 110);
+  const state = getCardHoverIntent(card);
+  activateCardHoverPreview(card);
+  if (state.isActive || state.timeoutId) return;
 
-  card.style.setProperty("--card-hover-entry-delay", `${entryDelay}ms`);
-  card.style.setProperty("--card-shell-duration", `${shellDuration}ms`);
-  card.style.setProperty("--card-title-duration", `${titleDuration}ms`);
-  card.style.setProperty("--card-copy-duration", `${copyDuration}ms`);
+  state.timeoutId = window.setTimeout(() => {
+    activateCardHover(card);
+  }, CARD_HOVER_FULL_DELAY_MS);
 }
 
-function clearCardHoverTempo(card) {
+function clearCardHoverActivation(card) {
   if (!card) return;
-  card.style.removeProperty("--card-hover-entry-delay");
-  card.style.removeProperty("--card-shell-duration");
-  card.style.removeProperty("--card-title-duration");
-  card.style.removeProperty("--card-copy-duration");
+
+  const state = getCardHoverIntent(card);
+  if (state.timeoutId) {
+    window.clearTimeout(state.timeoutId);
+    state.timeoutId = 0;
+  }
+
+  state.isActive = false;
+  card.classList.remove("is-hover-preview");
+  card.classList.remove("is-hover-active");
 }
 
 function setMobileNavState(isOpen) {
@@ -830,10 +836,6 @@ if (workLoadMoreButton) {
 }
 
 if (workGrid) {
-  document.addEventListener("pointermove", updatePointerMotionState, {
-    passive: true
-  });
-
   workGrid.addEventListener(
     "load",
     (event) => {
@@ -852,7 +854,7 @@ if (workGrid) {
     const previousCard = event.relatedTarget?.closest?.(".card");
     if (previousCard === card) return;
 
-    applyCardHoverTempo(card, getPointerEntrySpeed(event));
+    scheduleCardHoverActivation(card);
     scheduleCardImageShellMetricsUpdate();
   });
 
@@ -862,13 +864,13 @@ if (workGrid) {
     if (!card || !workGrid.contains(card)) return;
     const nextCard = event.relatedTarget?.closest?.(".card");
     if (nextCard === card) return;
-    clearCardHoverTempo(card);
+    clearCardHoverActivation(card);
   });
 
   workGrid.addEventListener("focusin", (event) => {
     const card = event.target.closest(".card");
     if (!card || !workGrid.contains(card)) return;
-    applyCardHoverTempo(card, 1.4);
+    activateCardHover(card);
     scheduleCardImageShellMetricsUpdate();
   });
 
@@ -877,7 +879,7 @@ if (workGrid) {
     if (!card || !workGrid.contains(card)) return;
     const nextCard = event.relatedTarget?.closest?.(".card");
     if (nextCard === card) return;
-    clearCardHoverTempo(card);
+    clearCardHoverActivation(card);
   });
 }
 
