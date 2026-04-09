@@ -518,7 +518,7 @@ main {
 }
 
 h1 {
-  font-size: clamp(1.62rem, 3.42vw, 3.24rem);
+  font-size: clamp(1.377rem, 2.907vw, 2.754rem);
   max-width: 80%;
   margin: 16px 0 18px;
   text-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
@@ -1500,7 +1500,7 @@ textarea:focus {
   }
 
   h1 {
-    font-size: clamp(1.75rem, 9vw, 2.2rem);
+    font-size: clamp(1.488rem, 7.65vw, 1.87rem);
   }
 
   .btn {
@@ -1535,7 +1535,7 @@ textarea:focus {
   }
 
   h1 {
-    font-size: clamp(3.2rem, 4vw, 5rem);
+    font-size: clamp(2.72rem, 3.4vw, 4.25rem);
   }
 
   h2 {
