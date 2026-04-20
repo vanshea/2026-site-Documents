@@ -4,9 +4,12 @@ import * as crypto from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import path from "node:path";
-import { DATA_ROOT, readServerEnv, safeCompare } from "@/lib/server-runtime";
+import { DATA_ROOT, readServerEnv, readServerEnvSync, safeCompare } from "@/lib/server-runtime";
 
-const DATABASE_PATH = path.join(DATA_ROOT, "client-secrets.sqlite");
+const configuredDatabasePath = readServerEnvSync("CLIENT_SECRETS_DB_PATH");
+const DATABASE_PATH = configuredDatabasePath
+  ? path.resolve(configuredDatabasePath)
+  : path.join(DATA_ROOT, "client-secrets.sqlite");
 const MIGRATIONS_PATH = path.join(process.cwd(), "migrations");
 const ARGON2_MEMORY = 65536;
 const ARGON2_PASSES = 3;
@@ -47,7 +50,7 @@ let migrationsApplied = false;
 
 function getDatabase(): DatabaseSync {
   if (!database) {
-    fs.mkdirSync(DATA_ROOT, { recursive: true });
+    fs.mkdirSync(path.dirname(DATABASE_PATH), { recursive: true });
     database = new DatabaseSync(DATABASE_PATH);
   }
 

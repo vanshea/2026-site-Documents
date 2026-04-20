@@ -105,11 +105,11 @@ npm run prisma:deploy
 This site also uses a local SQLite file for client password hashes.
 
 File path:
-- `/data/client-secrets.sqlite`
+- whatever absolute path is set in `CLIENT_SECRETS_DB_PATH`
 
 This file is created automatically by the app.
 
-The `/data` folder must be persistent.
+That SQLite path must be persistent.
 
 ## Folders That Must Be Preserved
 
@@ -117,12 +117,11 @@ These folders are part of the live site and must not be deleted between deploys:
 
 - `/content/clients`
 - `/clients`
-- `/data`
 
 Purpose:
 - `/content/clients` = client registry and client slide JSON
 - `/clients` = client images and client `/http` folders
-- `/data` = SQLite file storing hashed client passwords
+- `CLIENT_SECRETS_DB_PATH` = SQLite file storing hashed client passwords
 
 ## Environment Variables Required
 
@@ -131,14 +130,17 @@ These values must be present in the production `.env` file:
 - `PORT=3000`
 - `DATABASE_URL=<TO BE PROVIDED>`
 - `SESSION_SECRET=<TO BE PROVIDED>`
+- `TRUSTED_WEB_ORIGINS=https://example.com,https://www.example.com`
 - `CLIENT_ACCESS_COOKIE_SECRET=<TO BE PROVIDED>`
 - `ADMIN_SESSION_COOKIE_SECRET=<TO BE PROVIDED>`
 - `CLIENT_PASSWORD_PEPPER=<OPTIONAL_TO_BE_PROVIDED>`
+- `CLIENT_SECRETS_DB_PATH=/var/lib/portfolio-site/client-secrets.sqlite`
 - `ANALYTICS_UI_ENABLED=true`
 - `ANALYTICS_UI_ORIGIN=http://127.0.0.1:3001`
 - `ANALYTICS_SESSION_TTL_MINUTES=<SET_VALUE>`
 - `ANALYTICS_ADMIN_USERNAME=<TO BE PROVIDED>`
 - `ANALYTICS_ADMIN_PASSWORD=<TO BE PROVIDED>`
+- `ANALYTICS_HOME_ADMIN_PASSWORD=<TO BE PROVIDED>`
 - `ANALYTICS_VIEWER_USERNAME=<TO BE PROVIDED>`
 - `ANALYTICS_VIEWER_PASSWORD=<TO BE PROVIDED>`
 
@@ -195,7 +197,7 @@ If the hosting company needs environment secrets:
 The client admin area is:
 - `/analytics/home/login`
 
-The current admin password is not listed in this document.
+The client admin password comes from `ANALYTICS_HOME_ADMIN_PASSWORD`.
 
 If the hosting company truly needs that password for launch support:
 - provide it separately and securely

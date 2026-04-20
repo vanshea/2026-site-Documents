@@ -30,7 +30,8 @@ This project has 4 moving parts:
 
 4. SQLite
    - stores client password hashes
-   - file path: `/data/client-secrets.sqlite`
+   - file path comes from `CLIENT_SECRETS_DB_PATH`
+   - default path is `/data/client-secrets.sqlite` only when that env var is not set
    - you do not start this manually
    - it is created automatically when needed
 
@@ -61,8 +62,10 @@ Then fill in `.env`.
 Minimum things to set:
 - `DATABASE_URL`
 - `SESSION_SECRET`
+- `TRUSTED_WEB_ORIGINS`
 - `CLIENT_ACCESS_COOKIE_SECRET`
 - `ADMIN_SESSION_COOKIE_SECRET`
+- `ANALYTICS_HOME_ADMIN_PASSWORD`
 
 ## Start PostgreSQL
 
@@ -125,15 +128,16 @@ Analytics login (`/login`):
   - `ANALYTICS_VIEWER_PASSWORD`
 
 Client admin login (`/analytics/home/login`):
-- password is currently hard-coded in:
-  [`/Library/WebServer/Documents/analytics-ui/lib/admin-auth.ts`](/Library/WebServer/Documents/analytics-ui/lib/admin-auth.ts)
-- current value:
-  - `1013VS1#`
+- password comes from:
+  - `ANALYTICS_HOME_ADMIN_PASSWORD`
 
 Client passwords:
 - are set from `/analytics/home`
 - are never shown back to you
 - are stored only as hashes in SQLite
+
+VSCimage admin:
+- `/vscimage` now requires an authenticated analytics admin session
 
 ## Client Content Files
 

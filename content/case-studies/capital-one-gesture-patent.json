@@ -1,0 +1,129 @@
+{
+  "slug": "capital-one-gesture-patent",
+  "sortOrder": 1,
+  "title": "Capital One Gesture Interface Patent",
+  "subtitle": "A future-facing interaction concept that translated ambiguous emerging technology into a concrete, patentable product story.",
+  "summary": "This sample case study shows how the new system supports hero content, structured narrative sections, a featured image viewer, and a gallery without duplicating page code.",
+  "cardImage": {
+    "src": "/assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp",
+    "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
+    "alt": "Thumbnail view of the gesture interface patent diagram."
+  },
+  "heroImage": {
+    "src": "/assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp",
+    "alt": "Diagram illustrating the gesture interface patent concept.",
+    "caption": "Patent concept diagram used to anchor the story."
+  },
+  "featuredImages": [
+    {
+      "src": "/assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
+      "alt": "Detailed patent concept diagram.",
+      "title": "Patent Concept Diagram",
+      "caption": "A systems-level view of the gesture interaction model."
+    },
+    {
+      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
+      "alt": "High-fidelity product interface concepts.",
+      "title": "Concept Screens",
+      "caption": "Exploratory product directions used to pressure-test the concept."
+    },
+    {
+      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-thumb-760x570.webp",
+      "alt": "Wireframe set showing user flow options.",
+      "title": "Flow Exploration",
+      "caption": "Wireframes that mapped where gesture interactions could reduce friction."
+    }
+  ],
+  "galleryImages": [
+    {
+      "src": "/assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
+      "alt": "Gesture interface patent overview.",
+      "caption": "Overview diagram."
+    },
+    {
+      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp",
+      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
+      "alt": "Product concept board.",
+      "caption": "Concept board."
+    },
+    {
+      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-large-1900x1600.webp",
+      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-thumb-760x570.webp",
+      "alt": "Wireframe study.",
+      "caption": "Wireframe study."
+    },
+    {
+      "src": "/assets/vscimage/generated/large-web-portfolio-gore3200x1800-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-gore3200x1800-thumb-760x570.webp",
+      "alt": "Supporting illustration used in the storytelling system.",
+      "caption": "Supporting technical illustration."
+    },
+    {
+      "src": "/assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-large-1900x1600.webp",
+      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-thumb-760x570.webp",
+      "alt": "Low-fidelity schematic sketch.",
+      "caption": "Schematic sketch."
+    }
+  ],
+  "sections": [
+    {
+      "id": "opportunity",
+      "heading": "Opportunity",
+      "body": [
+        "The brief was not a typical feature design problem. It was an open question about how a novel gesture interface might create a differentiated banking experience without collapsing into science fiction.",
+        "For this template, the body copy is stored directly in JSON so you can revise or remove paragraphs without touching layout code."
+      ],
+      "image": {
+        "src": "/assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp",
+        "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
+        "alt": "Condensed view of the patent diagram.",
+        "caption": "A tighter crop used inline with the narrative."
+      }
+    },
+    {
+      "id": "approach",
+      "heading": "Approach",
+      "body": [
+        "I assembled a focused cross-functional team, mapped the interaction architecture, and turned a conceptual technology direction into a story executives and legal partners could evaluate together.",
+        "The reusable section component also supports optional bullet lists and an optional image. If a case study does not need media in a section, you can remove that object from the JSON and the layout adapts automatically."
+      ],
+      "bullets": [
+        "Framed the concept around user value instead of technical novelty.",
+        "Created prototypes and storyboards to make the interaction feel concrete.",
+        "Prepared the narrative for both strategic review and legal evaluation."
+      ]
+    },
+    {
+      "id": "outcome",
+      "heading": "Outcome",
+      "body": [
+        "The concept helped secure internal momentum and contributed to a patent-winning direction. More importantly for the site system, this example demonstrates how the same template can hold hero media, narrative copy, metadata, feature imagery, and a flexible gallery.",
+        "Future case studies can be shorter, longer, more image-heavy, or more text-heavy by editing content files only."
+      ],
+      "image": {
+        "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp",
+        "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
+        "alt": "Refined product concept screens.",
+        "caption": "Final concept direction."
+      }
+    }
+  ],
+  "metadata": {
+    "client": "Capital One",
+    "role": "Principal User Experience Designer",
+    "year": "2017",
+    "industry": "Financial Services",
+    "services": [
+      "Interaction Design",
+      "Service Design",
+      "Prototyping",
+      "Storytelling"
+    ]
+  },
+  "readingTime": "6 min read",
+  "updatedAt": "2026-04-09"
+}

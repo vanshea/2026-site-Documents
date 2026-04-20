@@ -9,6 +9,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const prisma = require("./lib/prisma");
 const analytics = require("./lib/analytics");
 const analyticsApi = require("./lib/analytics-api");
+const { listCaseStudies, getCaseStudyBySlug } = require("./lib/case-studies");
 let multer = null;
 let sharp = null;
 
@@ -30,6 +31,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const rootDir = __dirname;
 const assetsDir = path.join(rootDir, "assets");
+const largeWebPortfolioDir = path.join(rootDir, "large_web_portfolio");
 const vscimageDir = path.join(assetsDir, "vscimage");
 const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
@@ -39,6 +41,16 @@ const featuredThumbSize = {
   width: 2400,
   height: 570
 };
+const publicRootFiles = new Set([
+  "/analytics.js",
+  "/experience.html",
+  "/index.html",
+  "/index.html.en",
+  "/script.js",
+  "/styles.css",
+  "/vscimage.css",
+  "/vscimage.js"
+]);
 const acceptedImageExt = new Set([
   ".png",
   ".jpg",
@@ -134,6 +146,42 @@ function toBool(value, defaultValue = false) {
 function toInt(value, defaultValue) {
   const parsed = Number.parseInt(String(value || ""), 10);
   return Number.isFinite(parsed) ? parsed : defaultValue;
+}
+
+function parseTrustedOriginList(rawValue) {
+  const origins = new Set();
+
+  String(rawValue || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .forEach((value) => {
+      try {
+        origins.add(new URL(value).origin);
+      } catch (_error) {
+        // Ignore malformed values so a typo does not crash local development.
+      }
+    });
+
+  if (process.env.NODE_ENV !== "production") {
+    origins.add("http://localhost:3000");
+    origins.add("http://127.0.0.1:3000");
+  }
+
+  return origins;
+}
+
+function readRuntimeSecret(name, fallback = "") {
+  const configuredValue = String(process.env[name] || "").trim();
+  if (configuredValue) {
+    return configuredValue;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(`${name} must be set in production.`);
+  }
+
+  return fallback;
 }
 
 function toWebPath(filePath) {
@@ -1651,8 +1699,11 @@ function hasAnyAnalyticsCredentials() {
 
 const SESSION_TTL_MINUTES = Math.max(5, toInt(process.env.ANALYTICS_SESSION_TTL_MINUTES, 60));
 const SESSION_TTL_MS = SESSION_TTL_MINUTES * 60 * 1000;
-const SESSION_SECRET =
-  process.env.SESSION_SECRET || "change-this-session-secret-in-production";
+const SESSION_SECRET = readRuntimeSecret(
+  "SESSION_SECRET",
+  "change-this-session-secret-in-production"
+);
+const TRUSTED_WEB_ORIGINS = parseTrustedOriginList(process.env.TRUSTED_WEB_ORIGINS);
 
 const ANALYTICS_DASHBOARD_ENABLED = toBool(process.env.ANALYTICS_DASHBOARD_ENABLED, true);
 const ANALYTICS_COLLECT_ENABLED = toBool(process.env.ANALYTICS_COLLECT_ENABLED, true);
@@ -1685,15 +1736,89 @@ app.use(
   })
 );
 
-app.use(express.static(rootDir));
+const publicRootStatic = express.static(rootDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: false,
+  redirect: false
+});
+const publicAssetsStatic = express.static(assetsDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: false,
+  redirect: false
+});
+const publicLargePortfolioStatic = express.static(largeWebPortfolioDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: false,
+  redirect: false
+});
+
+function serveStaticSubpath(staticHandler, routePrefix) {
+  return (req, res, next) => {
+    const originalUrl = req.url;
+    const nextUrl = req.url === routePrefix ? "/" : req.url.slice(routePrefix.length) || "/";
+    req.url = nextUrl.startsWith("/") ? nextUrl : `/${nextUrl}`;
+    staticHandler(req, res, (error) => {
+      req.url = originalUrl;
+      next(error);
+    });
+  };
+}
+
+const serveAssetsStatic = serveStaticSubpath(publicAssetsStatic, "/assets");
+const serveLargePortfolioStatic = serveStaticSubpath(
+  publicLargePortfolioStatic,
+  "/large_web_portfolio"
+);
+
+app.use((req, res, next) => {
+  if (!["GET", "HEAD"].includes(req.method)) {
+    return next();
+  }
+
+  if (publicRootFiles.has(req.path)) {
+    return publicRootStatic(req, res, next);
+  }
+
+  if (req.path.startsWith("/assets/")) {
+    const assetPath = req.path.slice("/assets/".length);
+    if (assetPath === "vscimage/originals" || assetPath.startsWith("vscimage/originals/")) {
+      return res.status(404).send("Not found.");
+    }
+
+    return serveAssetsStatic(req, res, next);
+  }
+
+  if (req.path.startsWith("/large_web_portfolio/")) {
+    return serveLargePortfolioStatic(req, res, next);
+  }
+
+  return next();
+});
 
 app.use("/api", (req, res, next) => {
-  res.set("Access-Control-Allow-Origin", "*");
+  const requestOrigin = String(req.headers.origin || "").trim();
+  const originAllowed = !requestOrigin || TRUSTED_WEB_ORIGINS.has(requestOrigin);
+
+  if (requestOrigin && originAllowed) {
+    res.set("Access-Control-Allow-Origin", requestOrigin);
+    res.append("Vary", "Origin");
+  }
+
   res.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type,Authorization");
 
   if (req.method === "OPTIONS") {
+    if (!originAllowed) {
+      return res.status(403).json({ error: "Origin is not allowed." });
+    }
     return res.sendStatus(204);
+  }
+
+  if (!originAllowed) {
+    return res.status(403).json({ error: "Origin is not allowed." });
   }
 
   return next();
@@ -1718,9 +1843,11 @@ function requireAnalyticsStorage(req, res, next) {
 function ensureAnalyticsSession(req, res, options = {}) {
   if (!req.session || !req.session.analyticsAuthenticated) {
     if (options.json) {
-      return res.status(401).json({ error: "Authentication required." });
+      res.status(401).json({ error: "Authentication required." });
+      return false;
     }
-    return res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
+    res.redirect(`/login?next=${encodeURIComponent(req.originalUrl)}`);
+    return false;
   }
 
   const now = Date.now();
@@ -1752,6 +1879,30 @@ function requireAnalyticsApiAuth(req, res, next) {
   if (!ensureAnalyticsSession(req, res, { json: true })) {
     return;
   }
+  next();
+}
+
+function requireAnalyticsAdmin(req, res, next) {
+  if (!ensureAnalyticsSession(req, res, { json: false })) {
+    return;
+  }
+
+  if (String(req.session.analyticsRole || "") !== "admin") {
+    return res.status(403).send("Admin access required.");
+  }
+
+  next();
+}
+
+function requireAnalyticsAdminApi(req, res, next) {
+  if (!ensureAnalyticsSession(req, res, { json: true })) {
+    return;
+  }
+
+  if (String(req.session.analyticsRole || "") !== "admin") {
+    return res.status(403).json({ error: "Admin access required." });
+  }
+
   next();
 }
 
@@ -2183,11 +2334,48 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-app.get("/vscimage", (req, res) => {
+app.get("/vscimage", requireAnalyticsAdmin, (req, res) => {
   res.sendFile(path.join(rootDir, "vscimage.html"));
 });
 
-app.get("/api/vscimage/config", async (req, res) => {
+app.get("/case-studies", async (req, res) => {
+  try {
+    const caseStudies = await listCaseStudies();
+
+    return res.render("case-studies/index", {
+      pageTitle: "Case Studies | Van Shea Creative",
+      metaDescription:
+        "Structured, reusable case studies for Van Shea Creative client and concept work.",
+      currentPath: req.path,
+      caseStudies
+    });
+  } catch (error) {
+    console.error("Unable to load case study index:", error);
+    return res.status(500).send("Unable to load case studies.");
+  }
+});
+
+app.get("/case-studies/:slug", async (req, res) => {
+  try {
+    const caseStudy = await getCaseStudyBySlug(req.params.slug);
+
+    if (!caseStudy) {
+      return res.status(404).send("Case study not found.");
+    }
+
+    return res.render("case-studies/show", {
+      pageTitle: `${caseStudy.title} | Case Study | Van Shea Creative`,
+      metaDescription: caseStudy.summary || caseStudy.subtitle || caseStudy.title,
+      currentPath: req.path,
+      caseStudy
+    });
+  } catch (error) {
+    console.error("Unable to load case study detail:", error);
+    return res.status(500).send("Unable to load case study.");
+  }
+});
+
+app.get("/api/vscimage/config", requireAnalyticsAdminApi, async (req, res) => {
   try {
     const config = await readVscimageConfig();
     return res.status(200).json(config);
@@ -2197,7 +2385,7 @@ app.get("/api/vscimage/config", async (req, res) => {
   }
 });
 
-app.post("/api/vscimage/config", async (req, res) => {
+app.post("/api/vscimage/config", requireAnalyticsAdminApi, async (req, res) => {
   const payload = req.body || {};
 
   if (!payload.logos || !payload.projects) {
@@ -2217,7 +2405,7 @@ app.post("/api/vscimage/config", async (req, res) => {
   }
 });
 
-app.get("/api/vscimage/files", async (req, res) => {
+app.get("/api/vscimage/files", requireAnalyticsAdminApi, async (req, res) => {
   try {
     await ensureVscimageStorage();
     const allFiles = await listImageFilesRecursive(assetsDir);
@@ -2231,7 +2419,7 @@ app.get("/api/vscimage/files", async (req, res) => {
   }
 });
 
-app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
+app.post("/api/vscimage/gallery/:entryId/update", requireAnalyticsAdminApi, async (req, res) => {
   const entryId = String(req.params.entryId || "").trim();
   const title = normalizeTextField(req.body?.title, 120);
   const cardDescription = normalizeCardDescription(req.body?.cardDescription, 120);
@@ -2268,7 +2456,7 @@ app.post("/api/vscimage/gallery/:entryId/update", async (req, res) => {
   }
 });
 
-app.post("/api/vscimage/gallery/:entryId/archive", async (req, res) => {
+app.post("/api/vscimage/gallery/:entryId/archive", requireAnalyticsAdminApi, async (req, res) => {
   const entryId = String(req.params.entryId || "").trim();
   const archived = Object.prototype.hasOwnProperty.call(req.body || {}, "archived")
     ? toBool(req.body.archived, true)
@@ -2291,7 +2479,7 @@ app.post("/api/vscimage/gallery/:entryId/archive", async (req, res) => {
   }
 });
 
-app.post("/api/vscimage/gallery/:entryId/reorder", async (req, res) => {
+app.post("/api/vscimage/gallery/:entryId/reorder", requireAnalyticsAdminApi, async (req, res) => {
   const entryId = String(req.params.entryId || "").trim();
   const direction = String(req.body?.direction || "").trim().toLowerCase();
   const targetEntryId = String(req.body?.targetEntryId || "").trim();
@@ -2325,7 +2513,7 @@ app.post("/api/vscimage/gallery/:entryId/reorder", async (req, res) => {
   }
 });
 
-app.post("/api/vscimage/gallery/:entryId/delete", async (req, res) => {
+app.post("/api/vscimage/gallery/:entryId/delete", requireAnalyticsAdminApi, async (req, res) => {
   const entryId = String(req.params.entryId || "").trim();
 
   if (!entryId) {
@@ -2349,72 +2537,77 @@ app.post("/api/vscimage/gallery/:entryId/delete", async (req, res) => {
 });
 
 if (upload) {
-  app.post("/api/vscimage/gallery/:entryId/edit", upload.fields(galleryEditUploadFields), async (req, res) => {
-    const entryId = String(req.params.entryId || "").trim();
-    const uploadedFiles = Object.values(req.files || {})
-      .flat()
-      .filter(Boolean);
+  app.post(
+    "/api/vscimage/gallery/:entryId/edit",
+    requireAnalyticsAdminApi,
+    upload.fields(galleryEditUploadFields),
+    async (req, res) => {
+      const entryId = String(req.params.entryId || "").trim();
+      const uploadedFiles = Object.values(req.files || {})
+        .flat()
+        .filter(Boolean);
 
-    if (!entryId) {
-      return res.status(400).json({ error: "Gallery entry id is required." });
-    }
-
-    for (const file of uploadedFiles) {
-      const mime = String(file.mimetype || "").trim().toLowerCase();
-      const ext = path.extname(file.originalname || "").toLowerCase();
-      if (!mime.startsWith("image/") && !acceptedImageExt.has(ext)) {
-        return res.status(400).json({ error: "Only image files are supported." });
-      }
-    }
-
-    const sourceImage = req.files?.image?.[0];
-    const thumbImage = req.files?.thumbImage?.[0];
-    const largeImage = req.files?.largeImage?.[0];
-    const fullscreenImage = req.files?.fullscreenImage?.[0];
-    const logoImage = req.files?.logoImage?.[0];
-
-    try {
-      const editedEntry = await editVscimageGalleryEntry(entryId, {
-        title: req.body?.title,
-        cardDescription: req.body?.cardDescription,
-        category: req.body?.category,
-        description: req.body?.description,
-        homepageVisible: req.body?.homepageVisible,
-        featured: req.body?.featured,
-        name: req.body?.name,
-        backgroundColor: req.body?.backgroundColor,
-        imageBuffer: sourceImage?.buffer,
-        originalName: sourceImage?.originalname,
-        thumbImageBuffer: thumbImage?.buffer,
-        largeImageBuffer: largeImage?.buffer,
-        fullscreenImageBuffer: fullscreenImage?.buffer,
-        logoImageBuffer: logoImage?.buffer
-      });
-
-      if (!editedEntry) {
-        return res.status(404).json({ error: "Gallery entry was not found." });
+      if (!entryId) {
+        return res.status(400).json({ error: "Gallery entry id is required." });
       }
 
-      return res.status(200).json({ ok: true, entry: editedEntry });
-    } catch (error) {
-      if (
-        [
-          "VSCIMAGE_ORIGINAL_MISSING",
-          "VSCIMAGE_ASSET_MISSING",
-          "VSCIMAGE_FEATURED_SOURCE_MISSING",
-          "VSCIMAGE_INVALID_BACKGROUND",
-          "VSCIMAGE_EDITING_UNAVAILABLE"
-        ].includes(error.code)
-      ) {
-        return res.status(400).json({ error: error.message });
+      for (const file of uploadedFiles) {
+        const mime = String(file.mimetype || "").trim().toLowerCase();
+        const ext = path.extname(file.originalname || "").toLowerCase();
+        if (!mime.startsWith("image/") && !acceptedImageExt.has(ext)) {
+          return res.status(400).json({ error: "Only image files are supported." });
+        }
       }
 
-      console.error("Unable to edit VSCimage gallery entry:", error);
-      return res.status(500).json({ error: "Unable to edit thumbnail entry." });
-    }
-  });
+      const sourceImage = req.files?.image?.[0];
+      const thumbImage = req.files?.thumbImage?.[0];
+      const largeImage = req.files?.largeImage?.[0];
+      const fullscreenImage = req.files?.fullscreenImage?.[0];
+      const logoImage = req.files?.logoImage?.[0];
 
-  app.post("/api/vscimage/upload", upload.single("image"), async (req, res) => {
+      try {
+        const editedEntry = await editVscimageGalleryEntry(entryId, {
+          title: req.body?.title,
+          cardDescription: req.body?.cardDescription,
+          category: req.body?.category,
+          description: req.body?.description,
+          homepageVisible: req.body?.homepageVisible,
+          featured: req.body?.featured,
+          name: req.body?.name,
+          backgroundColor: req.body?.backgroundColor,
+          imageBuffer: sourceImage?.buffer,
+          originalName: sourceImage?.originalname,
+          thumbImageBuffer: thumbImage?.buffer,
+          largeImageBuffer: largeImage?.buffer,
+          fullscreenImageBuffer: fullscreenImage?.buffer,
+          logoImageBuffer: logoImage?.buffer
+        });
+
+        if (!editedEntry) {
+          return res.status(404).json({ error: "Gallery entry was not found." });
+        }
+
+        return res.status(200).json({ ok: true, entry: editedEntry });
+      } catch (error) {
+        if (
+          [
+            "VSCIMAGE_ORIGINAL_MISSING",
+            "VSCIMAGE_ASSET_MISSING",
+            "VSCIMAGE_FEATURED_SOURCE_MISSING",
+            "VSCIMAGE_INVALID_BACKGROUND",
+            "VSCIMAGE_EDITING_UNAVAILABLE"
+          ].includes(error.code)
+        ) {
+          return res.status(400).json({ error: error.message });
+        }
+
+        console.error("Unable to edit VSCimage gallery entry:", error);
+        return res.status(500).json({ error: "Unable to edit thumbnail entry." });
+      }
+    }
+  );
+
+  app.post("/api/vscimage/upload", requireAnalyticsAdminApi, upload.single("image"), async (req, res) => {
     if (!sharp) {
       return res.status(503).json({
         error:
@@ -2597,13 +2790,13 @@ if (upload) {
     }
   });
 } else {
-  app.post("/api/vscimage/gallery/:entryId/edit", async (req, res) => {
+  app.post("/api/vscimage/gallery/:entryId/edit", requireAnalyticsAdminApi, async (req, res) => {
     return res.status(503).json({
       error: "Upload dependency is missing. Run npm install to enable editing."
     });
   });
 
-  app.post("/api/vscimage/upload", async (req, res) => {
+  app.post("/api/vscimage/upload", requireAnalyticsAdminApi, async (req, res) => {
     return res.status(503).json({
       error: "Upload dependency is missing. Run npm install to enable uploads."
     });
@@ -2611,6 +2804,10 @@ if (upload) {
 }
 
 app.get("*", (req, res) => {
+  const baseName = path.basename(req.path);
+  if (baseName.startsWith(".") || baseName.includes(".")) {
+    return res.status(404).send("Not found.");
+  }
   res.sendFile(path.join(rootDir, "index.html"));
 });
 

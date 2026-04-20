@@ -6,6 +6,8 @@ Simple how-to guides:
 - Localhost: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md)
 - Publishing online: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md)
 - Network Solutions handoff: [`/Library/WebServer/Documents/docs/NETWORK-SOLUTIONS-HOSTING-HANDOFF.md`](/Library/WebServer/Documents/docs/NETWORK-SOLUTIONS-HOSTING-HANDOFF.md)
+- SiteGround static FTP handoff: [`/Library/WebServer/Documents/docs/SITEGROUND-STATIC-FTP-HANDOFF.md`](/Library/WebServer/Documents/docs/SITEGROUND-STATIC-FTP-HANDOFF.md)
+- Dynamic backup + static export workflow: [`/Library/WebServer/Documents/docs/BACKUP-AND-STATIC-WORKFLOW.md`](/Library/WebServer/Documents/docs/BACKUP-AND-STATIC-WORKFLOW.md)
 
 Maintenance rule:
 - If startup, localhost, deployment, database, env var, or domain-routing behavior changes, update all of the docs above in the same change.
@@ -16,7 +18,7 @@ Maintenance rule:
 - Analytics storage: PostgreSQL + Prisma
 - Analytics UI: Next.js 14 + TypeScript + Tailwind + Recharts (mounted at `/analytics`)
 - Client content: `/content/clients/index.json` registry + `/content/clients/<clientId>.json`
-- Client secret storage: SQLite (`/data/client-secrets.sqlite`)
+- Client secret storage: SQLite (`CLIENT_SECRETS_DB_PATH`, defaults to `/data/client-secrets.sqlite` only when unset)
 
 ## Local Setup
 
@@ -46,13 +48,16 @@ Copy `.env.example` to `.env` and set:
 - `PORT`: Express port (`3000` by default)
 - `DATABASE_URL`: Postgres connection string
 - `SESSION_SECRET`: long random session secret
+- `TRUSTED_WEB_ORIGINS`: comma-separated browser origins allowed to call first-party APIs and Next server actions
 - `ANALYTICS_ADMIN_USERNAME` / `ANALYTICS_ADMIN_PASSWORD`: admin credentials
+- `ANALYTICS_HOME_ADMIN_PASSWORD`: password for `/analytics/home`
 - `ANALYTICS_VIEWER_USERNAME` / `ANALYTICS_VIEWER_PASSWORD`: read-only viewer credentials
 - `ANALYTICS_UI_ENABLED`: enable Next.js proxy mount (`true`)
 - `ANALYTICS_UI_ORIGIN`: Next.js origin (`http://127.0.0.1:3001`)
 - `CLIENT_ACCESS_COOKIE_SECRET`: signing secret for per-client unlock cookies
 - `ADMIN_SESSION_COOKIE_SECRET`: signing secret for the `/home` admin cookie
 - `CLIENT_PASSWORD_PEPPER`: optional extra server-side pepper for Argon2 client password hashes
+- `CLIENT_SECRETS_DB_PATH`: optional absolute path for the SQLite password DB outside the repo/web root
 - `ANALYTICS_SESSION_TTL_MINUTES`: session timeout
 - `ANALYTICS_COLLECT_ENABLED`, `ANALYTICS_DASHBOARD_ENABLED`
 - Optional mail settings: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`
@@ -79,16 +84,16 @@ Security rule:
 How `/home` works:
 - Route path in the Next app is `/home`, exposed publicly at `/analytics/home` because the app uses `basePath: /analytics`.
 - Login page is `/analytics/home/login`.
-- The admin password is checked server-side with a timing-safe compare against the literal `1013VS1#`.
+- The admin password comes from `ANALYTICS_HOME_ADMIN_PASSWORD`.
 - Successful login sets a signed `httpOnly` `admin_session` cookie with a 12 hour max age.
 - `/home` never displays any stored client password. Password resets are write-only and stored as Argon2 hashes in SQLite.
 - Registry edits update [`/Library/WebServer/Documents/content/clients/index.json`](/Library/WebServer/Documents/content/clients/index.json).
-- Client password resets upsert into the SQLite database at [`/Library/WebServer/Documents/data/client-secrets.sqlite`](/Library/WebServer/Documents/data/client-secrets.sqlite).
+- Client password resets upsert into the SQLite database pointed to by `CLIENT_SECRETS_DB_PATH`.
 
 Warnings:
 - No plaintext passwords are stored in JSON.
 - No plaintext passwords are re-displayed by `/home`.
-- If you need to rotate the admin password, update the literal in [`admin-auth.ts`](/Library/WebServer/Documents/analytics-ui/lib/admin-auth.ts) and restart the Next app.
+- `/vscimage` and `/api/vscimage/*` now require an authenticated analytics admin session.
 
 Create a new client scaffold:
 
@@ -151,6 +156,17 @@ npm --prefix analytics-ui run build && npm --prefix analytics-ui run start
 ```
 
 Ensure `ANALYTICS_UI_ORIGIN` points to the deployed Next.js analytics UI service.
+
+## Launch-Ready FTP Upload
+
+Create a clean upload folder with:
+
+```bash
+node scripts/create-launch-ready-bundle.mjs
+```
+
+This generates a clean FTP bundle without local secrets, SQL dumps, `node_modules`, or build artifacts.
+By default the bundle is written to `~/Backups/portfolio-site/launch-ready` because the web root itself may be read-only.
 
 ## Existing APIs
 

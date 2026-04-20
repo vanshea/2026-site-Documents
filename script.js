@@ -48,17 +48,125 @@ themeButtons.forEach((button) => {
 
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
+const experienceResumeSection = document.getElementById("experienceResumeSection");
+const copyExperienceTextButton = document.getElementById("copyExperienceText");
 const workGrid = document.querySelector("#work .grid");
 const siteHeader = document.querySelector(".site-header");
 const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 640px)");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
+const CARD_HOVER_FULL_DELAY_MS = 1000;
+const cardHoverIntentState = new WeakMap();
 
 function toSitePath(filePath) {
   if (!filePath) return "";
   if (/^(https?:)?\/\//.test(filePath)) return filePath;
   return filePath.startsWith("/") ? filePath : `/${filePath}`;
+}
+
+function normalizeAsciiText(value) {
+  return String(value || "")
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/[\u2013\u2014\u2212]/g, "-")
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
+}
+
+function buildAsciiSectionText(section) {
+  if (!section) return "";
+
+  const clone = section.cloneNode(true);
+  clone.querySelectorAll("[data-copy-exclude]").forEach((node) => {
+    node.remove();
+  });
+
+  return normalizeAsciiText(clone.innerText || clone.textContent || "")
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function copyPlainText(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.setAttribute("readonly", "true");
+  helper.style.position = "fixed";
+  helper.style.opacity = "0";
+  helper.style.pointerEvents = "none";
+  document.body.appendChild(helper);
+  helper.focus();
+  helper.select();
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(helper);
+
+  if (!copied) {
+    throw new Error("Copy command failed");
+  }
+}
+
+function getCardHoverIntent(card) {
+  let state = cardHoverIntentState.get(card);
+  if (state) return state;
+
+  state = { timeoutId: 0, isActive: false };
+  cardHoverIntentState.set(card, state);
+  return state;
+}
+
+function activateCardHoverPreview(card) {
+  if (!card) return;
+  card.classList.add("is-hover-preview");
+}
+
+function activateCardHover(card) {
+  if (!card) return;
+  const state = getCardHoverIntent(card);
+  if (state.timeoutId) {
+    window.clearTimeout(state.timeoutId);
+  }
+  state.timeoutId = 0;
+  state.isActive = true;
+  card.classList.add("is-hover-preview");
+  card.classList.add("is-hover-active");
+}
+
+function scheduleCardHoverActivation(card) {
+  if (!card) return;
+
+  const state = getCardHoverIntent(card);
+  activateCardHoverPreview(card);
+  if (state.isActive || state.timeoutId) return;
+
+  state.timeoutId = window.setTimeout(() => {
+    activateCardHover(card);
+  }, CARD_HOVER_FULL_DELAY_MS);
+}
+
+function clearCardHoverActivation(card) {
+  if (!card) return;
+
+  const state = getCardHoverIntent(card);
+  if (state.timeoutId) {
+    window.clearTimeout(state.timeoutId);
+    state.timeoutId = 0;
+  }
+
+  state.isActive = false;
+  card.classList.remove("is-hover-preview");
+  card.classList.remove("is-hover-active");
 }
 
 function setMobileNavState(isOpen) {
@@ -106,6 +214,109 @@ function getWorkCardElements() {
   return Array.from(workGrid.children).filter((element) =>
     element.classList?.contains("card")
   );
+}
+
+function ensureCardImageShells() {
+  getWorkCardElements().forEach((card) => {
+    const image = card.querySelector(".card-image");
+    if (!image || image.parentElement?.classList.contains("card-image-shell")) {
+      return;
+    }
+
+    const shell = document.createElement("span");
+    shell.className = "card-image-shell";
+    image.parentNode.insertBefore(shell, image);
+    shell.appendChild(image);
+  });
+}
+
+function updateCardImageShellMetrics() {
+  getWorkCardElements().forEach((card) => {
+    const link = card.querySelector(".work-link");
+    const shell = card.querySelector(".card-image-shell");
+    const image = shell?.querySelector(".card-image");
+    if (!link || !shell || !image) return;
+
+    const shellRect = shell.getBoundingClientRect();
+    const shellWidth = shellRect.width;
+    const shellHeight = shellRect.height;
+    const cardWidth = card.clientWidth;
+    const cardInnerHeight = card.clientHeight;
+
+    if (shellWidth > 0 && shellHeight > 0 && cardWidth > 0 && cardInnerHeight > 0) {
+      const scaleX = cardWidth / shellWidth;
+      const scaleY = cardInnerHeight / shellHeight;
+      const coverScale = Math.max(1, scaleX, scaleY);
+      link.style.setProperty("--card-shell-scale", coverScale.toFixed(4));
+      return;
+    }
+
+    link.style.removeProperty("--card-shell-scale");
+  });
+}
+
+function updateCardHoverTitleTone(card) {
+  const image = card?.querySelector(".card-image");
+  if (!card || !image || !image.complete || !image.naturalWidth || !image.naturalHeight) {
+    return;
+  }
+
+  try {
+    const sampleCanvas = document.createElement("canvas");
+    const sampleContext = sampleCanvas.getContext("2d", { willReadFrequently: true });
+    if (!sampleContext) return;
+
+    const sampleWidth = 24;
+    const sampleHeight = 24;
+    const sourceX = Math.floor(image.naturalWidth * 0.15);
+    const sourceY = Math.floor(image.naturalHeight * 0.45);
+    const sourceWidth = Math.max(1, Math.floor(image.naturalWidth * 0.7));
+    const sourceHeight = Math.max(1, Math.floor(image.naturalHeight * 0.35));
+
+    sampleCanvas.width = sampleWidth;
+    sampleCanvas.height = sampleHeight;
+    sampleContext.drawImage(
+      image,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      0,
+      0,
+      sampleWidth,
+      sampleHeight
+    );
+
+    const { data } = sampleContext.getImageData(0, 0, sampleWidth, sampleHeight);
+    let colorTotal = 0;
+    let opaquePixels = 0;
+
+    for (let index = 0; index < data.length; index += 4) {
+      const alpha = data[index + 3];
+      if (alpha < 16) continue;
+      const red = data[index];
+      const green = data[index + 1];
+      const blue = data[index + 2];
+      colorTotal += 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+      opaquePixels += 1;
+    }
+
+    if (!opaquePixels) return;
+
+    const averageLuminance = colorTotal / opaquePixels;
+    card.style.setProperty(
+      "--card-hover-title-color",
+      averageLuminance >= 150 ? "#000000" : "#ffffff"
+    );
+  } catch (error) {
+    card.style.removeProperty("--card-hover-title-color");
+  }
+}
+
+function updateCardHoverTitleTones() {
+  getWorkCardElements().forEach((card) => {
+    updateCardHoverTitleTone(card);
+  });
 }
 
 function isPlaceholderAssetPath(filePath) {
@@ -416,6 +627,8 @@ const workLoadMoreButton = document.getElementById("workLoadMore");
 const WORK_ROWS_PER_PAGE = 2;
 let visibleWorkCards = 0;
 let featuredCardHeightFrame = 0;
+let cardImageShellMetricsFrame = 0;
+let cardHoverTitleToneFrame = 0;
 const REGULAR_CARD_IMAGE_ASPECT_RATIO = 4 / 3;
 
 function getWorkGridColumnCount() {
@@ -559,6 +772,30 @@ function scheduleFeaturedCardHeightUpdate() {
   });
 }
 
+function scheduleCardImageShellMetricsUpdate() {
+  if (!workGrid) return;
+  if (cardImageShellMetricsFrame) {
+    window.cancelAnimationFrame(cardImageShellMetricsFrame);
+  }
+
+  cardImageShellMetricsFrame = window.requestAnimationFrame(() => {
+    cardImageShellMetricsFrame = 0;
+    updateCardImageShellMetrics();
+  });
+}
+
+function scheduleCardHoverTitleToneUpdate() {
+  if (!workGrid) return;
+  if (cardHoverTitleToneFrame) {
+    window.cancelAnimationFrame(cardHoverTitleToneFrame);
+  }
+
+  cardHoverTitleToneFrame = window.requestAnimationFrame(() => {
+    cardHoverTitleToneFrame = 0;
+    updateCardHoverTitleTones();
+  });
+}
+
 function applyActiveFilter() {
   const cards = getWorkCardElements();
   const filteredCards = getFilteredCards();
@@ -577,6 +814,8 @@ function applyActiveFilter() {
     workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
   }
 
+  scheduleCardImageShellMetricsUpdate();
+  scheduleCardHoverTitleToneUpdate();
   scheduleFeaturedCardHeightUpdate();
 }
 
@@ -601,10 +840,47 @@ if (workGrid) {
     "load",
     (event) => {
       if (!event.target?.classList?.contains("card-image")) return;
+      scheduleCardImageShellMetricsUpdate();
+      scheduleCardHoverTitleToneUpdate();
       scheduleFeaturedCardHeightUpdate();
     },
     true
   );
+
+  workGrid.addEventListener("pointerover", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    const card = event.target.closest(".card");
+    if (!card || !workGrid.contains(card)) return;
+    const previousCard = event.relatedTarget?.closest?.(".card");
+    if (previousCard === card) return;
+
+    scheduleCardHoverActivation(card);
+    scheduleCardImageShellMetricsUpdate();
+  });
+
+  workGrid.addEventListener("pointerout", (event) => {
+    if (event.pointerType && event.pointerType !== "mouse") return;
+    const card = event.target.closest(".card");
+    if (!card || !workGrid.contains(card)) return;
+    const nextCard = event.relatedTarget?.closest?.(".card");
+    if (nextCard === card) return;
+    clearCardHoverActivation(card);
+  });
+
+  workGrid.addEventListener("focusin", (event) => {
+    const card = event.target.closest(".card");
+    if (!card || !workGrid.contains(card)) return;
+    activateCardHover(card);
+    scheduleCardImageShellMetricsUpdate();
+  });
+
+  workGrid.addEventListener("focusout", (event) => {
+    const card = event.target.closest(".card");
+    if (!card || !workGrid.contains(card)) return;
+    const nextCard = event.relatedTarget?.closest?.(".card");
+    if (nextCard === card) return;
+    clearCardHoverActivation(card);
+  });
 }
 
 if (navToggle && siteHeader && siteNav) {
@@ -642,6 +918,31 @@ if (navToggle && siteHeader && siteNav) {
     if (!siteHeader.classList.contains("is-nav-open")) return;
     setMobileNavState(false);
     navToggle.focus();
+  });
+}
+
+if (copyExperienceTextButton && experienceResumeSection) {
+  const defaultCopyLabel = copyExperienceTextButton.textContent.trim() || "Copy Text";
+  let copyLabelTimer = 0;
+
+  copyExperienceTextButton.addEventListener("click", async () => {
+    const asciiText = buildAsciiSectionText(experienceResumeSection);
+    if (!asciiText) return;
+
+    copyExperienceTextButton.disabled = true;
+
+    try {
+      await copyPlainText(asciiText);
+      copyExperienceTextButton.textContent = "Copied";
+    } catch (error) {
+      copyExperienceTextButton.textContent = "Copy Failed";
+    } finally {
+      window.clearTimeout(copyLabelTimer);
+      copyLabelTimer = window.setTimeout(() => {
+        copyExperienceTextButton.textContent = defaultCopyLabel;
+        copyExperienceTextButton.disabled = false;
+      }, 1600);
+    }
   });
 }
 
@@ -910,6 +1211,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
   });
 }
 
+ensureCardImageShells();
 refreshWorkCardState();
 visibleWorkCards = getWorkCardsPerPage();
 applyActiveFilter();

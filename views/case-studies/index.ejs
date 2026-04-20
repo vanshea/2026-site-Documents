@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="theme2">
+  <head>
+    <%- include("../partials/public_head", { pageTitle, metaDescription }) %>
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <%- include("../partials/public_header", { currentPath }) %>
+
+    <main id="top">
+      <section class="hero case-study-index-hero reveal">
+        <div class="case-study-index-copy">
+          <p class="eyebrow">Selected Work</p>
+          <h1>Case studies built from structured content, not duplicated templates.</h1>
+          <p class="lead">
+            Each entry below is powered by a reusable slug route and a JSON content file,
+            so future case studies can be added in VS Code without rebuilding layout
+            components.
+          </p>
+        </div>
+      </section>
+
+      <section class="case-study-block reveal" aria-labelledby="caseStudiesIndexHeading">
+        <div class="section-head case-study-block-head">
+          <div>
+            <p class="eyebrow">Gallery</p>
+            <h2 id="caseStudiesIndexHeading">Case Study Index</h2>
+          </div>
+        </div>
+
+        <div class="grid case-study-card-grid">
+          <% caseStudies.forEach((caseStudy) => { %>
+            <%- include("../partials/case-studies/case-study-card", { caseStudy }) %>
+          <% }) %>
+        </div>
+      </section>
+    </main>
+
+    <%- include("../partials/public_footer") %>
+    <%- include("../partials/consent_banner") %>
+
+    <script src="/analytics.js"></script>
+    <script src="/script.js"></script>
+  </body>
+</html>

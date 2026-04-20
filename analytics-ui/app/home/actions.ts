@@ -9,6 +9,7 @@ import {
   assertAdminSession,
   createSignedAdminSessionCookieValue,
   getAdminSessionCookieOptions,
+  isAdminPasswordConfigured,
   verifyAdminPassword
 } from "@/lib/admin-auth";
 import {
@@ -47,6 +48,11 @@ async function requireAdminForMutation() {
 }
 
 export async function loginAdmin(formData: FormData) {
+  const configured = await isAdminPasswordConfigured();
+  if (!configured) {
+    redirect("/home/login?error=unconfigured");
+  }
+
   const submittedPassword = String(formData.get("password") || "");
   const valid = await verifyAdminPassword(submittedPassword);
 
