@@ -102,8 +102,17 @@ That starts:
 
 ## What To Open In The Browser
 
-Main site:
+Main entry:
 - `http://localhost:3000`
+
+Live site:
+- `http://localhost:3000/livesite/`
+
+Coming-soon site:
+- `http://localhost:3000/comingsoon/`
+
+Build sandbox:
+- `http://localhost:3000/build/`
 
 Analytics login:
 - `http://localhost:3000/login`
@@ -116,6 +125,21 @@ Client admin:
 
 Client admin login:
 - `http://localhost:3000/analytics/home/login`
+
+## Public Site Folder Layout
+
+Static source folders:
+- [`/Library/WebServer/Documents/livesite`](/Library/WebServer/Documents/livesite)
+- [`/Library/WebServer/Documents/comingsoon`](/Library/WebServer/Documents/comingsoon)
+- [`/Library/WebServer/Documents/build`](/Library/WebServer/Documents/build)
+
+Shared assets used by those folders:
+- [`/Library/WebServer/Documents/assets`](/Library/WebServer/Documents/assets)
+- [`/Library/WebServer/Documents/large_web_portfolio`](/Library/WebServer/Documents/large_web_portfolio)
+
+Static FTP bundle commands:
+- `npm run livesite:bundle`
+- `npm run comingsoon:bundle`
 
 ## Passwords
 

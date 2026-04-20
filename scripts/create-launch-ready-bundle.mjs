@@ -27,11 +27,14 @@ const topLevelFiles = [
 const topLevelDirs = [
   "analytics-ui",
   "assets",
+  "build",
   "clients",
+  "comingsoon",
   "content",
   "docs",
   "large_web_portfolio",
   "lib",
+  "livesite",
   "prisma",
   "scripts",
   "views"

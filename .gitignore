@@ -5,6 +5,10 @@ analytics-ui/.next/
 out/
 dist/
 build/
+!build/
+!build/README.md
+!build/index.html
+!build/styles.css
 launch-ready/
 
 .env*

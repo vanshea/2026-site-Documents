@@ -47,7 +47,10 @@ Runs on:
 
 Purpose:
 - serves the main website
+- redirects `/` to `/livesite/`
+- serves `/livesite`, `/comingsoon`, and `/build`
 - handles `/login`
+- redirects `/app` into `/analytics`
 - proxies `/analytics/*` into the Next app
 
 ### Process 2
@@ -115,6 +118,9 @@ That SQLite path must be persistent.
 
 These folders are part of the live site and must not be deleted between deploys:
 
+- `/livesite`
+- `/comingsoon`
+- `/build`
 - `/content/clients`
 - `/clients`
 

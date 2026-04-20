@@ -35,11 +35,27 @@ npm run dev
 ```
 
 Open:
-- Portfolio: [http://localhost:3000](http://localhost:3000)
+- Portfolio hub: [http://localhost:3000](http://localhost:3000)
+- Live site: [http://localhost:3000/livesite/](http://localhost:3000/livesite/)
+- Coming soon: [http://localhost:3000/comingsoon/](http://localhost:3000/comingsoon/)
+- Build sandbox: [http://localhost:3000/build/](http://localhost:3000/build/)
 - Analytics login: [http://localhost:3000/login](http://localhost:3000/login)
 - Analytics app (after login): [http://localhost:3000/analytics](http://localhost:3000/analytics)
 - Client rooms: [http://localhost:3000/analytics/clients](http://localhost:3000/analytics/clients)
 - Client admin: [http://localhost:3000/analytics/home](http://localhost:3000/analytics/home)
+
+Static variant folders:
+- Live site: [`/Library/WebServer/Documents/livesite`](/Library/WebServer/Documents/livesite)
+- Coming-soon site: [`/Library/WebServer/Documents/comingsoon`](/Library/WebServer/Documents/comingsoon)
+- Build variant: [`/Library/WebServer/Documents/build`](/Library/WebServer/Documents/build)
+
+Each variant folder now contains a complete static copy of:
+- `index.html`
+- `experience.html`
+- `case-studies/`
+- `assets/`
+- `large_web_portfolio/`
+- `.htaccess`
 
 ## Environment Variables
 
@@ -156,6 +172,28 @@ npm --prefix analytics-ui run build && npm --prefix analytics-ui run start
 ```
 
 Ensure `ANALYTICS_UI_ORIGIN` points to the deployed Next.js analytics UI service.
+
+## Static FTP Exports
+
+Refresh the complete static variant folders after source-content changes:
+
+```bash
+npm run variants:sync
+```
+
+Create a root-ready static export for the live site:
+
+```bash
+npm run livesite:bundle
+```
+
+Create a root-ready static export for the coming-soon site:
+
+```bash
+npm run comingsoon:bundle
+```
+
+Both commands write to `~/Backups/portfolio-site/<variant>-static-upload`.
 
 ## Launch-Ready FTP Upload
 

@@ -3,7 +3,7 @@
 This workflow keeps two separate deliverables:
 
 1. A private backup of the full dynamic site as it exists on this machine
-2. A static SiteGround-friendly export for simple hosting
+2. A static export for simple hosting
 
 ## Commands
 
@@ -19,10 +19,16 @@ Create both the dynamic backup and the static hosting package:
 npm run backup:dynamic-and-static
 ```
 
-Create only the SiteGround static package:
+Create only the coming-soon static package:
 
 ```bash
-npm run siteground:bundle
+npm run comingsoon:bundle
+```
+
+Create the live-site static package:
+
+```bash
+npm run livesite:bundle
 ```
 
 ## Dynamic Backup Output
@@ -55,11 +61,15 @@ The backup also creates a zip file beside the folder when the `zip` command is a
 
 ## Static Output
 
-The static SiteGround package is written to:
+The coming-soon static package is written to:
 
-- `~/Backups/portfolio-site/siteground-static-upload/`
+- `~/Backups/portfolio-site/comingsoon-static-upload/`
 
-It includes only the files needed for the static public site, pre-rendered case study pages, and `.htaccess` redirects for old dynamic routes.
+The live-site static package is written to:
+
+- `~/Backups/portfolio-site/livesite-static-upload/`
+
+Each bundle includes only the files needed for the static public site, pre-rendered case study pages, and `.htaccess` redirects for old dynamic routes.
 
 ## PostgreSQL Note
 

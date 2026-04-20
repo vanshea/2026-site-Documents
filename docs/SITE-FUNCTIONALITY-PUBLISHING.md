@@ -34,6 +34,7 @@ The simplest mental model is:
 This project is easiest to publish when:
 - the whole repo stays together
 - Express and Next both run from the same repo
+- the public static source folders stay together: `/livesite`, `/comingsoon`, `/build`
 - the `content` and `clients` folders stay beside the code
 - the SQLite password DB lives at the absolute path in `CLIENT_SECRETS_DB_PATH`
 
@@ -133,7 +134,10 @@ You need both running at the same time.
 
 Express:
 - serves the main site
+- redirects `/` to `/livesite/`
+- serves `/livesite`, `/comingsoon`, and `/build`
 - handles `/login`
+- redirects `/app` to `/analytics`
 - proxies `/analytics/*` to Next
 
 Next:
@@ -154,6 +158,9 @@ The browser should never need to talk directly to port `3001`.
 Once deployed, these are the main paths:
 
 - `/`
+- `/livesite`
+- `/comingsoon`
+- `/build`
 - `/login`
 - `/analytics`
 - `/analytics/clients`

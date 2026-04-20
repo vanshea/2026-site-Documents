@@ -31,12 +31,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const rootDir = __dirname;
 const assetsDir = path.join(rootDir, "assets");
+const livesiteDir = path.join(rootDir, "livesite");
+const comingsoonDir = path.join(rootDir, "comingsoon");
+const buildDir = path.join(rootDir, "build");
 const largeWebPortfolioDir = path.join(rootDir, "large_web_portfolio");
 const vscimageDir = path.join(assetsDir, "vscimage");
 const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
 const vscimageConfigPath = path.join(vscimageDir, "config.json");
-const homepageIndexPath = path.join(rootDir, "index.html");
+const homepageIndexPaths = [
+  path.join(rootDir, "index.html"),
+  path.join(livesiteDir, "index.html"),
+  path.join(comingsoonDir, "index.html")
+];
 const featuredThumbSize = {
   width: 2400,
   height: 570
@@ -475,32 +482,27 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
 }
 
 async function syncHomepageGeneratedGallery(galleryEntries) {
-  if (!fsSync.existsSync(homepageIndexPath)) {
-    return;
-  }
-
-  const html = await fs.readFile(homepageIndexPath, "utf8");
-  if (!html.includes(generatedGalleryStartMarker) || !html.includes(generatedGalleryEndMarker)) {
-    return;
-  }
-
   const generatedMarkup = buildGeneratedGalleryMarkup(galleryEntries);
-  const replacement = [
-    generatedGalleryStartMarker,
-    generatedMarkup || "",
-    `          ${generatedGalleryEndMarker}`
-  ].join("\n");
-
+  const replacement = [generatedGalleryStartMarker, generatedMarkup || "", `          ${generatedGalleryEndMarker}`].join("\n");
   const markerPattern = new RegExp(
-    `${escapeRegExp(generatedGalleryStartMarker)}[\\s\\S]*?${escapeRegExp(
-      generatedGalleryEndMarker
-    )}`,
+    `${escapeRegExp(generatedGalleryStartMarker)}[\\s\\S]*?${escapeRegExp(generatedGalleryEndMarker)}`,
     "m"
   );
 
-  const nextHtml = html.replace(markerPattern, replacement);
-  if (nextHtml !== html) {
-    await fs.writeFile(homepageIndexPath, nextHtml, "utf8");
+  for (const homepageIndexPath of homepageIndexPaths) {
+    if (!fsSync.existsSync(homepageIndexPath)) {
+      continue;
+    }
+
+    const html = await fs.readFile(homepageIndexPath, "utf8");
+    if (!html.includes(generatedGalleryStartMarker) || !html.includes(generatedGalleryEndMarker)) {
+      continue;
+    }
+
+    const nextHtml = html.replace(markerPattern, replacement);
+    if (nextHtml !== html) {
+      await fs.writeFile(homepageIndexPath, nextHtml, "utf8");
+    }
   }
 }
 
@@ -1754,6 +1756,24 @@ const publicLargePortfolioStatic = express.static(largeWebPortfolioDir, {
   index: false,
   redirect: false
 });
+const publicLivesiteStatic = express.static(livesiteDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: false,
+  redirect: false
+});
+const publicComingsoonStatic = express.static(comingsoonDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: false,
+  redirect: false
+});
+const publicBuildStatic = express.static(buildDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: false,
+  redirect: false
+});
 
 function serveStaticSubpath(staticHandler, routePrefix) {
   return (req, res, next) => {
@@ -1772,6 +1792,15 @@ const serveLargePortfolioStatic = serveStaticSubpath(
   publicLargePortfolioStatic,
   "/large_web_portfolio"
 );
+const serveLivesiteStatic = serveStaticSubpath(publicLivesiteStatic, "/livesite");
+const serveComingsoonStatic = serveStaticSubpath(publicComingsoonStatic, "/comingsoon");
+const serveBuildStatic = serveStaticSubpath(publicBuildStatic, "/build");
+
+function serveFolderIndex(routePrefix, absoluteIndexPath) {
+  app.get([routePrefix, `${routePrefix}/`], (req, res) => {
+    res.sendFile(absoluteIndexPath);
+  });
+}
 
 app.use((req, res, next) => {
   if (!["GET", "HEAD"].includes(req.method)) {
@@ -1795,7 +1824,32 @@ app.use((req, res, next) => {
     return serveLargePortfolioStatic(req, res, next);
   }
 
+  if (req.path === "/livesite" || req.path.startsWith("/livesite/")) {
+    return serveLivesiteStatic(req, res, next);
+  }
+
+  if (req.path === "/comingsoon" || req.path.startsWith("/comingsoon/")) {
+    return serveComingsoonStatic(req, res, next);
+  }
+
+  if (req.path === "/build" || req.path.startsWith("/build/")) {
+    return serveBuildStatic(req, res, next);
+  }
+
   return next();
+});
+
+serveFolderIndex("/livesite", path.join(livesiteDir, "index.html"));
+serveFolderIndex("/comingsoon", path.join(comingsoonDir, "index.html"));
+serveFolderIndex("/build", path.join(buildDir, "index.html"));
+
+app.get("/app", (req, res) => {
+  res.redirect("/analytics");
+});
+
+app.get("/app/*", (req, res) => {
+  const suffix = req.path.replace(/^\/app/, "") || "/";
+  res.redirect(`/analytics${suffix}`);
 });
 
 app.use("/api", (req, res, next) => {
@@ -2354,6 +2408,7 @@ app.get("/case-studies", async (req, res) => {
     return res.status(500).send("Unable to load case studies.");
   }
 });
+
 
 app.get("/case-studies/:slug", async (req, res) => {
   try {

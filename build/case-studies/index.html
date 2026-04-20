@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="theme2">
+  <head>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<title>Case Studies | Van Shea Creative</title>
+<meta name="description" content="Structured, reusable case studies for Van Shea Creative client and concept work." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" href="/build/styles.css" />
+<link rel="stylesheet" href="/build/assets/case-studies.css" />
+
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <header class="site-header">
+  <a href="/build/" class="brand" aria-label="Back to homepage">
+    <picture>
+      <source
+        id="brandLogoDarkSource"
+        srcset="/build/assets/web_logomark_240_white.png"
+        media="(prefers-color-scheme: dark)"
+      />
+      <img
+        id="brandLogoLightImage"
+        class="brand-logo"
+        src="/build/assets/web_logomark_240_dark.png"
+        alt="VSS logo"
+      />
+    </picture>
+    <span class="brand-name">Van Shea Creative</span>
+  </a>
+  <button
+    class="nav-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="siteNav"
+    aria-label="Open navigation menu"
+  >
+    <span class="sr-only">Toggle navigation</span>
+    <span class="nav-toggle-icon" aria-hidden="true">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </span>
+  </button>
+  <nav id="siteNav" class="nav">
+    <a href="/build/" >Home</a>
+    <a
+      href="/build/case-studies"
+      aria-current=&#34;page&#34;
+    >
+      Case Studies
+    </a>
+    <a
+      href="/build/experience.html"
+      
+    >
+      Experience
+    </a>
+  </nav>
+</header>
+
+
+    <main id="top">
+      <section class="hero case-study-index-hero reveal">
+        <div class="case-study-index-copy">
+          <p class="eyebrow">Selected Work</p>
+          <h1>Case studies built from structured content, not duplicated templates.</h1>
+          <p class="lead">
+            Each entry below is powered by a reusable slug route and a JSON content file,
+            so future case studies can be added in VS Code without rebuilding layout
+            components.
+          </p>
+        </div>
+      </section>
+
+      <section class="case-study-block reveal" aria-labelledby="caseStudiesIndexHeading">
+        <div class="section-head case-study-block-head">
+          <div>
+            <p class="eyebrow">Gallery</p>
+            <h2 id="caseStudiesIndexHeading">Case Study Index</h2>
+          </div>
+        </div>
+
+        <div class="grid case-study-card-grid">
+          
+            <article class="card case-study-card reveal">
+  <a class="case-study-card-link" href="/build/case-studies/capital-one-gesture-patent">
+    
+      <span class="card-image-shell case-study-card-image-shell">
+        <img
+          class="card-image case-study-card-image"
+          src="/build/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp"
+          alt="Thumbnail view of the gesture interface patent diagram."
+          loading="lazy"
+        />
+      </span>
+    
+
+    <div class="case-study-card-topline">
+      
+        <span>Capital One</span>
+      
+      
+        <span>2017</span>
+      
+    </div>
+
+    <h3>Capital One Gesture Interface Patent</h3>
+
+    
+      <p class="case-study-card-subtitle">A future-facing interaction concept that translated ambiguous emerging technology into a concrete, patentable product story.</p>
+    
+
+    
+      <p>This sample case study shows how the new system supports hero content, structured narrative sections, a featured image viewer, and a gallery without duplicating page code.</p>
+    
+
+    
+      <div class="case-study-card-tags" aria-label="Services">
+        
+          <span class="case-study-pill">Interaction Design</span>
+        
+          <span class="case-study-pill">Service Design</span>
+        
+          <span class="case-study-pill">Prototyping</span>
+        
+      </div>
+    
+  </a>
+</article>
+
+          
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+  <div class="site-footer-inner">
+    <p>&copy; <span id="year"></span> Van Shea Sedita. All rights reserved.</p>
+    <div class="theme-switcher" role="group" aria-label="Choose site theme">
+      <button class="theme-link" type="button" data-theme="theme1" aria-pressed="false">
+        Theme 1
+      </button>
+      <button
+        class="theme-link is-active"
+        type="button"
+        data-theme="theme2"
+        aria-pressed="true"
+      >
+        Theme 2
+      </button>
+      <button class="theme-link" type="button" data-theme="theme3" aria-pressed="false">
+        High Contrast
+      </button>
+      <a
+        class="theme-link"
+        href="https://drive.google.com/file/d/1QXv1FpxqmIzxF5zZQfSkBliALbQFwfXT/view?usp=sharing"
+        target="_blank"
+        rel="noreferrer noopener"
+        data-analytics="resume_download"
+        data-analytics-location="footer"
+      >
+        Resume
+      </a>
+      <button class="theme-link consent-manage-btn" id="consentManageBtn" type="button">
+        Privacy Settings
+      </button>
+    </div>
+  </div>
+</footer>
+
+    <aside
+  class="consent-banner"
+  id="consentBanner"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Analytics consent"
+  hidden
+>
+  <p class="consent-text">
+    We use privacy-first analytics to measure meaningful actions, not personal identity.
+  </p>
+  <div class="consent-actions">
+    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+      Deny
+    </button>
+    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+      Allow Analytics
+    </button>
+  </div>
+</aside>
+
+
+    <script src="/build/analytics.js"></script>
+    <script src="/build/script.js"></script>
+  </body>
+</html>

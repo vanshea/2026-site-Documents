@@ -2,6 +2,9 @@
 
 This document is for publishing the current coming-soon site to SiteGround shared hosting.
 
+Source folder:
+- [`/Library/WebServer/Documents/comingsoon`](/Library/WebServer/Documents/comingsoon)
+
 ## Important Hosting Limitation
 
 SiteGround shared hosting is suitable for this project only as a static site handoff.
@@ -27,12 +30,12 @@ The SiteGround handoff intentionally excludes the full app runtime and publishes
 From the project root run:
 
 ```bash
-npm run siteground:bundle
+npm run comingsoon:bundle
 ```
 
 This creates:
 
-- [`/Users/vansedita/Backups/portfolio-site/siteground-static-upload`](/Users/vansedita/Backups/portfolio-site/siteground-static-upload)
+- [`/Users/vansedita/Backups/portfolio-site/comingsoon-static-upload`](/Users/vansedita/Backups/portfolio-site/comingsoon-static-upload)
 
 Inside that folder:
 
@@ -60,6 +63,7 @@ Redirect targets include:
 - `/login`
 - `/analytics`
 - `/analytics/*`
+- `/app`
 - `/vscimage`
 
 ## Upload Steps In SiteGround
