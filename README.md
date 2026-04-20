@@ -6,6 +6,8 @@ Simple how-to guides:
 - Localhost: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-LOCAL.md)
 - Publishing online: [`/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md`](/Library/WebServer/Documents/docs/SITE-FUNCTIONALITY-PUBLISHING.md)
 - Network Solutions handoff: [`/Library/WebServer/Documents/docs/NETWORK-SOLUTIONS-HOSTING-HANDOFF.md`](/Library/WebServer/Documents/docs/NETWORK-SOLUTIONS-HOSTING-HANDOFF.md)
+- SiteGround static FTP handoff: [`/Library/WebServer/Documents/docs/SITEGROUND-STATIC-FTP-HANDOFF.md`](/Library/WebServer/Documents/docs/SITEGROUND-STATIC-FTP-HANDOFF.md)
+- Dynamic backup + static export workflow: [`/Library/WebServer/Documents/docs/BACKUP-AND-STATIC-WORKFLOW.md`](/Library/WebServer/Documents/docs/BACKUP-AND-STATIC-WORKFLOW.md)
 
 Maintenance rule:
 - If startup, localhost, deployment, database, env var, or domain-routing behavior changes, update all of the docs above in the same change.

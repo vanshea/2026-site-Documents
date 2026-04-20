@@ -9,6 +9,7 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const prisma = require("./lib/prisma");
 const analytics = require("./lib/analytics");
 const analyticsApi = require("./lib/analytics-api");
+const { listCaseStudies, getCaseStudyBySlug } = require("./lib/case-studies");
 let multer = null;
 let sharp = null;
 
@@ -2335,6 +2336,43 @@ app.post("/api/contact", async (req, res) => {
 
 app.get("/vscimage", requireAnalyticsAdmin, (req, res) => {
   res.sendFile(path.join(rootDir, "vscimage.html"));
+});
+
+app.get("/case-studies", async (req, res) => {
+  try {
+    const caseStudies = await listCaseStudies();
+
+    return res.render("case-studies/index", {
+      pageTitle: "Case Studies | Van Shea Creative",
+      metaDescription:
+        "Structured, reusable case studies for Van Shea Creative client and concept work.",
+      currentPath: req.path,
+      caseStudies
+    });
+  } catch (error) {
+    console.error("Unable to load case study index:", error);
+    return res.status(500).send("Unable to load case studies.");
+  }
+});
+
+app.get("/case-studies/:slug", async (req, res) => {
+  try {
+    const caseStudy = await getCaseStudyBySlug(req.params.slug);
+
+    if (!caseStudy) {
+      return res.status(404).send("Case study not found.");
+    }
+
+    return res.render("case-studies/show", {
+      pageTitle: `${caseStudy.title} | Case Study | Van Shea Creative`,
+      metaDescription: caseStudy.summary || caseStudy.subtitle || caseStudy.title,
+      currentPath: req.path,
+      caseStudy
+    });
+  } catch (error) {
+    console.error("Unable to load case study detail:", error);
+    return res.status(500).send("Unable to load case study.");
+  }
 });
 
 app.get("/api/vscimage/config", requireAnalyticsAdminApi, async (req, res) => {

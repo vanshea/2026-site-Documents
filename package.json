@@ -14,7 +14,10 @@
     "prisma:migrate": "prisma migrate dev --name init_analytics",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "launch:bundle": "node scripts/create-launch-ready-bundle.mjs"
+    "launch:bundle": "node scripts/create-launch-ready-bundle.mjs",
+    "siteground:bundle": "node scripts/create-siteground-static-bundle.mjs",
+    "backup:dynamic": "node scripts/create-dynamic-backup.mjs",
+    "backup:dynamic-and-static": "node scripts/create-dynamic-and-static-packages.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
