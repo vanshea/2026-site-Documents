@@ -329,6 +329,34 @@
               ></textarea>
             </label>
 
+            <label data-editor-single-only>
+              Link Text
+              <input
+                id="thumbEditorLinkText"
+                name="linkText"
+                type="text"
+                maxlength="80"
+                placeholder="Example: View prototype"
+              />
+              <span class="field-note">
+                Optional link label shown in the large image and fullscreen caption.
+              </span>
+            </label>
+
+            <label data-editor-single-only>
+              Link URL
+              <input
+                id="thumbEditorLinkUrl"
+                name="linkUrl"
+                type="url"
+                maxlength="320"
+                placeholder="https://example.com"
+              />
+              <span class="field-note">
+                Leave both link fields blank to remove the custom link. Undo remains available after saving.
+              </span>
+            </label>
+
             <div id="thumbEditorBatchTools" class="batch-tools is-hidden">
               <label>
                 Batch Rename Pattern

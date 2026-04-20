@@ -1258,6 +1258,27 @@ textarea:focus {
   font-size: 0.95rem;
 }
 
+.lightbox-caption-separator {
+  opacity: 0.72;
+}
+
+.lightbox-caption-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.lightbox-caption-link:hover {
+  opacity: 0.88;
+}
+
+.lightbox-caption-link:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
 .lightbox-close {
   position: absolute;
   top: 18px;

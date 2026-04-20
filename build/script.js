@@ -1023,6 +1023,79 @@ function updateLightboxFullscreenButton() {
   }
 }
 
+function isVscimageAssetPath(value) {
+  return /(?:^|\/)assets\/vscimage\//i.test(String(value || "").trim());
+}
+
+function buildVscimageUrl(link) {
+  const candidates = [
+    link?.dataset?.lightboxSrc,
+    link?.dataset?.fullscreenSrc,
+    link?.getAttribute?.("href")
+  ];
+
+  if (!candidates.some((value) => isVscimageAssetPath(value))) {
+    return "";
+  }
+
+  return "/vscimage";
+}
+
+function getCustomLightboxLink(link) {
+  const text = String(link?.dataset?.lightboxLinkText || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 80);
+  const url = String(link?.dataset?.lightboxLinkUrl || "").trim().slice(0, 320);
+
+  if (!text || !url) {
+    return null;
+  }
+
+  if (!/^(\/|https?:|mailto:|tel:)/i.test(url)) {
+    return null;
+  }
+
+  return { text, url };
+}
+
+function renderLightboxCaption(link, title, description, index, total) {
+  if (!lightboxCaption) return;
+
+  const counterText = `(${index + 1}/${total})`;
+  const summary = description ? `${title}: ${description} ${counterText}` : `${title} ${counterText}`;
+  const customLink = getCustomLightboxLink(link);
+  const vscimageUrl = customLink ? "" : buildVscimageUrl(link);
+
+  lightboxCaption.replaceChildren();
+
+  const copy = document.createElement("span");
+  copy.textContent = summary;
+  lightboxCaption.appendChild(copy);
+
+  if (!customLink && !vscimageUrl) {
+    return;
+  }
+
+  lightboxCaption.appendChild(document.createTextNode(" "));
+
+  const divider = document.createElement("span");
+  divider.className = "lightbox-caption-separator";
+  divider.setAttribute("aria-hidden", "true");
+  divider.textContent = "•";
+  lightboxCaption.appendChild(divider);
+
+  lightboxCaption.appendChild(document.createTextNode(" "));
+
+  const editLink = document.createElement("a");
+  editLink.className = "lightbox-caption-link";
+  editLink.href = customLink?.url || vscimageUrl;
+  editLink.textContent = customLink?.text || "Open in VSCimage";
+  editLink.target = "_blank";
+  editLink.rel = "noreferrer noopener";
+  lightboxCaption.appendChild(editLink);
+}
+
 function renderLightboxImage(index) {
   const workLinks = getWorkLinks();
   if (workLinks.length === 0) return;
@@ -1045,11 +1118,7 @@ function renderLightboxImage(index) {
   activeLightboxIndex = safeIndex;
   lightboxImage.setAttribute("src", source);
   lightboxImage.setAttribute("alt", `Large FPO image for ${title}`);
-  if (description) {
-    lightboxCaption.textContent = `${title}: ${description} (${safeIndex + 1}/${workLinks.length})`;
-  } else {
-    lightboxCaption.textContent = `${title} (${safeIndex + 1}/${workLinks.length})`;
-  }
+  renderLightboxCaption(link, title, description, safeIndex, workLinks.length);
 }
 
 function openLightbox(index, useFullscreenVersion = false) {

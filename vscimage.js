@@ -144,6 +144,8 @@ const thumbEditorTitle = document.getElementById("thumbEditorTitle");
 const thumbEditorCardDescription = document.getElementById("thumbEditorCardDescription");
 const thumbEditorCategory = document.getElementById("thumbEditorCategory");
 const thumbEditorDescription = document.getElementById("thumbEditorDescription");
+const thumbEditorLinkText = document.getElementById("thumbEditorLinkText");
+const thumbEditorLinkUrl = document.getElementById("thumbEditorLinkUrl");
 const thumbEditorBatchTools = document.getElementById("thumbEditorBatchTools");
 const thumbEditorBatchRenameMode = document.getElementById("thumbEditorBatchRenameMode");
 const thumbEditorBatchRenameValue = document.getElementById("thumbEditorBatchRenameValue");
@@ -314,6 +316,28 @@ function normalizeCardDescription(value, maxLength = 120) {
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
+}
+
+function normalizeLinkText(value, maxLength = 80) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, maxLength);
+}
+
+function normalizeLinkUrl(value, maxLength = 320) {
+  const raw = String(value || "").trim().slice(0, maxLength);
+  if (!raw) return "";
+
+  if (/^\//.test(raw)) {
+    return raw;
+  }
+
+  if (/^(https?:|mailto:|tel:)/i.test(raw)) {
+    return raw;
+  }
+
+  return "";
 }
 
 function normalizeGalleryCategory(value) {
@@ -645,6 +669,8 @@ function normalizeGalleryEntries(entries) {
         entry?.description || "Generated in VSCimage."
       );
       const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
+      const linkText = normalizeLinkText(entry?.linkText || "");
+      const linkUrl = normalizeLinkUrl(entry?.linkUrl || "");
       const category = normalizeGalleryCategory(entry?.category);
       const homepageVisible = normalizeHomepageVisible(entry?.homepageVisible);
       const featured =
@@ -675,6 +701,8 @@ function normalizeGalleryEntries(entries) {
         title: title || id,
         description,
         cardDescription,
+        linkText,
+        linkUrl,
         category,
         homepageVisible,
         featured,
@@ -998,6 +1026,8 @@ function captureUndoEntrySnapshots(entries) {
     homepageVisible: isGalleryEntryHomepageVisible(entry),
     title: entry.title,
     cardDescription: entry.cardDescription,
+    linkText: entry.linkText,
+    linkUrl: entry.linkUrl,
     category: entry.category,
     description: entry.description
   }));
@@ -1068,6 +1098,8 @@ async function undoLastAction() {
       body: JSON.stringify({
         title: snapshot.title,
         cardDescription: snapshot.cardDescription,
+        linkText: snapshot.linkText,
+        linkUrl: snapshot.linkUrl,
         category: snapshot.category,
         description: snapshot.description,
         homepageVisible: snapshot.homepageVisible
@@ -1504,6 +1536,8 @@ function setGalleryEditorMode(mode, entries = []) {
     thumbEditorCategory.value = "__keep__";
     thumbEditorDescription.value = "";
     thumbEditorDescription.placeholder = "Leave blank to keep current descriptions";
+    if (thumbEditorLinkText) thumbEditorLinkText.value = "";
+    if (thumbEditorLinkUrl) thumbEditorLinkUrl.value = "";
     if (thumbEditorBatchRenameMode) thumbEditorBatchRenameMode.value = "keep";
     if (thumbEditorBatchRenameValue) thumbEditorBatchRenameValue.value = "";
     if (thumbEditorBatchDescriptionMode) thumbEditorBatchDescriptionMode.value = "keep";
@@ -1528,6 +1562,8 @@ function setGalleryEditorMode(mode, entries = []) {
   thumbEditorDelete.dataset.editorAction = "archive";
   thumbEditorCardDescription.placeholder = "Short one-line text for the homepage card";
   thumbEditorDescription.placeholder = "";
+  if (thumbEditorLinkText) thumbEditorLinkText.value = "";
+  if (thumbEditorLinkUrl) thumbEditorLinkUrl.value = "";
   removeBatchCategoryOption();
   thumbEditorHomepageVisible.indeterminate = false;
   thumbEditorFeatured.indeterminate = false;
@@ -1561,6 +1597,8 @@ function openGalleryEditor(entryId) {
     thumbEditorCardDescription.value = entry.cardDescription || "";
     thumbEditorCategory.value = normalizeGalleryCategory(entry.category);
     thumbEditorDescription.value = entry.description || "";
+    if (thumbEditorLinkText) thumbEditorLinkText.value = entry.linkText || "";
+    if (thumbEditorLinkUrl) thumbEditorLinkUrl.value = entry.linkUrl || "";
     thumbEditorHomepageVisible.checked = isGalleryEntryHomepageVisible(entry);
     thumbEditorFeatured.checked = Boolean(entry.featured);
     thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
@@ -1820,6 +1858,7 @@ async function saveGalleryEditor() {
     thumbEditorSave.disabled = true;
     thumbEditorDelete.disabled = true;
     setThumbEditorStatus(`Saving ${targetEntries.length} selected images...`, "");
+    const snapshots = captureUndoEntrySnapshots(targetEntries);
 
     const failedLabels = [];
     let updatedCount = 0;
@@ -1892,6 +1931,13 @@ async function saveGalleryEditor() {
       await reloadData();
       clearEditorDraft();
       closeGalleryEditor();
+      if (updatedCount > 0) {
+        setUndoAction({
+          kind: "entry-state",
+          label: `Updated ${updatedCount} image${updatedCount === 1 ? "" : "s"}`,
+          entries: snapshots
+        });
+      }
       if (failedLabels.length) {
         setThumbStatus(
           `Updated ${updatedCount} image${updatedCount === 1 ? "" : "s"}. ${failedLabels.join(" ")}`,
@@ -1929,6 +1975,9 @@ async function saveGalleryEditor() {
   const nextCardDescription = normalizeCardDescription(thumbEditorCardDescription?.value || "");
   const nextCategory = normalizeGalleryCategory(thumbEditorCategory?.value || "all");
   const nextDescription = normalizeDescription(thumbEditorDescription?.value || "", 320);
+  const nextLinkText = normalizeLinkText(thumbEditorLinkText?.value || "");
+  const nextLinkUrlRaw = String(thumbEditorLinkUrl?.value || "").trim();
+  const nextLinkUrl = normalizeLinkUrl(nextLinkUrlRaw, 320);
   const nextBackgroundColor = thumbEditorUseBg?.checked
     ? normalizeHexColor(thumbEditorBgColor?.value || "#ffffff")
     : "";
@@ -1945,12 +1994,20 @@ async function saveGalleryEditor() {
     return;
   }
 
+  if (nextLinkUrlRaw && !nextLinkUrl) {
+    setThumbEditorStatus("Link URL must start with /, http://, https://, mailto:, or tel:.", "error");
+    thumbEditorLinkUrl?.focus();
+    return;
+  }
+
   const formData = new FormData();
   formData.append("name", nextName);
   formData.append("title", nextTitle);
   formData.append("cardDescription", nextCardDescription);
   formData.append("category", nextCategory);
   formData.append("description", nextDescription);
+  formData.append("linkText", nextLinkText);
+  formData.append("linkUrl", nextLinkUrl);
   formData.append("homepageVisible", thumbEditorHomepageVisible?.checked ? "true" : "false");
   formData.append("featured", thumbEditorFeatured?.checked ? "true" : "false");
   formData.append("backgroundColor", nextBackgroundColor);
@@ -1982,6 +2039,7 @@ async function saveGalleryEditor() {
   thumbEditorSave.disabled = true;
   thumbEditorDelete.disabled = true;
   setThumbEditorStatus(`Saving ${nextTitle}...`, "");
+  const snapshots = captureUndoEntrySnapshots([entry]);
 
   try {
     await fetchJson(`${state.apiOrigin}/api/vscimage/gallery/${encodeURIComponent(entryId)}/edit`, {
@@ -1991,6 +2049,11 @@ async function saveGalleryEditor() {
     await reloadData();
     clearEditorDraft();
     closeGalleryEditor();
+    setUndoAction({
+      kind: "entry-state",
+      label: "Updated 1 image",
+      entries: snapshots
+    });
     setThumbStatus("Thumbnail updated.", "ok");
   } catch (error) {
     setThumbEditorStatus(error.message, "error");
@@ -2676,6 +2739,8 @@ function persistEditorDraft() {
     cardDescription: thumbEditorCardDescription?.value || "",
     category: thumbEditorCategory?.value || "all",
     description: thumbEditorDescription?.value || "",
+    linkText: thumbEditorLinkText?.value || "",
+    linkUrl: thumbEditorLinkUrl?.value || "",
     homepageVisible: thumbEditorHomepageVisible?.checked || false,
     homepageIndeterminate: Boolean(thumbEditorHomepageVisible?.indeterminate),
     featured: thumbEditorFeatured?.checked || false,
@@ -2701,6 +2766,8 @@ function restoreEditorDraft() {
   if (thumbEditorCardDescription) thumbEditorCardDescription.value = draft.cardDescription || "";
   if (thumbEditorCategory && draft.category) thumbEditorCategory.value = draft.category;
   if (thumbEditorDescription) thumbEditorDescription.value = draft.description || "";
+  if (thumbEditorLinkText) thumbEditorLinkText.value = draft.linkText || "";
+  if (thumbEditorLinkUrl) thumbEditorLinkUrl.value = draft.linkUrl || "";
   if (thumbEditorHomepageVisible) {
     thumbEditorHomepageVisible.checked = Boolean(draft.homepageVisible);
     thumbEditorHomepageVisible.indeterminate = Boolean(draft.homepageIndeterminate);
@@ -3255,6 +3322,8 @@ if (thumbEditorBgColor) {
   thumbEditorCardDescription,
   thumbEditorCategory,
   thumbEditorDescription,
+  thumbEditorLinkText,
+  thumbEditorLinkUrl,
   thumbEditorHomepageVisible,
   thumbEditorFeatured,
   thumbEditorUseBg,

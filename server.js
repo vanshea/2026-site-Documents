@@ -461,10 +461,12 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const escapedFullscreen = escapeHtml(fullscreen);
       const escapedCardDescription = escapeHtml(displayCardDescription);
       const escapedDescription = escapeHtml(displayDescription);
+      const escapedLinkText = escapeHtml(normalizeLinkText(entry?.linkText || "", 80));
+      const escapedLinkUrl = escapeHtml(normalizeLinkUrl(entry?.linkUrl || "", 320));
 
       return [
         `          <article class="${cardClasses.join(" ")}" data-category="${category}" data-generated="true"${featured ? ' data-featured="true"' : ""}>`,
-        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}">`,
+        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}"${escapedLinkText ? ` data-lightbox-link-text="${escapedLinkText}"` : ""}${escapedLinkUrl ? ` data-lightbox-link-url="${escapedLinkUrl}"` : ""}>`,
         `              <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
         displayCardDescription ? `              <p>${escapedCardDescription}</p>` : "",
@@ -540,6 +542,21 @@ function normalizeTextField(value, maxLength) {
 
 function normalizeCardDescription(value, maxLength = 120) {
   return normalizeTextField(value, maxLength);
+}
+
+function normalizeLinkText(value, maxLength = 80) {
+  return normalizeTextField(value, maxLength);
+}
+
+function normalizeLinkUrl(value, maxLength = 320) {
+  const raw = String(value || "").trim().slice(0, maxLength);
+  if (!raw) return "";
+
+  if (raw.startsWith("/")) {
+    return raw;
+  }
+
+  return /^(https?:|mailto:|tel:)/i.test(raw) ? raw : "";
 }
 
 function normalizeGalleryCategory(value) {
@@ -1091,6 +1108,8 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     options.cardDescription ?? currentEntry.cardDescription ?? "",
     120
   );
+  const nextLinkText = normalizeLinkText(options.linkText ?? currentEntry.linkText ?? "", 80);
+  const nextLinkUrl = normalizeLinkUrl(options.linkUrl ?? currentEntry.linkUrl ?? "", 320);
   const nextCategory = normalizeGalleryCategory(options.category ?? currentEntry.category);
   const nextDescription =
     normalizeTextField(options.description ?? currentEntry.description ?? "", 320) ||
@@ -1368,6 +1387,8 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     ...currentEntry,
     title: nextTitle,
     cardDescription: nextCardDescription,
+    linkText: nextLinkText,
+    linkUrl: nextLinkUrl,
     category: nextCategory,
     description: nextDescription,
     homepageVisible: nextArchived ? false : nextHomepageVisible,
@@ -1422,6 +1443,14 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextTitle =
     normalizeTextField(nextTitleInput || entryId, 120) || entryId;
   const nextCardDescription = normalizeCardDescription(nextCardDescriptionInput || "", 120);
+  const nextLinkTextInput = Object.prototype.hasOwnProperty.call(updates || {}, "linkText")
+    ? updates.linkText
+    : currentEntry.linkText;
+  const nextLinkUrlInput = Object.prototype.hasOwnProperty.call(updates || {}, "linkUrl")
+    ? updates.linkUrl
+    : currentEntry.linkUrl;
+  const nextLinkText = normalizeLinkText(nextLinkTextInput || "", 80);
+  const nextLinkUrl = normalizeLinkUrl(nextLinkUrlInput || "", 320);
   const nextCategory = normalizeGalleryCategory(nextCategoryInput);
   const nextDescription =
     normalizeTextField(nextDescriptionInput || "", 320) ||
@@ -1452,6 +1481,8 @@ async function updateVscimageGalleryEntry(entryId, updates) {
     ...currentEntry,
     title: nextTitle,
     cardDescription: nextCardDescription,
+    linkText: nextLinkText,
+    linkUrl: nextLinkUrl,
     category: nextCategory,
     description: nextDescription,
     homepageVisible: nextArchived ? false : nextHomepageVisible,
@@ -2478,6 +2509,8 @@ app.post("/api/vscimage/gallery/:entryId/update", requireAnalyticsAdminApi, asyn
   const entryId = String(req.params.entryId || "").trim();
   const title = normalizeTextField(req.body?.title, 120);
   const cardDescription = normalizeCardDescription(req.body?.cardDescription, 120);
+  const linkText = normalizeLinkText(req.body?.linkText, 80);
+  const linkUrl = normalizeLinkUrl(req.body?.linkUrl, 320);
   const category = normalizeGalleryCategory(req.body?.category);
   const description = normalizeTextField(req.body?.description, 320);
   const hasHomepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible");
@@ -2495,6 +2528,8 @@ app.post("/api/vscimage/gallery/:entryId/update", requireAnalyticsAdminApi, asyn
     const updatedEntry = await updateVscimageGalleryEntry(entryId, {
       title,
       cardDescription,
+      linkText,
+      linkUrl,
       category,
       description,
       ...(hasHomepageVisible ? { homepageVisible: req.body.homepageVisible } : {}),
@@ -2624,6 +2659,8 @@ if (upload) {
         const editedEntry = await editVscimageGalleryEntry(entryId, {
           title: req.body?.title,
           cardDescription: req.body?.cardDescription,
+          linkText: req.body?.linkText,
+          linkUrl: req.body?.linkUrl,
           category: req.body?.category,
           description: req.body?.description,
           homepageVisible: req.body?.homepageVisible,
@@ -2754,6 +2791,8 @@ if (upload) {
         const galleryEntry = await editVscimageGalleryEntry(String(duplicate.entry?.id || "").trim(), {
           title: displayTitle || duplicate.entry?.title || resolvedBaseName,
           cardDescription: normalizeCardDescription(req.body.cardDescription || "", 120),
+          linkText: normalizeLinkText(req.body.linkText || "", 80),
+          linkUrl: normalizeLinkUrl(req.body.linkUrl || "", 320),
           category,
           description:
             String(req.body.description || "")
@@ -2804,6 +2843,8 @@ if (upload) {
           id: entryId,
           title: displayTitle || resolvedBaseName,
           cardDescription: normalizeCardDescription(req.body.cardDescription || "", 120),
+          linkText: normalizeLinkText(req.body.linkText || "", 80),
+          linkUrl: normalizeLinkUrl(req.body.linkUrl || "", 320),
           category,
           description:
             String(req.body.description || "")
