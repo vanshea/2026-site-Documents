@@ -51,6 +51,10 @@
   --status-success: #248a3d;
   --status-error: #d92f2f;
   --status-loading: #0071e3;
+  --nav-link-ink: #ffffff;
+  --nav-link-hover-bg: rgba(255, 255, 255, 0.12);
+  --mobile-menu-link-ink: var(--nav-link-ink);
+  --mobile-menu-link-hover-bg: var(--nav-link-hover-bg);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -91,41 +95,45 @@
 
 :root[data-theme="theme2"] {
   color-scheme: light;
-  --bg: #d9d4d3;
-  --ink: #58484b;
-  --ink-soft: #7f666a;
-  --focus-ring: #8e6e6b;
-  --paper: rgba(247, 243, 243, 0.84);
-  --line: rgba(142, 110, 107, 0.18);
-  --accent: #8e6e6b;
-  --accent-2: #547597;
-  --accent-3: #c9c6c5;
-  --shadow: 0 18px 44px rgba(88, 72, 75, 0.16);
-  --bg-wash-a: #efebea;
-  --bg-wash-b: #d7d1d0;
-  --shape-a: rgba(142, 110, 107, 0.18);
-  --shape-b: rgba(201, 198, 197, 0.22);
-  --header-bg: rgba(217, 212, 211, 0.82);
-  --btn-bg: #8e6e6b;
+  --bg: #e5dddc;
+  --ink: #2f2427;
+  --ink-soft: #4c3c40;
+  --focus-ring: #6c4a4d;
+  --paper: rgba(251, 247, 246, 0.92);
+  --line: rgba(72, 55, 58, 0.2);
+  --accent: #6c4a4d;
+  --accent-2: #496684;
+  --accent-3: #d5cbca;
+  --shadow: 0 20px 48px rgba(47, 36, 39, 0.18);
+  --bg-wash-a: #f3eceb;
+  --bg-wash-b: #d8cfce;
+  --shape-a: rgba(108, 74, 77, 0.16);
+  --shape-b: rgba(213, 203, 202, 0.32);
+  --header-bg: rgba(241, 234, 233, 0.9);
+  --btn-bg: #6c4a4d;
   --btn-text: #ffffff;
-  --btn-hover-shadow: 0 10px 24px rgba(142, 110, 107, 0.3);
-  --filter-active-bg: linear-gradient(135deg, #8e6e6b, #b1969a);
+  --btn-hover-shadow: 0 12px 28px rgba(108, 74, 77, 0.28);
+  --filter-active-bg: linear-gradient(135deg, #6c4a4d, #8c666a);
   --filter-active-text: #ffffff;
-  --input-bg: rgba(247, 243, 243, 0.9);
-  --contact-shell-start: rgba(247, 243, 243, 0.88);
-  --contact-shell-end: rgba(217, 212, 211, 0.76);
-  --form-slot-bg: rgba(247, 243, 243, 0.9);
-  --embed-bg: #ede8e7;
+  --input-bg: rgba(255, 250, 249, 0.96);
+  --contact-shell-start: rgba(255, 250, 249, 0.96);
+  --contact-shell-end: rgba(233, 225, 224, 0.9);
+  --form-slot-bg: rgba(255, 250, 249, 0.94);
+  --embed-bg: #f7f1f0;
   --lightbox-overlay: rgba(19, 24, 31, 0.92);
-  --lightbox-image-border: rgba(201, 198, 197, 0.36);
+  --lightbox-image-border: rgba(213, 203, 202, 0.36);
   --lightbox-image-bg: #1e2833;
-  --lightbox-caption: #f7f3f3;
+  --lightbox-caption: #fbf7f6;
   --lightbox-caption-bg: rgba(19, 24, 31, 0.78);
-  --lightbox-control-bg: rgba(247, 243, 243, 0.96);
-  --lightbox-control-ink: #58484b;
+  --lightbox-control-bg: rgba(251, 247, 246, 0.98);
+  --lightbox-control-ink: #2f2427;
   --status-success: #2d7a58;
   --status-error: #c14343;
-  --status-loading: #8e6e6b;
+  --status-loading: #6c4a4d;
+  --nav-link-ink: #2b2123;
+  --nav-link-hover-bg: rgba(108, 74, 77, 0.08);
+  --mobile-menu-link-ink: #000000;
+  --mobile-menu-link-hover-bg: rgba(0, 0, 0, 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -163,6 +171,10 @@
     --status-success: #9dceb0;
     --status-error: #ffaaaa;
     --status-loading: #b1969a;
+    --nav-link-ink: #f1eceb;
+    --nav-link-hover-bg: rgba(255, 255, 255, 0.08);
+    --mobile-menu-link-ink: var(--nav-link-ink);
+    --mobile-menu-link-hover-bg: rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -495,8 +507,14 @@ p {
 
 .nav a {
   text-decoration: none;
-  color: #fff;
+  color: var(--nav-link-ink);
   font-weight: 500;
+  transition: color 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.nav a:hover,
+.nav a:active {
+  opacity: 0.86;
 }
 
 main {
@@ -588,7 +606,7 @@ h2 {
   border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--paper) 70%, transparent);
-  color: #fff;
+  color: var(--ink);
   padding: calc(7px * var(--control-scale)) calc(14px * var(--control-scale));
   font-family: "Space Grotesk", sans-serif;
   font-weight: 500;
@@ -1416,10 +1434,13 @@ textarea:focus {
   body.nav-ready .site-header .nav a {
     padding: 12px 14px;
     border-radius: 14px;
+    color: var(--mobile-menu-link-ink);
   }
 
-  body.nav-ready .site-header .nav a:hover {
-    background: rgba(255, 255, 255, 0.12);
+  body.nav-ready .site-header .nav a:hover,
+  body.nav-ready .site-header .nav a:active {
+    opacity: 1;
+    background: var(--mobile-menu-link-hover-bg);
   }
 
   main {

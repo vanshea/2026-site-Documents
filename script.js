@@ -411,6 +411,7 @@ async function loadSiteImageConfig() {
         `.work-link[data-project-id="${projectId}"]`
       );
       if (!link || !projectConfig) return;
+      const detailUrl = String(link.dataset.detailUrl || "").trim();
 
       if (projectConfig.title) {
         link.dataset.lightboxTitle = projectConfig.title;
@@ -418,7 +419,9 @@ async function loadSiteImageConfig() {
 
       if (projectConfig.large) {
         const largePath = toSitePath(projectConfig.large);
-        link.setAttribute("href", largePath);
+        if (!detailUrl) {
+          link.setAttribute("href", largePath);
+        }
         link.dataset.lightboxSrc = largePath;
       }
 
@@ -1183,6 +1186,18 @@ if (lightbox && lightboxImage && lightboxCaption) {
 
       const link = event.target.closest(".work-link");
       if (!link || !workGrid.contains(link)) return;
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+      if (link.dataset.detailUrl) {
+        return;
+      }
       event.preventDefault();
       const workLinks = getWorkLinks();
       const index = workLinks.indexOf(link);
