@@ -982,7 +982,7 @@ textarea:focus {
 .contact-shell {
   position: relative;
   border: 0;
-  border-radius: calc(var(--radius) + 8px);
+  border-radius: 0;
   padding: clamp(18px, 3vw, 30px);
   background: linear-gradient(
     145deg,
