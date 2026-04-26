@@ -30,18 +30,18 @@
     </span>
   </button>
   <nav id="siteNav" class="nav">
-    <a href="/" <%= currentPath === "/" ? 'aria-current="page"' : "" %>>Home</a>
-    <a
-      href="/case-studies"
-      <%= currentPath.startsWith("/case-studies") ? 'aria-current="page"' : "" %>
-    >
-      Case Studies
-    </a>
+    <a href="/" <%= currentPath === "/" ? 'aria-current="page"' : "" %>>Work</a>
     <a
       href="/experience.html"
       <%= currentPath === "/experience.html" ? 'aria-current="page"' : "" %>
     >
       Experience
+    </a>
+    <a
+      href="/case-studies"
+      <%= currentPath.startsWith("/case-studies") ? 'aria-current="page"' : "" %>
+    >
+      Case Studies
     </a>
   </nav>
 </header>

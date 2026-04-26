@@ -879,6 +879,63 @@ function findGalleryEntryForCaseStudyImage(image) {
   }) || null;
 }
 
+function collectCaseStudyImages(caseStudy) {
+  const rows = [];
+
+  if (caseStudy?.heroImage) rows.push(caseStudy.heroImage);
+  if (caseStudy?.cardImage) rows.push(caseStudy.cardImage);
+  (caseStudy?.featuredImages || []).forEach((image) => rows.push(image));
+  (caseStudy?.galleryImages || []).forEach((image) => rows.push(image));
+  (caseStudy?.sections || []).forEach((section) => {
+    if (section?.image) rows.push(section.image);
+  });
+
+  return rows;
+}
+
+function getGalleryEntryPathSet(entry) {
+  return new Set(
+    [entry?.thumb, entry?.large, entry?.fullscreen, entry?.logo]
+      .map(normalizeComparablePath)
+      .filter(Boolean)
+  );
+}
+
+function getCaseStudyUsageLabels(entry) {
+  const entryPaths = getGalleryEntryPathSet(entry);
+  if (!entryPaths.size) return [];
+
+  const labels = [];
+  state.caseStudies.forEach((caseStudy) => {
+    const isUsed = collectCaseStudyImages(caseStudy).some((image) => {
+      return [image?.src, image?.thumbSrc, image?.thumbnail, image?.thumb]
+        .map(normalizeComparablePath)
+        .filter(Boolean)
+        .some((imagePath) => entryPaths.has(imagePath));
+    });
+
+    if (isUsed) {
+      labels.push(caseStudy.title || caseStudy.slug);
+    }
+  });
+
+  return [...new Set(labels)];
+}
+
+function isEntryUsedInCaseStudies(entry) {
+  return getCaseStudyUsageLabels(entry).length > 0;
+}
+
+function uniqueEntriesById(entries) {
+  const seen = new Set();
+  return (Array.isArray(entries) ? entries : []).filter((entry) => {
+    const id = String(entry?.id || "").trim();
+    if (!id || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
 function getActiveGalleryEntries() {
   return normalizeGalleryEntries(state.config?.gallery)
     .filter((entry) => !isGalleryEntryArchived(entry))
@@ -1229,7 +1286,8 @@ function entryMatchesGalleryFilters(entry) {
       entry.large,
       entry.fullscreen,
       entry.original,
-      entry.assetBaseName
+      entry.assetBaseName,
+      ...getCaseStudyUsageLabels(entry)
     ]
       .join(" ")
       .toLowerCase();
@@ -1285,6 +1343,10 @@ function getFilteredGallerySections() {
         [...homepageFeaturedEntries, ...homepageStandardEntries],
         "homepage"
       );
+  const caseStudyEntries = sortEntriesForCurrentView(
+    filteredEntries.filter((entry) => isEntryUsedInCaseStudies(entry)),
+    "case-studies"
+  );
 
   return {
     homepageEntries,
@@ -1293,6 +1355,7 @@ function getFilteredGallerySections() {
       state.galleryFilters.sort === "homepage"
         ? homepageStandardEntries
         : homepageEntries.filter((entry) => !isGalleryEntryHomepageFeatured(entry)),
+    caseStudyEntries,
     hiddenEntries: sortEntriesForCurrentView(processEntries, "hidden"),
     archivedEntries: sortEntriesForCurrentView(archivedEntries, "archived"),
     filteredEntries
@@ -1301,7 +1364,12 @@ function getFilteredGallerySections() {
 
 function getVisibleEntries() {
   const sections = getFilteredGallerySections();
-  return [...sections.homepageEntries, ...sections.hiddenEntries, ...sections.archivedEntries];
+  return uniqueEntriesById([
+    ...sections.homepageEntries,
+    ...sections.caseStudyEntries,
+    ...sections.hiddenEntries,
+    ...sections.archivedEntries
+  ]);
 }
 
 function setSelectedEntries(entryIds, { rerender = true } = {}) {
@@ -1486,6 +1554,9 @@ function buildThumbnailCard(entry, options = {}) {
     badges.appendChild(createThumbBadge("Featured", "is-featured"));
   } else if (entry.featured || entry.featuredThumb) {
     badges.appendChild(createThumbBadge("Featured when shown", "is-featured"));
+  }
+  if (isEntryUsedInCaseStudies(entry)) {
+    badges.appendChild(createThumbBadge("Case study", "is-case-study"));
   }
   if (hasAnimatedPreview) {
     badges.appendChild(createThumbBadge("Animated GIF", "is-live"));
@@ -2679,6 +2750,8 @@ function createThumbSection({
       batchLabel:
         section === "homepage"
           ? "homepage cards"
+          : section === "case-studies"
+            ? "case study assets"
           : section === "archived"
             ? "archived assets"
             : "hidden assetts",
@@ -2734,6 +2807,7 @@ function renderThumbAccordion() {
   const {
     homepageEntries,
     homepageStandardEntries,
+    caseStudyEntries,
     hiddenEntries,
     archivedEntries
   } = getFilteredGallerySections();
@@ -2741,7 +2815,12 @@ function renderThumbAccordion() {
 
   renderUndoBar();
 
-  if (!homepageEntries.length && !hiddenEntries.length && !archivedEntries.length) {
+  if (
+    !homepageEntries.length &&
+    !caseStudyEntries.length &&
+    !hiddenEntries.length &&
+    !archivedEntries.length
+  ) {
     const empty = document.createElement("p");
     empty.className = "thumb-empty";
     empty.textContent = allEntries.length
@@ -2766,6 +2845,18 @@ function renderThumbAccordion() {
         "No thumbnails are currently published to the homepage. Toggle a process thumbnail on or upload a new one.",
       section: "homepage",
       standardEntries: homepageStandardEntries
+    })
+  );
+
+  thumbAccordion.appendChild(
+    createThumbSection({
+      title: "Case Studies",
+      description:
+        "Assigned to one or more case studies. Use Edit to replace the VSCimage asset, or the Case Study Images panel to assign it elsewhere.",
+      entries: caseStudyEntries,
+      emptyMessage:
+        "No thumbnails are assigned to case studies yet. Assign one in the Case Study Images panel below.",
+      section: "case-studies"
     })
   );
 
@@ -3740,6 +3831,7 @@ if (caseStudyImageForm) {
       }
 
       renderCaseStudyImageControls();
+      renderThumbAccordion();
       setStatus(caseStudyImageMsg, "Image saved to case study.", "ok");
       announce("Image saved to case study.");
     } catch (error) {

@@ -574,6 +574,11 @@ textarea:focus-visible {
   color: #0f6c63;
 }
 
+.thumb-card-badge.is-case-study {
+  background: rgba(11, 95, 255, 0.16);
+  color: var(--focus);
+}
+
 .thumb-card-badge.is-archived {
   background: rgba(180, 24, 24, 0.14);
   color: var(--error);

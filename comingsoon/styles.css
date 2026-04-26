@@ -630,7 +630,10 @@ h2 {
   padding: 14px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
+  overflow: clip;
+  background-clip: padding-box;
   position: relative;
+  clip-path: inset(0 round var(--radius));
   --card-shell-duration: 620ms;
   --card-title-duration: 540ms;
   --card-copy-duration: 260ms;
@@ -649,6 +652,7 @@ h2 {
 
 .generated-card {
   border: 0;
+  clip-path: inset(0 round var(--radius));
 }
 
 .card.hide {
@@ -694,9 +698,13 @@ h2 {
 .card-image-shell {
   display: block;
   overflow: hidden;
+  overflow: clip;
   border-radius: var(--radius-soft);
   position: relative;
   aspect-ratio: 4 / 3;
+  background: var(--paper);
+  clip-path: inset(0 round var(--radius-soft));
+  transform: translateZ(0);
   transition:
     transform var(--card-shell-duration) cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.28s ease;
@@ -720,12 +728,21 @@ h2 {
   height: 100%;
   aspect-ratio: 4 / 3;
   border-radius: var(--radius-soft);
-  border: 1px solid var(--line);
+  border: 0;
   object-fit: cover;
   display: block;
   backface-visibility: hidden;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.card-image-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .card .card-image {
