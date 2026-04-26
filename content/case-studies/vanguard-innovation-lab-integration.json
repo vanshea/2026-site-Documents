@@ -1,0 +1,125 @@
+{
+  "slug": "vanguard-innovation-lab-integration",
+  "sortOrder": 2,
+  "title": "Vanguard Innovation Lab Integration",
+  "subtitle": "A structured critique system that helped innovation teams share learning earlier, pressure-test ideas, and improve decision quality.",
+  "summary": "Vanguard had strong innovation talent and research instincts, but ideas and insights were often developing in pockets. Van introduced a recurring critique system that turned isolated project learning into a shared operating rhythm.",
+  "cardImage": {
+    "src": "/assets/fpo-large-atlas-1900x1600.svg",
+    "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+    "alt": "Abstract system map representing cross-team innovation critique."
+  },
+  "heroImage": {
+    "src": "/assets/fpo-large-atlas-1900x1600.svg",
+    "alt": "Abstract system map representing innovation lab integration.",
+    "caption": "A shared critique system helped teams learn from one another while concepts were still flexible."
+  },
+  "featuredImages": [
+    {
+      "src": "/assets/fpo-large-atlas-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Innovation critique system concept board.",
+      "title": "Critique System",
+      "caption": "A recurring forum for evaluating emerging concepts before teams over-invested."
+    },
+    {
+      "src": "/assets/fpo-large-field-notes-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Research notes and concept evaluation artifacts.",
+      "title": "Learning Loops",
+      "caption": "The system helped teams connect research evidence, assumptions, and investment decisions."
+    }
+  ],
+  "galleryImages": [
+    {
+      "src": "/assets/fpo-large-atlas-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Innovation critique framework.",
+      "caption": "Critique framework."
+    },
+    {
+      "src": "/assets/fpo-large-field-notes-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Shared learning notes.",
+      "caption": "Shared learning notes."
+    },
+    {
+      "src": "/assets/fpo-large-wren-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Concept review artifact.",
+      "caption": "Concept review artifact."
+    }
+  ],
+  "sections": [
+    {
+      "id": "conflict",
+      "heading": "The Conflict",
+      "body": [
+        "Vanguard had innovation talent, strong research instincts, and emerging concepts, but the work was often happening in pockets. Innovation teams were generating ideas, prototypes, and insights without a consistent system for sharing what they were learning across teams.",
+        "The risk was that valuable knowledge stayed trapped inside individual projects, while other teams repeated similar discovery work or refined solutions too late in the process."
+      ],
+      "image": {
+        "src": "/assets/fpo-large-atlas-1900x1600.svg",
+        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+        "alt": "Abstract map of isolated innovation efforts.",
+        "caption": "The challenge was not talent. It was the absence of a repeatable feedback mechanism."
+      }
+    },
+    {
+      "id": "strategic-action",
+      "heading": "The Strategic Action",
+      "body": [
+        "Van recognized that the issue was cultural and operational. The organization did not simply need better presentation polish. It needed a better feedback mechanism.",
+        "He introduced a structured Design Critique system that gave teams a shared forum to examine concepts while they were still forming.",
+        "The critique model shifted the conversation from subjective preference to decision quality. Teams were encouraged to ask sharper questions: What user problem is this solving? What evidence supports this direction? What assumptions still need to be tested? What trade-offs are we making? What should we learn before investing further?"
+      ],
+      "bullets": [
+        "Created a shared forum for early concept review.",
+        "Moved critique away from preference and toward evidence, assumptions, and trade-offs.",
+        "Helped teams learn from one another before ideas became expensive to change."
+      ]
+    },
+    {
+      "id": "impact",
+      "heading": "Impact Beyond the Critique System",
+      "body": [
+        "The critique system helped teams pressure-test ideas earlier, before they hardened into expensive solutions. This increased the likelihood that concepts were grounded in real user needs rather than internal assumptions.",
+        "It also reduced innovation isolation by creating a recurring structure for cross-team learning, peer review, and shared design judgment."
+      ],
+      "bullets": [
+        "Customer win: Helped teams pressure-test ideas earlier, before they hardened into expensive solutions.",
+        "Organizational win: Reduced innovation isolation through recurring cross-team learning and peer review.",
+        "Strategic win: Repositioned critique as a tool for better investment decisions, not just visual refinement.",
+        "Execution win: Accelerated iteration cycles by moving feedback upstream into the concept stage."
+      ],
+      "image": {
+        "src": "/assets/fpo-large-field-notes-1900x1600.svg",
+        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+        "alt": "Research and critique artifacts used to improve decision quality.",
+        "caption": "Critique became a decision-quality tool, not a late-stage review ritual."
+      }
+    },
+    {
+      "id": "takeaway",
+      "heading": "Strategic Takeaway",
+      "body": [
+        "Van helped transform design critique from a late-stage review ritual into an early-stage strategic operating system.",
+        "The work strengthened decision-making, reduced duplication, and helped innovation teams learn from one another while ideas were still flexible."
+      ]
+    }
+  ],
+  "metadata": {
+    "client": "Vanguard",
+    "role": "Design Strategy Lead",
+    "year": "2018",
+    "industry": "Financial Services",
+    "services": [
+      "Design Strategy",
+      "Innovation Operations",
+      "Design Critique",
+      "Research Synthesis"
+    ]
+  },
+  "readingTime": "5 min read",
+  "updatedAt": "2026-04-26"
+}

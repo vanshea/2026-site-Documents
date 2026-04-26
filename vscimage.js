@@ -10,6 +10,7 @@ const PROJECTS = [
 const state = {
   config: null,
   files: [],
+  caseStudies: [],
   apiAvailable: true,
   apiOrigin: window.location.origin,
   uploadDroppedFiles: [],
@@ -126,6 +127,20 @@ const projectRows = document.getElementById("projectRows");
 const previewGrid = document.getElementById("previewGrid");
 const thumbAccordion = document.getElementById("thumbAccordion");
 const thumbMsg = document.getElementById("thumbMsg");
+const caseStudyImageForm = document.getElementById("caseStudyImageForm");
+const caseStudySelect = document.getElementById("caseStudySelect");
+const caseStudyAssetSelect = document.getElementById("caseStudyAssetSelect");
+const caseStudySlotSelect = document.getElementById("caseStudySlotSelect");
+const caseStudySectionLabel = document.getElementById("caseStudySectionLabel");
+const caseStudySectionSelect = document.getElementById("caseStudySectionSelect");
+const caseStudyAltInput = document.getElementById("caseStudyAltInput");
+const caseStudyTitleInput = document.getElementById("caseStudyTitleInput");
+const caseStudyCaptionInput = document.getElementById("caseStudyCaptionInput");
+const caseStudyAssignButton = document.getElementById("caseStudyAssignButton");
+const caseStudyPreviewLink = document.getElementById("caseStudyPreviewLink");
+const caseStudyImageMsg = document.getElementById("caseStudyImageMsg");
+const caseStudyImagePreview = document.getElementById("caseStudyImagePreview");
+const caseStudyCurrentImages = document.getElementById("caseStudyCurrentImages");
 const thumbEditorDialog = document.getElementById("thumbEditorDialog");
 const thumbEditorForm = document.getElementById("thumbEditorForm");
 const thumbEditorKicker = document.getElementById("thumbEditorKicker");
@@ -833,6 +848,286 @@ function getGalleryEntryFeaturedThumbPath(entry) {
 
 function getGalleryEntryById(entryId) {
   return normalizeGalleryEntries(state.config?.gallery).find((entry) => entry.id === entryId) || null;
+}
+
+function getSelectedCaseStudy() {
+  const slug = caseStudySelect?.value || "";
+  return state.caseStudies.find((caseStudy) => caseStudy.slug === slug) || null;
+}
+
+function normalizeComparablePath(value) {
+  return String(value || "")
+    .trim()
+    .replace(/^https?:\/\/[^/]+/i, "")
+    .replace(/^\/+/, "");
+}
+
+function findGalleryEntryForCaseStudyImage(image) {
+  const paths = [
+    image?.src,
+    image?.thumbSrc,
+    image?.thumbnail,
+    image?.thumb
+  ].map(normalizeComparablePath).filter(Boolean);
+
+  if (!paths.length) return null;
+
+  return normalizeGalleryEntries(state.config?.gallery).find((entry) => {
+    return [entry.thumb, entry.large, entry.fullscreen, entry.logo]
+      .map(normalizeComparablePath)
+      .some((entryPath) => paths.includes(entryPath));
+  }) || null;
+}
+
+function getActiveGalleryEntries() {
+  return normalizeGalleryEntries(state.config?.gallery)
+    .filter((entry) => !isGalleryEntryArchived(entry))
+    .sort(compareIsoDateDesc);
+}
+
+function getCaseStudyAssetEntry() {
+  return getGalleryEntryById(caseStudyAssetSelect?.value || "");
+}
+
+function renderCaseStudySelect() {
+  if (!caseStudySelect) return;
+
+  const previousValue = caseStudySelect.value;
+  caseStudySelect.innerHTML = "";
+
+  if (!state.caseStudies.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No case studies found";
+    caseStudySelect.appendChild(option);
+    return;
+  }
+
+  state.caseStudies.forEach((caseStudy) => {
+    const option = document.createElement("option");
+    option.value = caseStudy.slug;
+    option.textContent = caseStudy.title;
+    caseStudySelect.appendChild(option);
+  });
+
+  if (previousValue && state.caseStudies.some((caseStudy) => caseStudy.slug === previousValue)) {
+    caseStudySelect.value = previousValue;
+  }
+}
+
+function renderCaseStudyAssetSelect() {
+  if (!caseStudyAssetSelect) return;
+
+  const previousValue = caseStudyAssetSelect.value;
+  const entries = getActiveGalleryEntries();
+  caseStudyAssetSelect.innerHTML = "";
+
+  if (!entries.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Upload an image first";
+    caseStudyAssetSelect.appendChild(option);
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.id;
+    option.textContent = entry.title;
+    caseStudyAssetSelect.appendChild(option);
+  });
+
+  if (previousValue && entries.some((entry) => entry.id === previousValue)) {
+    caseStudyAssetSelect.value = previousValue;
+  }
+}
+
+function renderCaseStudySectionSelect() {
+  if (!caseStudySectionSelect || !caseStudySectionLabel) return;
+
+  const needsSection = caseStudySlotSelect?.value === "sectionImage";
+  caseStudySectionLabel.hidden = !needsSection;
+  caseStudySectionSelect.innerHTML = "";
+
+  if (!needsSection) return;
+
+  const caseStudy = getSelectedCaseStudy();
+  const sections = Array.isArray(caseStudy?.sections) ? caseStudy.sections : [];
+
+  if (!sections.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No sections found";
+    caseStudySectionSelect.appendChild(option);
+    return;
+  }
+
+  sections.forEach((section) => {
+    const option = document.createElement("option");
+    option.value = section.id;
+    option.textContent = section.heading || section.id;
+    caseStudySectionSelect.appendChild(option);
+  });
+}
+
+function updateCaseStudyPreviewLink() {
+  if (!caseStudyPreviewLink) return;
+  const caseStudy = getSelectedCaseStudy();
+  caseStudyPreviewLink.href = caseStudy?.routePath || "/case-studies";
+}
+
+function updateCaseStudyAssetPreview() {
+  if (!caseStudyImagePreview) return;
+
+  const entry = getCaseStudyAssetEntry();
+  if (!entry) {
+    caseStudyImagePreview.innerHTML = "";
+    return;
+  }
+
+  caseStudyImagePreview.innerHTML = "";
+
+  const image = document.createElement("img");
+  image.src = toAssetUrl(entry.large || entry.fullscreen || entry.thumb);
+  image.alt = entry.title;
+  image.loading = "lazy";
+
+  const copy = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = entry.title;
+  const path = document.createElement("p");
+  path.className = "path";
+  path.textContent = entry.large || entry.fullscreen || entry.thumb;
+
+  copy.appendChild(title);
+  copy.appendChild(path);
+  caseStudyImagePreview.appendChild(image);
+  caseStudyImagePreview.appendChild(copy);
+}
+
+function fillCaseStudyImageTextFromAsset({ force = false } = {}) {
+  const entry = getCaseStudyAssetEntry();
+  if (!entry) return;
+
+  if (caseStudyAltInput && (force || !caseStudyAltInput.value.trim())) {
+    caseStudyAltInput.value = entry.title || "";
+  }
+  if (caseStudyTitleInput && (force || !caseStudyTitleInput.value.trim())) {
+    caseStudyTitleInput.value = entry.title || "";
+  }
+  if (caseStudyCaptionInput && (force || !caseStudyCaptionInput.value.trim())) {
+    caseStudyCaptionInput.value = entry.description || entry.cardDescription || "";
+  }
+}
+
+function createCaseStudyImageRow(label, image) {
+  const row = document.createElement("article");
+  row.className = "case-study-current-image";
+
+  const entry = findGalleryEntryForCaseStudyImage(image);
+  const previewPath = image?.thumbSrc || image?.src || "";
+  if (previewPath) {
+    const preview = document.createElement("img");
+    preview.src = toAssetUrl(previewPath);
+    preview.alt = image?.alt || label;
+    preview.loading = "lazy";
+    row.appendChild(preview);
+  }
+
+  const copy = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = label;
+  const caption = document.createElement("p");
+  caption.textContent = image?.caption || image?.title || image?.alt || "No caption";
+  const path = document.createElement("p");
+  path.className = "path";
+  path.textContent = image?.src || "";
+  copy.appendChild(title);
+  copy.appendChild(caption);
+  copy.appendChild(path);
+
+  const actions = document.createElement("div");
+  actions.className = "case-study-current-actions";
+
+  if (image?.src) {
+    const openLink = document.createElement("a");
+    openLink.className = "btn btn-secondary";
+    openLink.href = toAssetUrl(image.src);
+    openLink.target = "_blank";
+    openLink.rel = "noreferrer";
+    openLink.textContent = "Open";
+    actions.appendChild(openLink);
+  }
+
+  if (entry) {
+    const editButton = document.createElement("button");
+    editButton.className = "btn btn-secondary";
+    editButton.type = "button";
+    editButton.textContent = "Edit In VSCimage";
+    editButton.dataset.caseStudyEditEntry = entry.id;
+    actions.appendChild(editButton);
+  }
+
+  copy.appendChild(actions);
+  row.appendChild(copy);
+  return row;
+}
+
+function renderCurrentCaseStudyImages() {
+  if (!caseStudyCurrentImages) return;
+
+  const caseStudy = getSelectedCaseStudy();
+  caseStudyCurrentImages.innerHTML = "";
+
+  if (!caseStudy) {
+    const empty = document.createElement("p");
+    empty.className = "thumb-empty";
+    empty.textContent = "Choose a case study to see its assigned images.";
+    caseStudyCurrentImages.appendChild(empty);
+    return;
+  }
+
+  const rows = [];
+  if (caseStudy.heroImage) rows.push(["Hero image", caseStudy.heroImage]);
+  if (caseStudy.cardImage) rows.push(["Index card image", caseStudy.cardImage]);
+  (caseStudy.featuredImages || []).forEach((image, index) => {
+    rows.push([`Featured image ${index + 1}`, image]);
+  });
+  (caseStudy.galleryImages || []).forEach((image, index) => {
+    rows.push([`Gallery image ${index + 1}`, image]);
+  });
+  (caseStudy.sections || []).forEach((section) => {
+    if (section.image) rows.push([`${section.heading || section.id} section image`, section.image]);
+  });
+
+  if (!rows.length) {
+    const empty = document.createElement("p");
+    empty.className = "thumb-empty";
+    empty.textContent = "No images are assigned to this case study yet.";
+    caseStudyCurrentImages.appendChild(empty);
+    return;
+  }
+
+  const heading = document.createElement("h3");
+  heading.textContent = "Current Images";
+  caseStudyCurrentImages.appendChild(heading);
+
+  rows.forEach(([label, image]) => {
+    caseStudyCurrentImages.appendChild(createCaseStudyImageRow(label, image));
+  });
+}
+
+function renderCaseStudyImageControls() {
+  renderCaseStudySelect();
+  renderCaseStudyAssetSelect();
+  renderCaseStudySectionSelect();
+  updateCaseStudyPreviewLink();
+  updateCaseStudyAssetPreview();
+  renderCurrentCaseStudyImages();
+  if (caseStudyAssignButton) {
+    caseStudyAssignButton.disabled =
+      !state.apiAvailable || !caseStudySelect?.value || !caseStudyAssetSelect?.value;
+  }
 }
 
 function ensureConfigShape(config) {
@@ -2879,7 +3174,11 @@ async function reloadData() {
     try {
       config = await fetchJson(`${state.apiOrigin}/api/vscimage/config`);
       const filesPayload = await fetchJson(`${state.apiOrigin}/api/vscimage/files`);
+      const caseStudiesPayload = await fetchJson(`${state.apiOrigin}/api/vscimage/case-studies`);
       files = Array.isArray(filesPayload.files) ? filesPayload.files : [];
+      state.caseStudies = Array.isArray(caseStudiesPayload.caseStudies)
+        ? caseStudiesPayload.caseStudies
+        : [];
     } catch (error) {
       state.apiAvailable = false;
       try {
@@ -2888,6 +3187,7 @@ async function reloadData() {
         config = {};
       }
       files = collectConfigImagePaths(config);
+      state.caseStudies = [];
       setStatus(
         configMsg,
         "File list API unavailable. Running in read-only mode.",
@@ -2917,6 +3217,7 @@ async function reloadData() {
   renderConfigControls();
   renderPreview();
   renderThumbAccordion();
+  renderCaseStudyImageControls();
 
   const saveButton = configForm?.querySelector('button[type="submit"]');
   updateUploadButtonState();
@@ -3359,6 +3660,93 @@ if (thumbEditorForm) {
   thumbEditorForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     await saveGalleryEditor();
+  });
+}
+
+if (caseStudySelect) {
+  caseStudySelect.addEventListener("change", () => {
+    renderCaseStudySectionSelect();
+    updateCaseStudyPreviewLink();
+    renderCurrentCaseStudyImages();
+  });
+}
+
+if (caseStudyAssetSelect) {
+  caseStudyAssetSelect.addEventListener("change", () => {
+    fillCaseStudyImageTextFromAsset({ force: true });
+    updateCaseStudyAssetPreview();
+  });
+}
+
+if (caseStudySlotSelect) {
+  caseStudySlotSelect.addEventListener("change", () => {
+    renderCaseStudySectionSelect();
+  });
+}
+
+if (caseStudyCurrentImages) {
+  caseStudyCurrentImages.addEventListener("click", (event) => {
+    const editButton = event.target.closest("[data-case-study-edit-entry]");
+    if (!editButton) return;
+    openGalleryEditor(editButton.dataset.caseStudyEditEntry);
+  });
+}
+
+if (caseStudyImageForm) {
+  caseStudyImageForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!state.apiAvailable) {
+      setStatus(caseStudyImageMsg, "Case study assignment is unavailable in read-only mode.", "error");
+      return;
+    }
+
+    const slug = caseStudySelect?.value || "";
+    const entryId = caseStudyAssetSelect?.value || "";
+    const slot = caseStudySlotSelect?.value || "";
+    const sectionId = caseStudySectionSelect?.value || "";
+
+    if (!slug || !entryId || !slot) {
+      setStatus(caseStudyImageMsg, "Choose a case study, image, and destination.", "error");
+      return;
+    }
+
+    try {
+      if (caseStudyAssignButton) caseStudyAssignButton.disabled = true;
+      setStatus(caseStudyImageMsg, "Saving image to case study...", "");
+
+      const payload = await fetchJson(
+        `${state.apiOrigin}/api/vscimage/case-studies/${encodeURIComponent(slug)}/images`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            entryId,
+            slot,
+            sectionId,
+            alt: caseStudyAltInput?.value || "",
+            title: caseStudyTitleInput?.value || "",
+            caption: caseStudyCaptionInput?.value || ""
+          })
+        }
+      );
+
+      if (payload.caseStudy) {
+        state.caseStudies = state.caseStudies.map((caseStudy) =>
+          caseStudy.slug === payload.caseStudy.slug
+            ? { ...caseStudy, ...payload.caseStudy }
+            : caseStudy
+        );
+      }
+
+      renderCaseStudyImageControls();
+      setStatus(caseStudyImageMsg, "Image saved to case study.", "ok");
+      announce("Image saved to case study.");
+    } catch (error) {
+      setStatus(caseStudyImageMsg, error.message, "error");
+    } finally {
+      renderCaseStudyImageControls();
+    }
   });
 }
 

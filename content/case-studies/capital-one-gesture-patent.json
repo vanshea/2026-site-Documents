@@ -2,8 +2,8 @@
   "slug": "capital-one-gesture-patent",
   "sortOrder": 1,
   "title": "Capital One Gesture Interface Patent",
-  "subtitle": "A future-facing interaction concept that translated ambiguous emerging technology into a concrete, patentable product story.",
-  "summary": "This sample case study shows how the new system supports hero content, structured narrative sections, a featured image viewer, and a gallery without duplicating page code.",
+  "subtitle": "A self-directed prototype effort that turned a stalled taxonomy debate into a patented gesture-based mobile banking interaction.",
+  "summary": "When a large team pushed a simplistic taxonomy over user intuitiveness, Van formed a cross-functional shadow team to prototype a better path: a gesture-based interface that simplified complex banking data into human-centered insights.",
   "cardImage": {
     "src": "/assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp",
     "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
@@ -72,10 +72,10 @@
   "sections": [
     {
       "id": "opportunity",
-      "heading": "Opportunity",
+      "heading": "The Conflict",
       "body": [
-        "The brief was not a typical feature design problem. It was an open question about how a novel gesture interface might create a differentiated banking experience without collapsing into science fiction.",
-        "For this template, the body copy is stored directly in JSON so you can revise or remove paragraphs without touching layout code."
+        "A large team was pushing for a taxonomy and navigation flow that prioritized simplistic, random categories over user intuitiveness.",
+        "The risk was not just a messy information architecture. It was a mobile banking experience that would force customers to learn the bank's internal logic instead of helping them understand their own financial lives."
       ],
       "image": {
         "src": "/assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp",
@@ -86,10 +86,10 @@
     },
     {
       "id": "approach",
-      "heading": "Approach",
+      "heading": "The Strategic Action",
       "body": [
-        "I assembled a focused cross-functional team, mapped the interaction architecture, and turned a conceptual technology direction into a story executives and legal partners could evaluate together.",
-        "The reusable section component also supports optional bullet lists and an optional image. If a case study does not need media in a section, you can remove that object from the JSON and the layout adapts automatically."
+        "Rather than staying in sideline critique, Van formed a self-directed, cross-functional shadow team to build a working prototype of a gesture-based interface.",
+        "The prototype reframed the conversation around what customers could intuitively do, feel, and understand in context, instead of which static category label the business preferred."
       ],
       "bullets": [
         "Framed the concept around user value instead of technical novelty.",
@@ -99,10 +99,15 @@
     },
     {
       "id": "outcome",
-      "heading": "Outcome",
+      "heading": "Impact Beyond the Patent",
       "body": [
-        "The concept helped secure internal momentum and contributed to a patent-winning direction. More importantly for the site system, this example demonstrates how the same template can hold hero media, narrative copy, metadata, feature imagery, and a flexible gallery.",
-        "Future case studies can be shorter, longer, more image-heavy, or more text-heavy by editing content files only."
+        "The gesture interface, later published as US20220261083A1, reshaped how the bank approached mobile interaction. But the deeper win was organizational: the work proved that design could intervene early, make the problem tangible, and prevent business-crushing mediocrity before it hardened into product direction.",
+        "The effort also simplified complex data into human-centered insights, contributing to a customer win that helped drive a 30-day deposit increase of $10M."
+      ],
+      "bullets": [
+        "Customer win: Simplified complex data into human-centered insights, leading to a 30-day deposit increase of $10M.",
+        "Organizational win: Established a Guide/Solve model where design intervened early to prevent business-crushing mediocrity.",
+        "Technical win: The gesture interface, US20220261083A1, reshaped how the bank approached mobile interaction."
       ],
       "image": {
         "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp",

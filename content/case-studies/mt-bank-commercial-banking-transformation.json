@@ -1,0 +1,126 @@
+{
+  "slug": "mt-bank-commercial-banking-transformation",
+  "sortOrder": 3,
+  "title": "M&T Bank Commercial Banking Transformation",
+  "subtitle": "A service design effort that reframed commercial banking modernization around journeys, operations, and measurable customer outcomes.",
+  "summary": "M&T Bank's commercial banking experience was shaped by legacy systems and fragmented processes. Van helped the organization see the work as an interconnected service ecosystem, not just a technology modernization effort.",
+  "cardImage": {
+    "src": "/assets/fpo-large-city-transit-1900x1600.svg",
+    "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+    "alt": "Abstract journey map representing commercial banking service transformation."
+  },
+  "heroImage": {
+    "src": "/assets/fpo-large-city-transit-1900x1600.svg",
+    "alt": "Abstract journey map representing commercial banking transformation.",
+    "caption": "Service design connected customer friction to operational complexity and investment priorities."
+  },
+  "featuredImages": [
+    {
+      "src": "/assets/fpo-large-city-transit-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Commercial banking journey map.",
+      "title": "Journey Strategy",
+      "caption": "The work connected digital pain points to people, process, policy, and platform decisions."
+    },
+    {
+      "src": "/assets/fpo-large-northline-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Operational roadmap visualization.",
+      "title": "Optimization Roadmap",
+      "caption": "A practical roadmap translated service friction into measurable improvement opportunities."
+    }
+  ],
+  "galleryImages": [
+    {
+      "src": "/assets/fpo-large-city-transit-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Commercial banking service journey.",
+      "caption": "Service journey."
+    },
+    {
+      "src": "/assets/fpo-large-northline-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Optimization roadmap.",
+      "caption": "Optimization roadmap."
+    },
+    {
+      "src": "/assets/fpo-large-hollow-creek-1900x1600.svg",
+      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+      "alt": "Process ecosystem diagram.",
+      "caption": "Process ecosystem."
+    }
+  ],
+  "sections": [
+    {
+      "id": "conflict",
+      "heading": "The Conflict",
+      "body": [
+        "M&T Bank's Commercial Banking experience was shaped by legacy systems, fragmented processes, and internal operational complexity. Customers were navigating disjointed journeys across channels, teams, documents, and service touchpoints.",
+        "Internally, the organization risked treating the challenge as a technology modernization problem when the deeper issue was a fragmented service model."
+      ],
+      "image": {
+        "src": "/assets/fpo-large-city-transit-1900x1600.svg",
+        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+        "alt": "Fragmented service journey illustration.",
+        "caption": "The deeper challenge was a fragmented service model, not only legacy technology."
+      }
+    },
+    {
+      "id": "strategic-action",
+      "heading": "The Strategic Action",
+      "body": [
+        "Van reframed the work around the customer journey. Rather than starting with system constraints, he helped the organization examine how commercial banking actually functioned from the customer's point of view and from the employee's point of view.",
+        "He used service design methods to map the end-to-end experience, identify friction points, surface operational breakdowns, and connect digital pain points to back-end processes.",
+        "This created a shared language across business, design, product, and operations teams. The work moved the organization away from isolated feature fixes and toward a more integrated, journey-based strategy."
+      ],
+      "bullets": [
+        "Mapped the end-to-end commercial banking experience across customer and employee touchpoints.",
+        "Connected digital friction to operational breakdowns and back-end process issues.",
+        "Created a shared language for business, design, product, and operations teams."
+      ]
+    },
+    {
+      "id": "impact",
+      "heading": "Impact Beyond the Journey Maps",
+      "body": [
+        "The work improved the commercial banking experience by identifying friction across key moments in the customer journey, contributing to a reported 20% increase in customer satisfaction.",
+        "It also created a practical roadmap for measurable service improvement, connecting experience problems to operational inefficiencies and helping service design scale beyond a single pilot."
+      ],
+      "bullets": [
+        "Customer win: Contributed to a reported 20% increase in customer satisfaction.",
+        "Organizational win: Identified 40 digital and process optimization opportunities.",
+        "Financial win: Supported an estimated $10M in annual savings by connecting experience problems to operational inefficiencies.",
+        "Scale win: Helped service design move from one pilot effort into six distinct business lines.",
+        "Strategic win: Shifted the conversation from fixing legacy systems to designing better journeys across people, process, policy, and platforms."
+      ],
+      "image": {
+        "src": "/assets/fpo-large-northline-1900x1600.svg",
+        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
+        "alt": "Roadmap of digital and process optimization opportunities.",
+        "caption": "Journey work became a roadmap for customer, operational, and financial improvement."
+      }
+    },
+    {
+      "id": "takeaway",
+      "heading": "Strategic Takeaway",
+      "body": [
+        "Van helped M&T see commercial banking as an interconnected service ecosystem.",
+        "The value of the work was not only in the maps or recommendations. It was in giving the organization a repeatable way to diagnose complexity, prioritize investment, and improve both customer experience and operational performance."
+      ]
+    }
+  ],
+  "metadata": {
+    "client": "M&T Bank",
+    "role": "Service Design Lead",
+    "year": "2019",
+    "industry": "Financial Services",
+    "services": [
+      "Service Design",
+      "Journey Mapping",
+      "Experience Strategy",
+      "Operational Optimization"
+    ]
+  },
+  "readingTime": "6 min read",
+  "updatedAt": "2026-04-26"
+}

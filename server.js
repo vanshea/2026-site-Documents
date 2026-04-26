@@ -39,6 +39,7 @@ const vscimageDir = path.join(assetsDir, "vscimage");
 const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
 const vscimageConfigPath = path.join(vscimageDir, "config.json");
+const caseStudiesContentDir = path.join(rootDir, "content", "case-studies");
 const homepageIndexPaths = [
   path.join(rootDir, "index.html"),
   path.join(livesiteDir, "index.html"),
@@ -543,6 +544,97 @@ function normalizeGalleryDescription(value, maxLength = 320) {
 
 function normalizeCardDescription(value, maxLength = 120) {
   return normalizeTextField(value, maxLength);
+}
+
+function toPublicAssetPath(value) {
+  const normalized = sanitizeAssetPath(value);
+  if (!normalized) return "";
+  if (/^(https?:)?\/\//.test(normalized)) return normalized;
+  return `/${normalized}`;
+}
+
+function toCaseStudyImagePayload(entry, overrides = {}, slot = "") {
+  const src =
+    slot === "heroImage"
+      ? entry?.fullscreen || entry?.large || entry?.thumb || ""
+      : entry?.large || entry?.fullscreen || entry?.thumb || "";
+  const thumbSrc = entry?.thumb || src;
+  const fallbackTitle = String(entry?.title || "").trim();
+  const fallbackDescription = String(entry?.description || entry?.cardDescription || "").trim();
+
+  return {
+    src: toPublicAssetPath(src),
+    thumbSrc: toPublicAssetPath(thumbSrc),
+    alt: normalizeTextField(overrides.alt || fallbackTitle, 180),
+    title: normalizeTextField(overrides.title || fallbackTitle, 120),
+    caption: normalizeTextField(overrides.caption || fallbackDescription, 240)
+  };
+}
+
+async function readCaseStudyContentFiles() {
+  let entries = [];
+
+  try {
+    entries = await fs.readdir(caseStudiesContentDir, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+
+  const caseStudies = [];
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith(".json") || entry.name.startsWith("_")) {
+      continue;
+    }
+
+    const filePath = path.join(caseStudiesContentDir, entry.name);
+    const raw = await fs.readFile(filePath, "utf8");
+    const parsed = JSON.parse(raw);
+    const fallbackSlug = path.basename(entry.name, ".json");
+    const slug = sanitizeName(parsed.slug || fallbackSlug);
+
+    if (!slug || parsed.published === false) continue;
+
+    caseStudies.push({
+      slug,
+      title: normalizeTextField(parsed.title || slug, 160),
+      routePath: `/case-studies/${slug}`,
+      fileName: entry.name,
+      filePath,
+      cardImage: parsed.cardImage || null,
+      heroImage: parsed.heroImage || null,
+      featuredImages: Array.isArray(parsed.featuredImages) ? parsed.featuredImages : [],
+      galleryImages: Array.isArray(parsed.galleryImages) ? parsed.galleryImages : [],
+      sections: Array.isArray(parsed.sections)
+        ? parsed.sections.map((section, index) => ({
+            id: sanitizeName(section?.id || `section-${index + 1}`),
+            heading: normalizeTextField(section?.heading || `Section ${index + 1}`, 120),
+            image: section?.image || null
+          }))
+        : [],
+      sortOrder: Number.isFinite(Number(parsed.sortOrder))
+        ? Number(parsed.sortOrder)
+        : Number.MAX_SAFE_INTEGER
+    });
+  }
+
+  return caseStudies.sort((left, right) => {
+    if (left.sortOrder !== right.sortOrder) return left.sortOrder - right.sortOrder;
+    return left.title.localeCompare(right.title);
+  });
+}
+
+async function readCaseStudyContentBySlug(slug) {
+  const normalizedSlug = sanitizeName(slug);
+  const caseStudies = await readCaseStudyContentFiles();
+  const match = caseStudies.find((caseStudy) => caseStudy.slug === normalizedSlug);
+  if (!match) return null;
+
+  const raw = await fs.readFile(match.filePath, "utf8");
+  return {
+    ...match,
+    content: JSON.parse(raw)
+  };
 }
 
 function normalizeLinkText(value, maxLength = 80) {
@@ -2502,6 +2594,116 @@ app.get("/api/vscimage/files", requireAnalyticsAdminApi, async (req, res) => {
   } catch (error) {
     console.error("Unable to list files for VSCimage:", error);
     return res.status(500).json({ error: "Unable to list image files." });
+  }
+});
+
+app.get("/api/vscimage/case-studies", requireAnalyticsAdminApi, async (req, res) => {
+  try {
+    const caseStudies = (await readCaseStudyContentFiles()).map(
+      ({ fileName, filePath, ...caseStudy }) => caseStudy
+    );
+    return res.status(200).json({ caseStudies });
+  } catch (error) {
+    console.error("Unable to list VSCimage case studies:", error);
+    return res.status(500).json({ error: "Unable to list case studies." });
+  }
+});
+
+app.post("/api/vscimage/case-studies/:slug/images", requireAnalyticsAdminApi, async (req, res) => {
+  const slug = sanitizeName(req.params.slug);
+  const slot = String(req.body?.slot || "").trim();
+  const sectionId = sanitizeName(req.body?.sectionId || "");
+  const entryId = String(req.body?.entryId || "").trim();
+  const allowedSlots = new Set([
+    "cardImage",
+    "heroImage",
+    "featuredImages",
+    "galleryImages",
+    "sectionImage"
+  ]);
+
+  if (!slug) {
+    return res.status(400).json({ error: "Case study slug is required." });
+  }
+
+  if (!allowedSlots.has(slot)) {
+    return res.status(400).json({ error: "Choose a valid case study image destination." });
+  }
+
+  if (!entryId) {
+    return res.status(400).json({ error: "Choose a VSCimage asset." });
+  }
+
+  if (slot === "sectionImage" && !sectionId) {
+    return res.status(400).json({ error: "Choose a case study section." });
+  }
+
+  try {
+    const caseStudy = await readCaseStudyContentBySlug(slug);
+    if (!caseStudy) {
+      return res.status(404).json({ error: "Case study was not found." });
+    }
+
+    const config = await readVscimageConfig();
+    const gallery = Array.isArray(config.gallery) ? config.gallery : [];
+    const galleryEntry = gallery.find((entry) => String(entry?.id || "") === entryId);
+    if (!galleryEntry) {
+      return res.status(404).json({ error: "VSCimage asset was not found." });
+    }
+
+    const image = toCaseStudyImagePayload(
+      galleryEntry,
+      {
+        alt: req.body?.alt,
+        title: req.body?.title,
+        caption: req.body?.caption
+      },
+      slot
+    );
+
+    if (!image.src) {
+      return res.status(400).json({ error: "The selected VSCimage asset has no usable image." });
+    }
+
+    const nextContent = caseStudy.content;
+    if (slot === "cardImage" || slot === "heroImage") {
+      nextContent[slot] = image;
+    } else if (slot === "featuredImages" || slot === "galleryImages") {
+      nextContent[slot] = Array.isArray(nextContent[slot]) ? nextContent[slot] : [];
+      nextContent[slot].push(image);
+    } else if (slot === "sectionImage") {
+      nextContent.sections = Array.isArray(nextContent.sections) ? nextContent.sections : [];
+      const section = nextContent.sections.find(
+        (item, index) => sanitizeName(item?.id || `section-${index + 1}`) === sectionId
+      );
+      if (!section) {
+        return res.status(404).json({ error: "Case study section was not found." });
+      }
+      section.image = image;
+    }
+
+    nextContent.updatedAt = new Date().toISOString().slice(0, 10);
+    await fs.writeFile(caseStudy.filePath, `${JSON.stringify(nextContent, null, 2)}\n`, "utf8");
+
+    const refreshedCaseStudy = await readCaseStudyContentBySlug(slug);
+    return res.status(200).json({
+      ok: true,
+      caseStudy: refreshedCaseStudy
+        ? {
+            slug: refreshedCaseStudy.slug,
+            title: refreshedCaseStudy.title,
+            routePath: refreshedCaseStudy.routePath,
+            cardImage: refreshedCaseStudy.cardImage,
+            heroImage: refreshedCaseStudy.heroImage,
+            featuredImages: refreshedCaseStudy.featuredImages,
+            galleryImages: refreshedCaseStudy.galleryImages,
+            sections: refreshedCaseStudy.sections
+          }
+        : null
+    });
+  } catch (error) {
+    console.error("Unable to assign VSCimage asset to case study:", error);
+    return res.status(500).json({ error: "Unable to assign image to case study." });
   }
 });
 
