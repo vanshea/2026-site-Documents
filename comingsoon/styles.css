@@ -634,6 +634,7 @@ h2 {
   background-clip: padding-box;
   position: relative;
   clip-path: inset(0 round var(--radius));
+  contain: paint;
   --card-shell-duration: 620ms;
   --card-title-duration: 540ms;
   --card-copy-duration: 260ms;
@@ -653,6 +654,8 @@ h2 {
 .generated-card {
   border: 0;
   clip-path: inset(0 round var(--radius));
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: linear-gradient(#fff, #fff);
 }
 
 .card.hide {
@@ -704,7 +707,10 @@ h2 {
   aspect-ratio: 4 / 3;
   background: var(--paper);
   clip-path: inset(0 round var(--radius-soft));
+  contain: paint;
   transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: linear-gradient(#fff, #fff);
   transition:
     transform var(--card-shell-duration) cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.28s ease;
