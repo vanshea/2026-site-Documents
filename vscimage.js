@@ -305,10 +305,11 @@ function sanitizeAssetName(value) {
 }
 
 function normalizeDescription(value, maxLength = 320) {
-  return String(value || "")
+  const normalized = String(value || "")
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
+  return /^generated in vscimage\.?$/i.test(normalized) ? "" : normalized;
 }
 
 function normalizeCardDescription(value, maxLength = 120) {
@@ -665,9 +666,7 @@ function normalizeGalleryEntries(entries) {
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 120);
-      const description = normalizeDescription(
-        entry?.description || "Generated in VSCimage."
-      );
+      const description = normalizeDescription(entry?.description || "");
       const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
       const linkText = normalizeLinkText(entry?.linkText || "");
       const linkUrl = normalizeLinkUrl(entry?.linkUrl || "");
@@ -1202,7 +1201,7 @@ function buildThumbnailCard(entry, options = {}) {
 
   const description = document.createElement("p");
   description.className = "thumb-card-description";
-  description.textContent = entry.description || "Generated in VSCimage.";
+  description.textContent = entry.description || "";
 
   const path = document.createElement("p");
   path.className = "path";

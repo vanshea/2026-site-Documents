@@ -441,11 +441,7 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
         .replace(/\s+/g, " ")
         .slice(0, 120);
       const displayCardDescription = normalizeCardDescription(entry?.cardDescription || "", 120);
-      const displayDescription =
-        String(entry?.description || "")
-          .trim()
-          .replace(/\s+/g, " ")
-          .slice(0, 320) || "Generated in VSCimage.";
+      const displayDescription = normalizeGalleryDescription(entry?.description || "", 320);
       const idToken = sanitizeName(entry?.id || displayTitle || `generated-${index + 1}`);
       const cardClasses = ["card", "reveal", "generated-card"];
       if (featured) {
@@ -538,6 +534,11 @@ function normalizeTextField(value, maxLength) {
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
+}
+
+function normalizeGalleryDescription(value, maxLength = 320) {
+  const normalized = normalizeTextField(value, maxLength);
+  return /^generated in vscimage\.?$/i.test(normalized) ? "" : normalized;
 }
 
 function normalizeCardDescription(value, maxLength = 120) {
@@ -1111,9 +1112,10 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextLinkText = normalizeLinkText(options.linkText ?? currentEntry.linkText ?? "", 80);
   const nextLinkUrl = normalizeLinkUrl(options.linkUrl ?? currentEntry.linkUrl ?? "", 320);
   const nextCategory = normalizeGalleryCategory(options.category ?? currentEntry.category);
-  const nextDescription =
-    normalizeTextField(options.description ?? currentEntry.description ?? "", 320) ||
-    "Generated in VSCimage.";
+  const nextDescription = normalizeGalleryDescription(
+    options.description ?? currentEntry.description ?? "",
+    320
+  );
   const currentHomepageVisible = isGalleryEntryHomepageVisible(currentEntry);
   const nextHomepageVisible = Object.prototype.hasOwnProperty.call(options, "homepageVisible")
     ? toBool(options.homepageVisible, currentHomepageVisible)
@@ -1452,9 +1454,7 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextLinkText = normalizeLinkText(nextLinkTextInput || "", 80);
   const nextLinkUrl = normalizeLinkUrl(nextLinkUrlInput || "", 320);
   const nextCategory = normalizeGalleryCategory(nextCategoryInput);
-  const nextDescription =
-    normalizeTextField(nextDescriptionInput || "", 320) ||
-    "Generated in VSCimage.";
+  const nextDescription = normalizeGalleryDescription(nextDescriptionInput || "", 320);
   const nextHomepageVisibleInput = Object.prototype.hasOwnProperty.call(
     updates || {},
     "homepageVisible"
@@ -2794,11 +2794,7 @@ if (upload) {
           linkText: normalizeLinkText(req.body.linkText || "", 80),
           linkUrl: normalizeLinkUrl(req.body.linkUrl || "", 320),
           category,
-          description:
-            String(req.body.description || "")
-              .trim()
-              .replace(/\s+/g, " ")
-              .slice(0, 320) || "Generated in VSCimage.",
+          description: normalizeGalleryDescription(req.body.description || "", 320),
           homepageVisible,
           featured: false,
           name: duplicateReplacementBaseName,
@@ -2846,11 +2842,7 @@ if (upload) {
           linkText: normalizeLinkText(req.body.linkText || "", 80),
           linkUrl: normalizeLinkUrl(req.body.linkUrl || "", 320),
           category,
-          description:
-            String(req.body.description || "")
-              .trim()
-              .replace(/\s+/g, " ")
-              .slice(0, 320) || "Generated in VSCimage.",
+          description: normalizeGalleryDescription(req.body.description || "", 320),
           homepageVisible,
           featured: false,
           thumb: galleryThumb,

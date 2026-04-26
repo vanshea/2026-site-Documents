@@ -1026,24 +1026,6 @@ function updateLightboxFullscreenButton() {
   }
 }
 
-function isVscimageAssetPath(value) {
-  return /(?:^|\/)assets\/vscimage\//i.test(String(value || "").trim());
-}
-
-function buildVscimageUrl(link) {
-  const candidates = [
-    link?.dataset?.lightboxSrc,
-    link?.dataset?.fullscreenSrc,
-    link?.getAttribute?.("href")
-  ];
-
-  if (!candidates.some((value) => isVscimageAssetPath(value))) {
-    return "";
-  }
-
-  return "/vscimage";
-}
-
 function getCustomLightboxLink(link) {
   const text = String(link?.dataset?.lightboxLinkText || "")
     .trim()
@@ -1068,7 +1050,6 @@ function renderLightboxCaption(link, title, description, index, total) {
   const counterText = `(${index + 1}/${total})`;
   const summary = description ? `${title}: ${description} ${counterText}` : `${title} ${counterText}`;
   const customLink = getCustomLightboxLink(link);
-  const vscimageUrl = customLink ? "" : buildVscimageUrl(link);
 
   lightboxCaption.replaceChildren();
 
@@ -1076,7 +1057,7 @@ function renderLightboxCaption(link, title, description, index, total) {
   copy.textContent = summary;
   lightboxCaption.appendChild(copy);
 
-  if (!customLink && !vscimageUrl) {
+  if (!customLink) {
     return;
   }
 
@@ -1092,8 +1073,8 @@ function renderLightboxCaption(link, title, description, index, total) {
 
   const editLink = document.createElement("a");
   editLink.className = "lightbox-caption-link";
-  editLink.href = customLink?.url || vscimageUrl;
-  editLink.textContent = customLink?.text || "Open in VSCimage";
+  editLink.href = customLink.url;
+  editLink.textContent = customLink.text;
   editLink.target = "_blank";
   editLink.rel = "noreferrer noopener";
   lightboxCaption.appendChild(editLink);
