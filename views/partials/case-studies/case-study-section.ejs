@@ -2,9 +2,13 @@
   <div class="case-study-section-copy">
     <h2><%= section.heading %></h2>
 
-    <% section.body.forEach((paragraph) => { %>
-      <p><%= paragraph %></p>
-    <% }) %>
+    <% if (section.bodyHtml) { %>
+      <div class="case-study-rich-text"><%- section.bodyHtml %></div>
+    <% } else { %>
+      <% section.body.forEach((paragraph) => { %>
+        <p><%= paragraph %></p>
+      <% }) %>
+    <% } %>
 
     <% if (section.bullets.length > 0) { %>
       <ul class="case-study-list">

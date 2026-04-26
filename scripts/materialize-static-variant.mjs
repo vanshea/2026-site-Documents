@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { createRequire } from "node:module";
 
@@ -31,7 +31,7 @@ function getVariantSourceRoot(variant) {
 function rewriteVariantPreviewLinks(html, variant) {
   const prefix = `/${variant}`;
 
-  return String(html || "")
+  const rewritten = String(html || "")
     .replace(/href="\/"/g, `href="${prefix}/"`)
     .replace(/action="\/"/g, `action="${prefix}/"`)
     .replace(/(["'(])\/styles\.css/g, `$1${prefix}/styles.css`)
@@ -41,6 +41,21 @@ function rewriteVariantPreviewLinks(html, variant) {
     .replace(/(["'(])\/case-studies\b/g, `$1${prefix}/case-studies`)
     .replace(/(["'(])\/assets\//g, `$1${prefix}/assets/`)
     .replace(/(["'(])\/large_web_portfolio\//g, `$1${prefix}/large_web_portfolio/`);
+
+  if (!snapshotVariants.has(variant)) {
+    return rewritten;
+  }
+
+  return rewritten.replace(
+    /(<nav id="siteNav" class="nav">)([\s\S]*?)(<\/nav>)/,
+    (_match, openTag, navContents, closeTag) => {
+      const caseStudyNavPattern = new RegExp(
+        `\\s*<a\\s+href="/${variant}/case-studies"[\\s\\S]*?</a>`,
+        "g"
+      );
+      return `${openTag}${navContents.replace(caseStudyNavPattern, "")}${closeTag}`;
+    }
+  );
 }
 
 async function rewriteTopLevelHtmlFiles(variant) {
@@ -65,10 +80,17 @@ async function copyTopLevelPublicFiles(variant) {
 }
 
 async function copyDirectory(relativeSource, absoluteDestination) {
+  const sourcePath = path.join(projectRoot, relativeSource);
+  try {
+    await access(sourcePath);
+  } catch (error) {
+    return;
+  }
+
   await rm(absoluteDestination, { recursive: true, force: true });
   await mkdir(path.dirname(absoluteDestination), { recursive: true });
 
-  await cp(path.join(projectRoot, relativeSource), absoluteDestination, {
+  await cp(sourcePath, absoluteDestination, {
     recursive: true,
     filter(sourcePath) {
       const relativePath = path.relative(projectRoot, sourcePath);

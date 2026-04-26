@@ -30,6 +30,36 @@
         <a class="back-link" href="/">Back To Site</a>
       </header>
 
+      <nav class="workspace-tabs" aria-label="VSCimage workspace">
+        <button
+          class="workspace-tab is-active"
+          id="imageLibraryTab"
+          type="button"
+          data-workspace-tab="image-library"
+          aria-controls="imageLibraryWorkspace"
+          aria-selected="true"
+        >
+          Image Library
+        </button>
+        <button
+          class="workspace-tab"
+          id="caseStudiesTab"
+          type="button"
+          data-workspace-tab="case-studies"
+          aria-controls="caseStudiesWorkspace"
+          aria-selected="false"
+        >
+          Case Studies
+        </button>
+      </nav>
+
+      <div
+        class="workspace-panel is-active"
+        id="imageLibraryWorkspace"
+        role="tabpanel"
+        aria-labelledby="imageLibraryTab"
+        data-workspace-panel="image-library"
+      >
       <div class="top-panels">
         <section class="panel">
           <h2>Upload And Generate</h2>
@@ -179,81 +209,6 @@
         </section>
       </div>
 
-      <section class="panel" id="caseStudyImagePanel">
-        <h2>Case Study Images</h2>
-        <p class="subhead">
-          Upload or edit images above, then assign them to case studies here without opening JSON.
-        </p>
-
-        <form id="caseStudyImageForm" class="case-study-image-form">
-          <div class="case-study-image-grid">
-            <label>
-              Case Study
-              <select id="caseStudySelect"></select>
-            </label>
-            <label>
-              VSCimage Asset
-              <select id="caseStudyAssetSelect"></select>
-            </label>
-            <label>
-              Destination
-              <select id="caseStudySlotSelect">
-                <option value="heroImage">Hero image</option>
-                <option value="cardImage">Index card image</option>
-                <option value="featuredImages">Add to featured image viewer</option>
-                <option value="galleryImages">Add to gallery</option>
-                <option value="sectionImage">Replace section image</option>
-              </select>
-            </label>
-            <label id="caseStudySectionLabel" hidden>
-              Section
-              <select id="caseStudySectionSelect"></select>
-            </label>
-          </div>
-
-          <div class="case-study-image-grid">
-            <label>
-              Alt Text
-              <input
-                id="caseStudyAltInput"
-                type="text"
-                maxlength="180"
-                placeholder="Briefly describe the image"
-              />
-            </label>
-            <label>
-              Image Title
-              <input
-                id="caseStudyTitleInput"
-                type="text"
-                maxlength="120"
-                placeholder="Optional display title"
-              />
-            </label>
-            <label>
-              Caption
-              <input
-                id="caseStudyCaptionInput"
-                type="text"
-                maxlength="240"
-                placeholder="Optional caption"
-              />
-            </label>
-          </div>
-
-          <div class="case-study-image-actions">
-            <button id="caseStudyAssignButton" class="btn" type="submit">Save To Case Study</button>
-            <a id="caseStudyPreviewLink" class="back-link" href="/case-studies" target="_blank" rel="noreferrer">
-              Preview Case Study
-            </a>
-          </div>
-        </form>
-
-        <p id="caseStudyImageMsg" class="status" role="status" aria-live="polite"></p>
-        <div id="caseStudyImagePreview" class="case-study-image-preview"></div>
-        <div id="caseStudyCurrentImages" class="case-study-current-images"></div>
-      </section>
-
       <section class="panel">
         <h2>Assign To Site</h2>
         <form id="configForm">
@@ -292,6 +247,129 @@
         <h2>Current Preview</h2>
         <div id="previewGrid" class="preview-grid"></div>
       </section>
+      </div>
+
+      <div
+        class="workspace-panel"
+        id="caseStudiesWorkspace"
+        role="tabpanel"
+        aria-labelledby="caseStudiesTab"
+        data-workspace-panel="case-studies"
+        hidden
+      >
+        <section class="panel case-study-workspace-panel" id="caseStudyImagePanel">
+          <h2>Case Study Images</h2>
+          <p class="subhead">
+            Upload or edit images in the Image Library, then assign them to case studies here
+            without opening JSON.
+          </p>
+
+          <form id="caseStudyImageForm" class="case-study-image-form">
+            <div class="case-study-image-grid">
+              <label>
+                Case Study
+                <select id="caseStudySelect"></select>
+              </label>
+              <label>
+                VSCimage Asset
+                <select id="caseStudyAssetSelect"></select>
+              </label>
+              <label>
+                Destination
+                <select id="caseStudySlotSelect">
+                  <option value="heroImage">Hero image</option>
+                  <option value="cardImage">Index card image</option>
+                  <option value="featuredImages">Add to featured image viewer</option>
+                  <option value="galleryImages">Add to gallery</option>
+                  <option value="sectionImage">Replace section image</option>
+                </select>
+              </label>
+              <label id="caseStudySectionLabel" hidden>
+                Section
+                <select id="caseStudySectionSelect"></select>
+              </label>
+            </div>
+
+            <div class="case-study-image-grid">
+              <label>
+                Alt Text
+                <input
+                  id="caseStudyAltInput"
+                  type="text"
+                  maxlength="180"
+                  placeholder="Briefly describe the image"
+                />
+              </label>
+              <label>
+                Image Title
+                <input
+                  id="caseStudyTitleInput"
+                  type="text"
+                  maxlength="120"
+                  placeholder="Optional display title"
+                />
+              </label>
+              <label>
+                Caption
+                <input
+                  id="caseStudyCaptionInput"
+                  type="text"
+                  maxlength="240"
+                  placeholder="Optional caption"
+                />
+              </label>
+            </div>
+
+            <div class="case-study-image-actions">
+              <button id="caseStudyAssignButton" class="btn" type="submit">Save To Case Study</button>
+              <a id="caseStudyPreviewLink" class="back-link" href="/case-studies" target="_blank" rel="noreferrer">
+                Preview Case Study
+              </a>
+            </div>
+          </form>
+
+          <form id="caseStudyTextForm" class="case-study-text-form">
+            <div class="case-study-text-header">
+              <h3>Case Study Text</h3>
+              <div class="case-study-image-actions">
+                <button id="caseStudyInsertImageButton" class="btn btn-secondary" type="button">
+                  Insert Selected Image HTML
+                </button>
+                <button id="caseStudyTextSaveButton" class="btn" type="submit">
+                  Save Case Study Text
+                </button>
+              </div>
+            </div>
+
+            <div class="case-study-image-grid">
+              <label>
+                Title
+                <input id="caseStudyTextTitle" type="text" maxlength="160" />
+              </label>
+              <label>
+                Subtitle
+                <input id="caseStudyTextSubtitle" type="text" maxlength="260" />
+              </label>
+              <label>
+                Reading Time
+                <input id="caseStudyTextReadingTime" type="text" maxlength="40" />
+              </label>
+            </div>
+
+            <label>
+              Summary
+              <textarea id="caseStudyTextSummary" rows="3" maxlength="520"></textarea>
+            </label>
+
+            <div id="caseStudyTextSections" class="case-study-text-sections"></div>
+            <p id="caseStudyTextMsg" class="status" role="status" aria-live="polite"></p>
+          </form>
+
+          <p id="caseStudyImageMsg" class="status" role="status" aria-live="polite"></p>
+          <div id="caseStudyImagePreview" class="case-study-image-preview"></div>
+          <div id="caseStudyCurrentImages" class="case-study-current-images"></div>
+        </section>
+      </div>
     </main>
 
     <dialog

@@ -54,10 +54,7 @@
     {
       "id": "conflict",
       "heading": "The Conflict",
-      "body": [
-        "M&T Bank's Commercial Banking experience was shaped by legacy systems, fragmented processes, and internal operational complexity. Customers were navigating disjointed journeys across channels, teams, documents, and service touchpoints.",
-        "Internally, the organization risked treating the challenge as a technology modernization problem when the deeper issue was a fragmented service model."
-      ],
+      "bodyHtml": "<p>M&amp;T Bank’s Commercial Banking experience was shaped by legacy systems, fragmented processes, and internal operational complexity. Customers were navigating disjointed journeys across channels, teams, documents, and service touchpoints.</p><p>Internally, the organization risked treating the challenge as a technology modernization problem when the deeper issue was a fragmented service model.</p>",
       "image": {
         "src": "/assets/fpo-large-city-transit-1900x1600.svg",
         "thumbSrc": "/assets/fpo-thumb-760x570.svg",
@@ -68,31 +65,12 @@
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "body": [
-        "Van reframed the work around the customer journey. Rather than starting with system constraints, he helped the organization examine how commercial banking actually functioned from the customer's point of view and from the employee's point of view.",
-        "He used service design methods to map the end-to-end experience, identify friction points, surface operational breakdowns, and connect digital pain points to back-end processes.",
-        "This created a shared language across business, design, product, and operations teams. The work moved the organization away from isolated feature fixes and toward a more integrated, journey-based strategy."
-      ],
-      "bullets": [
-        "Mapped the end-to-end commercial banking experience across customer and employee touchpoints.",
-        "Connected digital friction to operational breakdowns and back-end process issues.",
-        "Created a shared language for business, design, product, and operations teams."
-      ]
+      "bodyHtml": "<p>Van reframed the work around the customer journey. Rather than starting with system constraints, he helped the organization examine how commercial banking actually functioned from the customer’s point of view and from the employee’s point of view.</p><p>He used service design methods to map the end-to-end experience, identify friction points, surface operational breakdowns, and connect digital pain points to back-end processes. This created a shared language across business, design, product, and operations teams. The work moved the organization away from isolated feature fixes and toward a more integrated, journey-based strategy.</p>"
     },
     {
       "id": "impact",
       "heading": "Impact Beyond the Journey Maps",
-      "body": [
-        "The work improved the commercial banking experience by identifying friction across key moments in the customer journey, contributing to a reported 20% increase in customer satisfaction.",
-        "It also created a practical roadmap for measurable service improvement, connecting experience problems to operational inefficiencies and helping service design scale beyond a single pilot."
-      ],
-      "bullets": [
-        "Customer win: Contributed to a reported 20% increase in customer satisfaction.",
-        "Organizational win: Identified 40 digital and process optimization opportunities.",
-        "Financial win: Supported an estimated $10M in annual savings by connecting experience problems to operational inefficiencies.",
-        "Scale win: Helped service design move from one pilot effort into six distinct business lines.",
-        "Strategic win: Shifted the conversation from fixing legacy systems to designing better journeys across people, process, policy, and platforms."
-      ],
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> Improved the commercial banking experience by identifying friction across key moments in the customer journey, contributing to a reported 20% increase in customer satisfaction.</li><li><strong>Organizational Win:</strong> Identified 40 digital and process optimization opportunities, creating a practical roadmap for measurable service improvement.</li><li><strong>Financial Win:</strong> Supported an estimated $10M in annual savings by connecting experience problems to operational inefficiencies.</li><li><strong>Scale Win:</strong> Helped service design move from one pilot effort into six distinct business lines, proving that the method could scale beyond a single project.</li><li><strong>Strategic Win:</strong> Shifted the internal conversation from “we need to fix legacy systems” to “we need to design better journeys across people, process, policy, and platforms.”</li></ul>",
       "image": {
         "src": "/assets/fpo-large-northline-1900x1600.svg",
         "thumbSrc": "/assets/fpo-thumb-760x570.svg",
@@ -103,10 +81,7 @@
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "body": [
-        "Van helped M&T see commercial banking as an interconnected service ecosystem.",
-        "The value of the work was not only in the maps or recommendations. It was in giving the organization a repeatable way to diagnose complexity, prioritize investment, and improve both customer experience and operational performance."
-      ]
+      "bodyHtml": "<p>Van helped M&amp;T see commercial banking as an interconnected service ecosystem. The value of the work was not only in the maps or recommendations. It was in giving the organization a repeatable way to diagnose complexity, prioritize investment, and improve both customer experience and operational performance.</p>"
     }
   ],
   "metadata": {

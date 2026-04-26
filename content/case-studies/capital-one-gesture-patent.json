@@ -1,120 +1,36 @@
 {
   "slug": "capital-one-gesture-patent",
   "sortOrder": 1,
-  "title": "Capital One Gesture Interface Patent",
+  "title": "Capital One: The Patent and Beyond",
   "subtitle": "A self-directed prototype effort that turned a stalled taxonomy debate into a patented gesture-based mobile banking interaction.",
-  "summary": "When a large team pushed a simplistic taxonomy over user intuitiveness, Van formed a cross-functional shadow team to prototype a better path: a gesture-based interface that simplified complex banking data into human-centered insights.",
-  "cardImage": {
-    "src": "/assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp",
-    "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
-    "alt": "Thumbnail view of the gesture interface patent diagram."
-  },
+  "summary": "Capital One had a strong design culture, but one major initiative was moving toward a taxonomy and navigation model that risked oversimplifying how customers understood their financial information.",
   "heroImage": {
     "src": "/assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp",
     "alt": "Diagram illustrating the gesture interface patent concept.",
     "caption": "Patent concept diagram used to anchor the story."
   },
-  "featuredImages": [
-    {
-      "src": "/assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
-      "alt": "Detailed patent concept diagram.",
-      "title": "Patent Concept Diagram",
-      "caption": "A systems-level view of the gesture interaction model."
-    },
-    {
-      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
-      "alt": "High-fidelity product interface concepts.",
-      "title": "Concept Screens",
-      "caption": "Exploratory product directions used to pressure-test the concept."
-    },
-    {
-      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-thumb-760x570.webp",
-      "alt": "Wireframe set showing user flow options.",
-      "title": "Flow Exploration",
-      "caption": "Wireframes that mapped where gesture interactions could reduce friction."
-    }
-  ],
-  "galleryImages": [
-    {
-      "src": "/assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
-      "alt": "Gesture interface patent overview.",
-      "caption": "Overview diagram."
-    },
-    {
-      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp",
-      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
-      "alt": "Product concept board.",
-      "caption": "Concept board."
-    },
-    {
-      "src": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-large-1900x1600.webp",
-      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx-wire-3200x1800-thumb-760x570.webp",
-      "alt": "Wireframe study.",
-      "caption": "Wireframe study."
-    },
-    {
-      "src": "/assets/vscimage/generated/large-web-portfolio-gore3200x1800-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-gore3200x1800-thumb-760x570.webp",
-      "alt": "Supporting illustration used in the storytelling system.",
-      "caption": "Supporting technical illustration."
-    },
-    {
-      "src": "/assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-large-1900x1600.webp",
-      "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-linedraw-01-3200x1800-thumb-760x570.webp",
-      "alt": "Low-fidelity schematic sketch.",
-      "caption": "Schematic sketch."
-    }
-  ],
+  "featuredImages": [],
+  "galleryImages": [],
   "sections": [
     {
       "id": "opportunity",
       "heading": "The Conflict",
-      "body": [
-        "A large team was pushing for a taxonomy and navigation flow that prioritized simplistic, random categories over user intuitiveness.",
-        "The risk was not just a messy information architecture. It was a mobile banking experience that would force customers to learn the bank's internal logic instead of helping them understand their own financial lives."
-      ],
-      "image": {
-        "src": "/assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp",
-        "thumbSrc": "/assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
-        "alt": "Condensed view of the patent diagram.",
-        "caption": "A tighter crop used inline with the narrative."
-      }
+      "bodyHtml": "<p>Capital One had a strong design culture, but one major initiative was moving toward a taxonomy and navigation model that risked oversimplifying how customers actually understood their financial information. The proposed structure prioritized internal categories and convenient labels over user intuition, behavioral logic, and meaningful decision support.</p><p>The risk was larger than a weak navigation system. A poorly structured experience could make complex financial data harder to understand, reduce customer confidence, and limit the product’s ability to help people act on their own information.</p>"
     },
     {
       "id": "approach",
       "heading": "The Strategic Action",
-      "body": [
-        "Rather than staying in sideline critique, Van formed a self-directed, cross-functional shadow team to build a working prototype of a gesture-based interface.",
-        "The prototype reframed the conversation around what customers could intuitively do, feel, and understand in context, instead of which static category label the business preferred."
-      ],
-      "bullets": [
-        "Framed the concept around user value instead of technical novelty.",
-        "Created prototypes and storyboards to make the interaction feel concrete.",
-        "Prepared the narrative for both strategic review and legal evaluation."
-      ]
+      "bodyHtml": "<p>Rather than staying in critique mode, Van formed a self-directed, cross-functional “shadow team” to explore a better solution. The team worked outside the normal delivery path to create a functioning prototype of a gesture-based interface that translated complex financial information into a more intuitive mobile interaction model.</p><p>The work reframed the problem from “how should we categorize this information?” to “how should people move through, understand, and act on this information?” That shift changed the nature of the solution. The interface became a tool for comprehension, pattern recognition, and action.</p>"
     },
     {
       "id": "outcome",
       "heading": "Impact Beyond the Patent",
-      "body": [
-        "The gesture interface, later published as US20220261083A1, reshaped how the bank approached mobile interaction. But the deeper win was organizational: the work proved that design could intervene early, make the problem tangible, and prevent business-crushing mediocrity before it hardened into product direction.",
-        "The effort also simplified complex data into human-centered insights, contributing to a customer win that helped drive a 30-day deposit increase of $10M."
-      ],
-      "bullets": [
-        "Customer win: Simplified complex data into human-centered insights, leading to a 30-day deposit increase of $10M.",
-        "Organizational win: Established a Guide/Solve model where design intervened early to prevent business-crushing mediocrity.",
-        "Technical win: The gesture interface, US20220261083A1, reshaped how the bank approached mobile interaction."
-      ],
-      "image": {
-        "src": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp",
-        "thumbSrc": "/assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
-        "alt": "Refined product concept screens.",
-        "caption": "Final concept direction."
-      }
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> Simplified complex financial data into clearer, more human-centered insights, contributing to a 30-day deposit increase of $10M.</li><li><strong>Organizational Win:</strong> Established a “Guide/Solve” model where design intervened early, shaped the direction of the work, and helped prevent weak strategic decisions from becoming expensive product decisions.</li><li><strong>Technical Win:</strong> The gesture interface, later reflected in patent <a href=\"https://patents.google.com/patent/US20220261083A1/en\" target=\"_blank\">US20220261083A1</a>, expanded how the bank thought about mobile interaction and customer-facing financial tools.</li><li><strong>Cultural Win:</strong> Demonstrated that designers could do more than critique finished work. They could organize talent, prototype alternatives, and create evidence for a stronger direction.</li><li><strong>Strategic Win:</strong> Shifted the conversation from surface-level navigation choices to the deeper question of how digital banking could help people understand and manage financial complexity.</li></ul>"
+    },
+    {
+      "id": "takeaway",
+      "heading": "Strategic Takeaway",
+      "bodyHtml": "<p>Van helped move the work from taxonomy cleanup to interaction strategy. The patent was one visible outcome, but the broader contribution was proving that design could step into ambiguity, build a better path, and turn a stalled or misdirected concept into a working model for innovation.</p>"
     }
   ],
   "metadata": {
@@ -130,5 +46,5 @@
     ]
   },
   "readingTime": "6 min read",
-  "updatedAt": "2026-04-09"
+  "updatedAt": "2026-04-26"
 }

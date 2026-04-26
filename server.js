@@ -598,6 +598,9 @@ async function readCaseStudyContentFiles() {
     caseStudies.push({
       slug,
       title: normalizeTextField(parsed.title || slug, 160),
+      subtitle: normalizeTextField(parsed.subtitle || "", 260),
+      summary: normalizeTextField(parsed.summary || "", 520),
+      readingTime: normalizeTextField(parsed.readingTime || "", 40),
       routePath: `/case-studies/${slug}`,
       fileName: entry.name,
       filePath,
@@ -609,6 +612,9 @@ async function readCaseStudyContentFiles() {
         ? parsed.sections.map((section, index) => ({
             id: sanitizeName(section?.id || `section-${index + 1}`),
             heading: normalizeTextField(section?.heading || `Section ${index + 1}`, 120),
+            bodyHtml: String(section?.bodyHtml || section?.html || ""),
+            body: Array.isArray(section?.body) ? section.body : [],
+            bullets: Array.isArray(section?.bullets) ? section.bullets : [],
             image: section?.image || null
           }))
         : [],
@@ -634,6 +640,24 @@ async function readCaseStudyContentBySlug(slug) {
   return {
     ...match,
     content: JSON.parse(raw)
+  };
+}
+
+function toVscimageCaseStudyResponse(caseStudy) {
+  if (!caseStudy) return null;
+
+  return {
+    slug: caseStudy.slug,
+    title: caseStudy.title,
+    subtitle: caseStudy.subtitle,
+    summary: caseStudy.summary,
+    readingTime: caseStudy.readingTime,
+    routePath: caseStudy.routePath,
+    cardImage: caseStudy.cardImage,
+    heroImage: caseStudy.heroImage,
+    featuredImages: caseStudy.featuredImages,
+    galleryImages: caseStudy.galleryImages,
+    sections: caseStudy.sections
   };
 }
 
@@ -2609,6 +2633,69 @@ app.get("/api/vscimage/case-studies", requireAnalyticsAdminApi, async (req, res)
   }
 });
 
+app.post("/api/vscimage/case-studies/:slug/text", requireAnalyticsAdminApi, async (req, res) => {
+  const slug = sanitizeName(req.params.slug);
+
+  if (!slug) {
+    return res.status(400).json({ error: "Case study slug is required." });
+  }
+
+  try {
+    const caseStudy = await readCaseStudyContentBySlug(slug);
+    if (!caseStudy) {
+      return res.status(404).json({ error: "Case study was not found." });
+    }
+
+    const nextContent = caseStudy.content;
+    const title = normalizeTextField(req.body?.title, 160);
+    if (!title) {
+      return res.status(400).json({ error: "Case study title is required." });
+    }
+
+    nextContent.title = title;
+    nextContent.subtitle = normalizeTextField(req.body?.subtitle, 260);
+    nextContent.summary = normalizeTextField(req.body?.summary, 520);
+    nextContent.readingTime = normalizeTextField(req.body?.readingTime, 40);
+
+    const incomingSections = Array.isArray(req.body?.sections) ? req.body.sections : [];
+    const sectionUpdates = new Map(
+      incomingSections.map((section) => [
+        sanitizeName(section?.id || ""),
+        {
+          heading: normalizeTextField(section?.heading, 120),
+          bodyHtml: String(section?.bodyHtml || "").trim().slice(0, 20000)
+        }
+      ])
+    );
+
+    nextContent.sections = Array.isArray(nextContent.sections) ? nextContent.sections : [];
+    nextContent.sections = nextContent.sections.map((section, index) => {
+      const sectionId = sanitizeName(section?.id || `section-${index + 1}`);
+      const update = sectionUpdates.get(sectionId);
+      if (!update) return section;
+
+      return {
+        ...section,
+        id: sectionId,
+        heading: update.heading || section.heading || `Section ${index + 1}`,
+        bodyHtml: update.bodyHtml
+      };
+    });
+
+    nextContent.updatedAt = new Date().toISOString().slice(0, 10);
+    await fs.writeFile(caseStudy.filePath, `${JSON.stringify(nextContent, null, 2)}\n`, "utf8");
+
+    const refreshedCaseStudy = await readCaseStudyContentBySlug(slug);
+    return res.status(200).json({
+      ok: true,
+      caseStudy: toVscimageCaseStudyResponse(refreshedCaseStudy)
+    });
+  } catch (error) {
+    console.error("Unable to update case study text:", error);
+    return res.status(500).json({ error: "Unable to update case study text." });
+  }
+});
+
 app.post("/api/vscimage/case-studies/:slug/images", requireAnalyticsAdminApi, async (req, res) => {
   const slug = sanitizeName(req.params.slug);
   const slot = String(req.body?.slot || "").trim();
@@ -2688,22 +2775,88 @@ app.post("/api/vscimage/case-studies/:slug/images", requireAnalyticsAdminApi, as
     const refreshedCaseStudy = await readCaseStudyContentBySlug(slug);
     return res.status(200).json({
       ok: true,
-      caseStudy: refreshedCaseStudy
-        ? {
-            slug: refreshedCaseStudy.slug,
-            title: refreshedCaseStudy.title,
-            routePath: refreshedCaseStudy.routePath,
-            cardImage: refreshedCaseStudy.cardImage,
-            heroImage: refreshedCaseStudy.heroImage,
-            featuredImages: refreshedCaseStudy.featuredImages,
-            galleryImages: refreshedCaseStudy.galleryImages,
-            sections: refreshedCaseStudy.sections
-          }
-        : null
+      caseStudy: toVscimageCaseStudyResponse(refreshedCaseStudy)
     });
   } catch (error) {
     console.error("Unable to assign VSCimage asset to case study:", error);
     return res.status(500).json({ error: "Unable to assign image to case study." });
+  }
+});
+
+app.post("/api/vscimage/case-studies/:slug/images/remove", requireAnalyticsAdminApi, async (req, res) => {
+  const slug = sanitizeName(req.params.slug);
+  const slot = String(req.body?.slot || "").trim();
+  const sectionId = sanitizeName(req.body?.sectionId || "");
+  const index = Number.parseInt(String(req.body?.index ?? ""), 10);
+  const allowedSlots = new Set([
+    "cardImage",
+    "heroImage",
+    "featuredImages",
+    "galleryImages",
+    "sectionImage"
+  ]);
+
+  if (!slug) {
+    return res.status(400).json({ error: "Case study slug is required." });
+  }
+
+  if (!allowedSlots.has(slot)) {
+    return res.status(400).json({ error: "Choose a valid case study image to remove." });
+  }
+
+  try {
+    const caseStudy = await readCaseStudyContentBySlug(slug);
+    if (!caseStudy) {
+      return res.status(404).json({ error: "Case study was not found." });
+    }
+
+    const nextContent = caseStudy.content;
+    let removed = false;
+
+    if (slot === "cardImage" || slot === "heroImage") {
+      if (nextContent[slot]) {
+        delete nextContent[slot];
+        removed = true;
+      }
+    } else if (slot === "featuredImages" || slot === "galleryImages") {
+      const images = Array.isArray(nextContent[slot]) ? nextContent[slot] : [];
+      if (Number.isInteger(index) && index >= 0 && index < images.length) {
+        images.splice(index, 1);
+        nextContent[slot] = images;
+        removed = true;
+      }
+    } else if (slot === "sectionImage") {
+      nextContent.sections = Array.isArray(nextContent.sections) ? nextContent.sections : [];
+      const section = nextContent.sections.find(
+        (item, sectionIndex) =>
+          sanitizeName(item?.id || `section-${sectionIndex + 1}`) === sectionId
+      );
+
+      if (!section) {
+        return res.status(404).json({ error: "Case study section was not found." });
+      }
+
+      if (section.image) {
+        delete section.image;
+        removed = true;
+      }
+    }
+
+    if (!removed) {
+      return res.status(404).json({ error: "Case study image was not found." });
+    }
+
+    nextContent.updatedAt = new Date().toISOString().slice(0, 10);
+    await fs.writeFile(caseStudy.filePath, `${JSON.stringify(nextContent, null, 2)}\n`, "utf8");
+
+    const refreshedCaseStudy = await readCaseStudyContentBySlug(slug);
+    return res.status(200).json({
+      ok: true,
+      caseStudy: toVscimageCaseStudyResponse(refreshedCaseStudy)
+    });
+  } catch (error) {
+    console.error("Unable to remove VSCimage asset from case study:", error);
+    return res.status(500).json({ error: "Unable to remove image from case study." });
   }
 });
 

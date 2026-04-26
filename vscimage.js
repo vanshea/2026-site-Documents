@@ -36,6 +36,7 @@ const state = {
   },
   dragEntryId: "",
   dropTargetEntryId: "",
+  caseStudyFocusedSectionId: "",
   undoAction: null
 };
 
@@ -86,6 +87,26 @@ function removeLocalStorageKey(key) {
   }
 }
 
+function setWorkspaceTab(tabName) {
+  const nextTab = String(tabName || "image-library").trim() || "image-library";
+
+  workspaceTabButtons.forEach((button) => {
+    const isActive = button.dataset.workspaceTab === nextTab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+
+  workspacePanels.forEach((panel) => {
+    const isActive = panel.dataset.workspacePanel === nextTab;
+    panel.classList.toggle("is-active", isActive);
+    panel.hidden = !isActive;
+  });
+
+  if (nextTab === "case-studies") {
+    renderCaseStudyImageControls();
+  }
+}
+
 function announce(message) {
   if (!a11yAnnouncer) return;
   a11yAnnouncer.textContent = "";
@@ -105,6 +126,8 @@ const IMAGE_FILE_EXT_PATTERN = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
 const uploadForm = document.getElementById("uploadForm");
 const uploadMsg = document.getElementById("uploadMsg");
 const generatedList = document.getElementById("generatedList");
+const workspaceTabButtons = Array.from(document.querySelectorAll("[data-workspace-tab]"));
+const workspacePanels = Array.from(document.querySelectorAll("[data-workspace-panel]"));
 const uploadDropzone = document.getElementById("uploadDropzone");
 const imageFileInput = document.getElementById("imageFile");
 const imageFolderInput = document.getElementById("imageFolder");
@@ -141,6 +164,15 @@ const caseStudyPreviewLink = document.getElementById("caseStudyPreviewLink");
 const caseStudyImageMsg = document.getElementById("caseStudyImageMsg");
 const caseStudyImagePreview = document.getElementById("caseStudyImagePreview");
 const caseStudyCurrentImages = document.getElementById("caseStudyCurrentImages");
+const caseStudyTextForm = document.getElementById("caseStudyTextForm");
+const caseStudyTextTitle = document.getElementById("caseStudyTextTitle");
+const caseStudyTextSubtitle = document.getElementById("caseStudyTextSubtitle");
+const caseStudyTextReadingTime = document.getElementById("caseStudyTextReadingTime");
+const caseStudyTextSummary = document.getElementById("caseStudyTextSummary");
+const caseStudyTextSections = document.getElementById("caseStudyTextSections");
+const caseStudyTextSaveButton = document.getElementById("caseStudyTextSaveButton");
+const caseStudyInsertImageButton = document.getElementById("caseStudyInsertImageButton");
+const caseStudyTextMsg = document.getElementById("caseStudyTextMsg");
 const thumbEditorDialog = document.getElementById("thumbEditorDialog");
 const thumbEditorForm = document.getElementById("thumbEditorForm");
 const thumbEditorKicker = document.getElementById("thumbEditorKicker");
@@ -1033,6 +1065,145 @@ function updateCaseStudyPreviewLink() {
   caseStudyPreviewLink.href = caseStudy?.routePath || "/case-studies";
 }
 
+function insertTextAtTextarea(textarea, text) {
+  if (!textarea || !text) return false;
+
+  const start = Number.isFinite(textarea.selectionStart) ? textarea.selectionStart : textarea.value.length;
+  const end = Number.isFinite(textarea.selectionEnd) ? textarea.selectionEnd : textarea.value.length;
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(end);
+  const spacerBefore = before && !before.endsWith("\n") ? "\n\n" : "";
+  const spacerAfter = after && !after.startsWith("\n") ? "\n\n" : "";
+
+  textarea.value = `${before}${spacerBefore}${text}${spacerAfter}${after}`;
+  const nextCursor = before.length + spacerBefore.length + text.length;
+  textarea.focus();
+  textarea.setSelectionRange(nextCursor, nextCursor);
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  return true;
+}
+
+function escapeHtmlAttribute(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function buildCaseStudyImageFigureHtml(entry) {
+  const src = toAssetUrl(entry?.large || entry?.fullscreen || entry?.thumb || "");
+  if (!src) return "";
+
+  const alt = escapeHtmlAttribute(entry?.title || "");
+  const caption = String(entry?.description || entry?.cardDescription || entry?.title || "").trim();
+  const captionHtml = caption
+    ? `\n  <figcaption>${escapeHtmlAttribute(caption)}</figcaption>`
+    : "";
+
+  return `<figure>\n  <img src="${escapeHtmlAttribute(src)}" alt="${alt}" loading="lazy" />${captionHtml}\n</figure>`;
+}
+
+function createCaseStudyTextSection(section, index) {
+  const wrapper = document.createElement("section");
+  wrapper.className = "case-study-text-section";
+
+  const heading = document.createElement("h4");
+  heading.textContent = section?.heading || `Section ${index + 1}`;
+  wrapper.appendChild(heading);
+
+  const headingLabel = document.createElement("label");
+  headingLabel.textContent = "Section Heading";
+  const headingInput = document.createElement("input");
+  headingInput.type = "text";
+  headingInput.maxLength = 120;
+  headingInput.value = section?.heading || "";
+  headingInput.dataset.caseStudySectionHeading = "true";
+  headingInput.dataset.sectionId = section?.id || `section-${index + 1}`;
+  headingLabel.appendChild(headingInput);
+  wrapper.appendChild(headingLabel);
+
+  const bodyLabel = document.createElement("label");
+  bodyLabel.textContent = "Body HTML";
+  const bodyInput = document.createElement("textarea");
+  bodyInput.rows = 8;
+  bodyInput.spellcheck = true;
+  bodyInput.value = section?.bodyHtml || "";
+  bodyInput.dataset.caseStudySectionBody = "true";
+  bodyInput.dataset.sectionId = section?.id || `section-${index + 1}`;
+  bodyLabel.appendChild(bodyInput);
+  wrapper.appendChild(bodyLabel);
+
+  return wrapper;
+}
+
+function renderCaseStudyTextControls() {
+  if (!caseStudyTextForm || !caseStudyTextSections) return;
+
+  const caseStudy = getSelectedCaseStudy();
+  const hasCaseStudy = Boolean(caseStudy);
+
+  if (caseStudyTextTitle) caseStudyTextTitle.value = caseStudy?.title || "";
+  if (caseStudyTextSubtitle) caseStudyTextSubtitle.value = caseStudy?.subtitle || "";
+  if (caseStudyTextReadingTime) caseStudyTextReadingTime.value = caseStudy?.readingTime || "";
+  if (caseStudyTextSummary) caseStudyTextSummary.value = caseStudy?.summary || "";
+
+  caseStudyTextSections.innerHTML = "";
+  const sections = Array.isArray(caseStudy?.sections) ? caseStudy.sections : [];
+
+  if (!hasCaseStudy) {
+    const empty = document.createElement("p");
+    empty.className = "thumb-empty";
+    empty.textContent = "Choose a case study to edit its text.";
+    caseStudyTextSections.appendChild(empty);
+  } else if (!sections.length) {
+    const empty = document.createElement("p");
+    empty.className = "thumb-empty";
+    empty.textContent = "No editable sections were found for this case study.";
+    caseStudyTextSections.appendChild(empty);
+  } else {
+    sections.forEach((section, index) => {
+      caseStudyTextSections.appendChild(createCaseStudyTextSection(section, index));
+    });
+  }
+
+  [
+    caseStudyTextTitle,
+    caseStudyTextSubtitle,
+    caseStudyTextReadingTime,
+    caseStudyTextSummary,
+    caseStudyTextSaveButton,
+    caseStudyInsertImageButton
+  ].forEach((element) => {
+    if (element) element.disabled = !state.apiAvailable || !hasCaseStudy;
+  });
+}
+
+function collectCaseStudyTextPayload() {
+  const sections = Array.from(
+    caseStudyTextSections?.querySelectorAll("[data-case-study-section-body]") || []
+  ).map((bodyInput) => {
+    const sectionId = bodyInput.dataset.sectionId || "";
+    const headingInput = caseStudyTextSections.querySelector(
+      `[data-case-study-section-heading][data-section-id="${CSS.escape(sectionId)}"]`
+    );
+
+    return {
+      id: sectionId,
+      heading: headingInput?.value || "",
+      bodyHtml: bodyInput.value || ""
+    };
+  });
+
+  return {
+    title: caseStudyTextTitle?.value || "",
+    subtitle: caseStudyTextSubtitle?.value || "",
+    summary: caseStudyTextSummary?.value || "",
+    readingTime: caseStudyTextReadingTime?.value || "",
+    sections
+  };
+}
+
 function updateCaseStudyAssetPreview() {
   if (!caseStudyImagePreview) return;
 
@@ -1077,9 +1248,20 @@ function fillCaseStudyImageTextFromAsset({ force = false } = {}) {
   }
 }
 
-function createCaseStudyImageRow(label, image) {
+function createCaseStudyImageRow({ label, image, slot, index = -1, sectionId = "" }) {
   const row = document.createElement("article");
   row.className = "case-study-current-image";
+
+  const removeButton = document.createElement("button");
+  removeButton.className = "case-study-remove-image";
+  removeButton.type = "button";
+  removeButton.textContent = "×";
+  removeButton.dataset.caseStudyRemoveImage = "true";
+  removeButton.dataset.slot = slot || "";
+  removeButton.dataset.index = Number.isInteger(index) ? String(index) : "-1";
+  removeButton.dataset.sectionId = sectionId || "";
+  removeButton.setAttribute("aria-label", `Remove ${label}`);
+  row.appendChild(removeButton);
 
   const entry = findGalleryEntryForCaseStudyImage(image);
   const previewPath = image?.thumbSrc || image?.src || "";
@@ -1145,16 +1327,37 @@ function renderCurrentCaseStudyImages() {
   }
 
   const rows = [];
-  if (caseStudy.heroImage) rows.push(["Hero image", caseStudy.heroImage]);
-  if (caseStudy.cardImage) rows.push(["Index card image", caseStudy.cardImage]);
+  if (caseStudy.heroImage) {
+    rows.push({ label: "Hero image", image: caseStudy.heroImage, slot: "heroImage" });
+  }
+  if (caseStudy.cardImage) {
+    rows.push({ label: "Index card image", image: caseStudy.cardImage, slot: "cardImage" });
+  }
   (caseStudy.featuredImages || []).forEach((image, index) => {
-    rows.push([`Featured image ${index + 1}`, image]);
+    rows.push({
+      label: `Featured image ${index + 1}`,
+      image,
+      slot: "featuredImages",
+      index
+    });
   });
   (caseStudy.galleryImages || []).forEach((image, index) => {
-    rows.push([`Gallery image ${index + 1}`, image]);
+    rows.push({
+      label: `Gallery image ${index + 1}`,
+      image,
+      slot: "galleryImages",
+      index
+    });
   });
   (caseStudy.sections || []).forEach((section) => {
-    if (section.image) rows.push([`${section.heading || section.id} section image`, section.image]);
+    if (section.image) {
+      rows.push({
+        label: `${section.heading || section.id} section image`,
+        image: section.image,
+        slot: "sectionImage",
+        sectionId: section.id
+      });
+    }
   });
 
   if (!rows.length) {
@@ -1169,14 +1372,15 @@ function renderCurrentCaseStudyImages() {
   heading.textContent = "Current Images";
   caseStudyCurrentImages.appendChild(heading);
 
-  rows.forEach(([label, image]) => {
-    caseStudyCurrentImages.appendChild(createCaseStudyImageRow(label, image));
+  rows.forEach((row) => {
+    caseStudyCurrentImages.appendChild(createCaseStudyImageRow(row));
   });
 }
 
 function renderCaseStudyImageControls() {
   renderCaseStudySelect();
   renderCaseStudyAssetSelect();
+  renderCaseStudyTextControls();
   renderCaseStudySectionSelect();
   updateCaseStudyPreviewLink();
   updateCaseStudyAssetPreview();
@@ -3425,6 +3629,12 @@ if (uploadForm) {
   });
 }
 
+workspaceTabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setWorkspaceTab(button.dataset.workspaceTab);
+  });
+});
+
 if (configForm) {
   configForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -3756,6 +3966,7 @@ if (thumbEditorForm) {
 
 if (caseStudySelect) {
   caseStudySelect.addEventListener("change", () => {
+    renderCaseStudyTextControls();
     renderCaseStudySectionSelect();
     updateCaseStudyPreviewLink();
     renderCurrentCaseStudyImages();
@@ -3775,8 +3986,127 @@ if (caseStudySlotSelect) {
   });
 }
 
+if (caseStudyInsertImageButton) {
+  caseStudyInsertImageButton.addEventListener("click", () => {
+    const entry = getCaseStudyAssetEntry();
+    const figureHtml = buildCaseStudyImageFigureHtml(entry);
+    const focusedSelector = state.caseStudyFocusedSectionId
+      ? `[data-case-study-section-body][data-section-id="${CSS.escape(state.caseStudyFocusedSectionId)}"]`
+      : "";
+    const activeTextarea = focusedSelector
+      ? caseStudyTextSections?.querySelector(focusedSelector)
+      : caseStudyTextSections?.querySelector("[data-case-study-section-body]");
+
+    if (!figureHtml) {
+      setStatus(caseStudyTextMsg, "Choose a VSCimage asset before inserting image HTML.", "error");
+      return;
+    }
+
+    if (!activeTextarea || !insertTextAtTextarea(activeTextarea, figureHtml)) {
+      setStatus(caseStudyTextMsg, "Choose a section body to insert the image HTML.", "error");
+      return;
+    }
+
+    setStatus(caseStudyTextMsg, "Image HTML inserted. Save the case study text to publish it.", "ok");
+  });
+}
+
+if (caseStudyTextSections) {
+  caseStudyTextSections.addEventListener("focusin", (event) => {
+    const bodyInput = event.target.closest("[data-case-study-section-body]");
+    if (bodyInput) {
+      state.caseStudyFocusedSectionId = bodyInput.dataset.sectionId || "";
+    }
+  });
+}
+
+if (caseStudyTextForm) {
+  caseStudyTextForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!state.apiAvailable) {
+      setStatus(caseStudyTextMsg, "Case study text editing is unavailable in read-only mode.", "error");
+      return;
+    }
+
+    const caseStudy = getSelectedCaseStudy();
+    if (!caseStudy) {
+      setStatus(caseStudyTextMsg, "Choose a case study to edit.", "error");
+      return;
+    }
+
+    try {
+      if (caseStudyTextSaveButton) caseStudyTextSaveButton.disabled = true;
+      setStatus(caseStudyTextMsg, "Saving case study text...", "");
+
+      const payload = await fetchJson(
+        `${state.apiOrigin}/api/vscimage/case-studies/${encodeURIComponent(caseStudy.slug)}/text`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(collectCaseStudyTextPayload())
+        }
+      );
+
+      if (payload.caseStudy) {
+        state.caseStudies = state.caseStudies.map((item) =>
+          item.slug === payload.caseStudy.slug ? { ...item, ...payload.caseStudy } : item
+        );
+      }
+
+      renderCaseStudyImageControls();
+      renderThumbAccordion();
+      setStatus(caseStudyTextMsg, "Case study text saved.", "ok");
+      announce("Case study text saved.");
+    } catch (error) {
+      setStatus(caseStudyTextMsg, error.message, "error");
+    } finally {
+      renderCaseStudyTextControls();
+    }
+  });
+}
+
 if (caseStudyCurrentImages) {
-  caseStudyCurrentImages.addEventListener("click", (event) => {
+  caseStudyCurrentImages.addEventListener("click", async (event) => {
+    const removeButton = event.target.closest("[data-case-study-remove-image]");
+    if (removeButton) {
+      const caseStudy = getSelectedCaseStudy();
+      if (!caseStudy) return;
+
+      try {
+        removeButton.disabled = true;
+        setStatus(caseStudyImageMsg, "Removing image from case study...", "");
+
+        const payload = await fetchJson(
+          `${state.apiOrigin}/api/vscimage/case-studies/${encodeURIComponent(caseStudy.slug)}/images/remove`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              slot: removeButton.dataset.slot || "",
+              index: removeButton.dataset.index || "-1",
+              sectionId: removeButton.dataset.sectionId || ""
+            })
+          }
+        );
+
+        if (payload.caseStudy) {
+          state.caseStudies = state.caseStudies.map((item) =>
+            item.slug === payload.caseStudy.slug ? { ...item, ...payload.caseStudy } : item
+          );
+        }
+
+        renderCaseStudyImageControls();
+        renderThumbAccordion();
+        setStatus(caseStudyImageMsg, "Image removed from case study.", "ok");
+        announce("Image removed from case study.");
+      } catch (error) {
+        removeButton.disabled = false;
+        setStatus(caseStudyImageMsg, error.message, "error");
+      }
+      return;
+    }
+
     const editButton = event.target.closest("[data-case-study-edit-entry]");
     if (!editButton) return;
     openGalleryEditor(editButton.dataset.caseStudyEditEntry);

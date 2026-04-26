@@ -126,6 +126,91 @@ h1 {
   margin-top: 16px;
 }
 
+.workspace-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 4px;
+}
+
+.workspace-tab {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  padding: calc(10px * var(--control-scale)) calc(16px * var(--control-scale));
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.workspace-tab.is-active {
+  border-color: var(--focus);
+  background: var(--focus);
+  color: var(--button-text);
+}
+
+.workspace-panel {
+  display: block;
+}
+
+.workspace-panel[hidden] {
+  display: none;
+}
+
+.case-study-workspace-panel {
+  min-height: 68vh;
+}
+
+.case-study-text-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-alt);
+  padding: 14px;
+}
+
+.case-study-text-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.case-study-text-header h3 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.case-study-text-sections {
+  display: grid;
+  gap: 12px;
+}
+
+.case-study-text-section {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  padding: 12px;
+}
+
+.case-study-text-section h4 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.case-study-text-section textarea {
+  min-height: 180px;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
 h2 {
   margin: 0 0 14px;
   font-size: clamp(1.2rem, 2.2vw, 1.6rem);
@@ -811,8 +896,15 @@ th {
 .case-study-image-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   align-items: start;
+}
+
+.case-study-image-grid > label,
+.case-study-image-grid input,
+.case-study-image-grid select {
+  min-width: 0;
+  width: 100%;
 }
 
 .case-study-image-actions,
@@ -875,12 +967,41 @@ th {
   border-radius: 12px;
   background: var(--surface-alt);
   padding: 10px;
+  position: relative;
 }
 
 .case-study-current-image p {
   margin: 6px 0 0;
   color: var(--ink-soft);
   font-weight: 600;
+}
+
+.case-study-remove-image {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: calc(30px * var(--control-scale));
+  height: calc(30px * var(--control-scale));
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.case-study-remove-image:hover:not(:disabled) {
+  border-color: var(--focus);
+  color: var(--focus);
+}
+
+.case-study-remove-image:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .path {

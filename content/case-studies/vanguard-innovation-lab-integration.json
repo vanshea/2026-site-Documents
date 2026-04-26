@@ -54,10 +54,7 @@
     {
       "id": "conflict",
       "heading": "The Conflict",
-      "body": [
-        "Vanguard had innovation talent, strong research instincts, and emerging concepts, but the work was often happening in pockets. Innovation teams were generating ideas, prototypes, and insights without a consistent system for sharing what they were learning across teams.",
-        "The risk was that valuable knowledge stayed trapped inside individual projects, while other teams repeated similar discovery work or refined solutions too late in the process."
-      ],
+      "bodyHtml": "<p>Vanguard had innovation talent, strong research instincts, and emerging concepts, but the work was often happening in pockets. Innovation teams were generating ideas, prototypes, and insights without a consistent system for sharing what they were learning across teams.</p><p>The risk was that valuable knowledge stayed trapped inside individual projects, while other teams repeated similar discovery work or refined solutions too late in the process.</p>",
       "image": {
         "src": "/assets/fpo-large-atlas-1900x1600.svg",
         "thumbSrc": "/assets/fpo-thumb-760x570.svg",
@@ -68,30 +65,12 @@
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "body": [
-        "Van recognized that the issue was cultural and operational. The organization did not simply need better presentation polish. It needed a better feedback mechanism.",
-        "He introduced a structured Design Critique system that gave teams a shared forum to examine concepts while they were still forming.",
-        "The critique model shifted the conversation from subjective preference to decision quality. Teams were encouraged to ask sharper questions: What user problem is this solving? What evidence supports this direction? What assumptions still need to be tested? What trade-offs are we making? What should we learn before investing further?"
-      ],
-      "bullets": [
-        "Created a shared forum for early concept review.",
-        "Moved critique away from preference and toward evidence, assumptions, and trade-offs.",
-        "Helped teams learn from one another before ideas became expensive to change."
-      ]
+      "bodyHtml": "<p>Van recognized that the issue was cultural and operational. The organization did not simply need better presentation polish. It needed a better feedback mechanism. He introduced a structured Design Critique system that gave teams a shared forum to examine concepts while they were still forming.</p><p>The critique model shifted the conversation from subjective preference to decision quality. Teams were encouraged to ask sharper questions: What user problem is this solving? What evidence supports this direction? What assumptions still need to be tested? What trade-offs are we making? What should we learn before investing further?</p>"
     },
     {
       "id": "impact",
       "heading": "Impact Beyond the Critique System",
-      "body": [
-        "The critique system helped teams pressure-test ideas earlier, before they hardened into expensive solutions. This increased the likelihood that concepts were grounded in real user needs rather than internal assumptions.",
-        "It also reduced innovation isolation by creating a recurring structure for cross-team learning, peer review, and shared design judgment."
-      ],
-      "bullets": [
-        "Customer win: Helped teams pressure-test ideas earlier, before they hardened into expensive solutions.",
-        "Organizational win: Reduced innovation isolation through recurring cross-team learning and peer review.",
-        "Strategic win: Repositioned critique as a tool for better investment decisions, not just visual refinement.",
-        "Execution win: Accelerated iteration cycles by moving feedback upstream into the concept stage."
-      ],
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> Helped teams pressure-test ideas earlier, before they hardened into expensive solutions. This increased the likelihood that concepts were grounded in real user needs rather than internal assumptions.</li><li><strong>Organizational Win:</strong> Reduced innovation isolation by creating a recurring structure for cross-team learning, peer review, and shared design judgment.</li><li><strong>Strategic Win:</strong> Repositioned critique as a tool for better investment decisions, not just visual refinement. The system helped teams move from “polishing outputs” to improving the quality of the thinking behind those outputs.</li><li><strong>Execution Win:</strong> Accelerated iteration cycles by moving feedback upstream into the concept stage, where teams could still adapt quickly and cheaply.</li></ul>",
       "image": {
         "src": "/assets/fpo-large-field-notes-1900x1600.svg",
         "thumbSrc": "/assets/fpo-thumb-760x570.svg",
@@ -102,10 +81,7 @@
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "body": [
-        "Van helped transform design critique from a late-stage review ritual into an early-stage strategic operating system.",
-        "The work strengthened decision-making, reduced duplication, and helped innovation teams learn from one another while ideas were still flexible."
-      ]
+      "bodyHtml": "<p>Van helped transform design critique from a late-stage review ritual into an early-stage strategic operating system. The work strengthened decision-making, reduced duplication, and helped innovation teams learn from one another while ideas were still flexible.</p>"
     }
   ],
   "metadata": {

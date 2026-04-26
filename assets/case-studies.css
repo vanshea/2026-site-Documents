@@ -266,6 +266,65 @@
   gap: 16px;
 }
 
+.case-study-rich-text {
+  display: grid;
+  gap: 16px;
+  color: var(--ink-soft);
+  font-family: "Open Sans", sans-serif;
+}
+
+.case-study-rich-text p,
+.case-study-rich-text ul,
+.case-study-rich-text ol,
+.case-study-rich-text blockquote,
+.case-study-rich-text figure {
+  margin: 0;
+}
+
+.case-study-rich-text a {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.16em;
+}
+
+.case-study-rich-text strong,
+.case-study-rich-text b {
+  color: var(--ink);
+}
+
+.case-study-rich-text ul,
+.case-study-rich-text ol {
+  display: grid;
+  gap: 8px;
+  padding-left: 22px;
+}
+
+.case-study-rich-text blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 16px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.case-study-rich-text figure {
+  display: grid;
+  gap: 8px;
+}
+
+.case-study-rich-text img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-soft);
+  background: var(--paper);
+}
+
+.case-study-rich-text figcaption {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
 .case-study-list {
   margin: 0;
   padding-left: 22px;
