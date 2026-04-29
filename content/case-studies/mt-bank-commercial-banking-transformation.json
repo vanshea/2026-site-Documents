@@ -28,6 +28,20 @@
       "alt": "Operational roadmap visualization.",
       "title": "Optimization Roadmap",
       "caption": "A practical roadmap translated service friction into measurable improvement opportunities."
+    },
+    {
+      "src": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing current-state journey mapping for M&T Bank commercial lending.",
+      "title": "Current-State Journey Sample",
+      "caption": "From the PDF: current-state commercial lending work tied research interviews, stakeholder participation, journey mapping, and process prioritization together."
+    },
+    {
+      "src": "/assets/vscimage/generated/mt-bank-future-blueprint-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/mt-bank-future-blueprint-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing the future-state service blueprint for M&T Bank commercial lending.",
+      "title": "Future-State Blueprint Sample",
+      "caption": "From the PDF: the future-state blueprint translated feedback into a logical customer experience narrative for senior stakeholders."
     }
   ],
   "galleryImages": [
@@ -48,6 +62,27 @@
       "thumbSrc": "/assets/fpo-thumb-760x570.svg",
       "alt": "Process ecosystem diagram.",
       "caption": "Process ecosystem."
+    },
+    {
+      "src": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing current-state journey mapping for M&T Bank commercial lending.",
+      "title": "Current-State Journey Sample",
+      "caption": "From the PDF: current-state commercial lending work tied research interviews, stakeholder participation, journey mapping, and process prioritization together."
+    },
+    {
+      "src": "/assets/vscimage/generated/mt-bank-future-blueprint-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/mt-bank-future-blueprint-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing the future-state service blueprint for M&T Bank commercial lending.",
+      "title": "Future-State Blueprint Sample",
+      "caption": "From the PDF: the future-state blueprint translated feedback into a logical customer experience narrative for senior stakeholders."
+    },
+    {
+      "src": "/assets/vscimage/generated/mt-bank-future-b2b-lending-board-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/mt-bank-future-b2b-lending-board-thumb-760x570.webp",
+      "alt": "Future B2B lending concept board with journey stages, actor notes, and product concepts.",
+      "title": "Future B2B Lending Concept Board",
+      "caption": "The concept board connected customer, employee, and leadership experience into a future commercial lending story."
     }
   ],
   "sections": [
@@ -82,6 +117,18 @@
       "id": "takeaway",
       "heading": "Strategic Takeaway",
       "bodyHtml": "<p>Van helped M&amp;T see commercial banking as an interconnected service ecosystem. The value of the work was not only in the maps or recommendations. It was in giving the organization a repeatable way to diagnose complexity, prioritize investment, and improve both customer experience and operational performance.</p>"
+    },
+    {
+      "id": "pdf-sample-evidence",
+      "heading": "Portfolio Sample Evidence",
+      "bodyHtml": "<p>The PDF adds a concrete view of the commercial lending work. In the current-state sample, Van led research interviews with senior stakeholders and customers, advocated for stakeholder participation, and shaped the journey-map synthesis, design direction, and presentation tactics.</p><p>The future-state blueprint sample shows the next step: turning the feedback into a logical customer experience narrative, guiding service and UX designers through idea refinement, and editing the story so senior stakeholders could understand how change could happen strategically over time.</p><ul><li><strong>Goal:</strong> Remove friction from the lending process by listening to customers and stakeholders, then prioritizing process changes and digital feature releases.</li><li><strong>Need:</strong> The sample notes an estimated $3MM in yearly waste and a department that had suffered 90% attrition in one year.</li><li><strong>Outcome:</strong> Roughly 40 digital and process enhancements were planned, and the future state became clearer to targeted teams led by designers.</li></ul>",
+      "image": {
+        "src": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp",
+        "alt": "PDF slide summarizing current-state journey mapping for M&T Bank commercial lending.",
+        "title": "Current-State Journey Sample",
+        "caption": "From the PDF: current-state commercial lending work tied research interviews, stakeholder participation, journey mapping, and process prioritization together."
+      }
     }
   ],
   "metadata": {
@@ -97,5 +144,5 @@
     ]
   },
   "readingTime": "6 min read",
-  "updatedAt": "2026-04-26"
+  "updatedAt": "2026-04-29"
 }

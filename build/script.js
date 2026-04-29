@@ -56,8 +56,6 @@ const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 640px)");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
-const CARD_HOVER_FULL_DELAY_MS = 1000;
-const cardHoverIntentState = new WeakMap();
 
 function toSitePath(filePath) {
   if (!filePath) return "";
@@ -117,55 +115,13 @@ async function copyPlainText(text) {
   }
 }
 
-function getCardHoverIntent(card) {
-  let state = cardHoverIntentState.get(card);
-  if (state) return state;
-
-  state = { timeoutId: 0, isActive: false };
-  cardHoverIntentState.set(card, state);
-  return state;
-}
-
-function activateCardHoverPreview(card) {
-  if (!card) return;
-  card.classList.add("is-hover-preview");
-}
-
 function activateCardHover(card) {
   if (!card) return;
-  const state = getCardHoverIntent(card);
-  if (state.timeoutId) {
-    window.clearTimeout(state.timeoutId);
-  }
-  state.timeoutId = 0;
-  state.isActive = true;
-  card.classList.add("is-hover-preview");
   card.classList.add("is-hover-active");
-}
-
-function scheduleCardHoverActivation(card) {
-  if (!card) return;
-
-  const state = getCardHoverIntent(card);
-  activateCardHoverPreview(card);
-  if (state.isActive || state.timeoutId) return;
-
-  state.timeoutId = window.setTimeout(() => {
-    activateCardHover(card);
-  }, CARD_HOVER_FULL_DELAY_MS);
 }
 
 function clearCardHoverActivation(card) {
   if (!card) return;
-
-  const state = getCardHoverIntent(card);
-  if (state.timeoutId) {
-    window.clearTimeout(state.timeoutId);
-    state.timeoutId = 0;
-  }
-
-  state.isActive = false;
-  card.classList.remove("is-hover-preview");
   card.classList.remove("is-hover-active");
 }
 
@@ -227,95 +183,6 @@ function ensureCardImageShells() {
     shell.className = "card-image-shell";
     image.parentNode.insertBefore(shell, image);
     shell.appendChild(image);
-  });
-}
-
-function updateCardImageShellMetrics() {
-  getWorkCardElements().forEach((card) => {
-    const link = card.querySelector(".work-link");
-    const shell = card.querySelector(".card-image-shell");
-    const image = shell?.querySelector(".card-image");
-    if (!link || !shell || !image) return;
-
-    const shellRect = shell.getBoundingClientRect();
-    const shellWidth = shellRect.width;
-    const shellHeight = shellRect.height;
-    const cardWidth = card.clientWidth;
-    const cardInnerHeight = card.clientHeight;
-
-    if (shellWidth > 0 && shellHeight > 0 && cardWidth > 0 && cardInnerHeight > 0) {
-      const scaleX = cardWidth / shellWidth;
-      const scaleY = cardInnerHeight / shellHeight;
-      const coverScale = Math.max(1, scaleX, scaleY);
-      link.style.setProperty("--card-shell-scale", coverScale.toFixed(4));
-      return;
-    }
-
-    link.style.removeProperty("--card-shell-scale");
-  });
-}
-
-function updateCardHoverTitleTone(card) {
-  const image = card?.querySelector(".card-image");
-  if (!card || !image || !image.complete || !image.naturalWidth || !image.naturalHeight) {
-    return;
-  }
-
-  try {
-    const sampleCanvas = document.createElement("canvas");
-    const sampleContext = sampleCanvas.getContext("2d", { willReadFrequently: true });
-    if (!sampleContext) return;
-
-    const sampleWidth = 24;
-    const sampleHeight = 24;
-    const sourceX = Math.floor(image.naturalWidth * 0.15);
-    const sourceY = Math.floor(image.naturalHeight * 0.45);
-    const sourceWidth = Math.max(1, Math.floor(image.naturalWidth * 0.7));
-    const sourceHeight = Math.max(1, Math.floor(image.naturalHeight * 0.35));
-
-    sampleCanvas.width = sampleWidth;
-    sampleCanvas.height = sampleHeight;
-    sampleContext.drawImage(
-      image,
-      sourceX,
-      sourceY,
-      sourceWidth,
-      sourceHeight,
-      0,
-      0,
-      sampleWidth,
-      sampleHeight
-    );
-
-    const { data } = sampleContext.getImageData(0, 0, sampleWidth, sampleHeight);
-    let colorTotal = 0;
-    let opaquePixels = 0;
-
-    for (let index = 0; index < data.length; index += 4) {
-      const alpha = data[index + 3];
-      if (alpha < 16) continue;
-      const red = data[index];
-      const green = data[index + 1];
-      const blue = data[index + 2];
-      colorTotal += 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-      opaquePixels += 1;
-    }
-
-    if (!opaquePixels) return;
-
-    const averageLuminance = colorTotal / opaquePixels;
-    card.style.setProperty(
-      "--card-hover-title-color",
-      averageLuminance >= 150 ? "#000000" : "#ffffff"
-    );
-  } catch (error) {
-    card.style.removeProperty("--card-hover-title-color");
-  }
-}
-
-function updateCardHoverTitleTones() {
-  getWorkCardElements().forEach((card) => {
-    updateCardHoverTitleTone(card);
   });
 }
 
@@ -630,8 +497,6 @@ const workLoadMoreButton = document.getElementById("workLoadMore");
 const WORK_ROWS_PER_PAGE = 2;
 let visibleWorkCards = 0;
 let featuredCardHeightFrame = 0;
-let cardImageShellMetricsFrame = 0;
-let cardHoverTitleToneFrame = 0;
 const REGULAR_CARD_IMAGE_ASPECT_RATIO = 4 / 3;
 
 function getWorkGridColumnCount() {
@@ -775,30 +640,6 @@ function scheduleFeaturedCardHeightUpdate() {
   });
 }
 
-function scheduleCardImageShellMetricsUpdate() {
-  if (!workGrid) return;
-  if (cardImageShellMetricsFrame) {
-    window.cancelAnimationFrame(cardImageShellMetricsFrame);
-  }
-
-  cardImageShellMetricsFrame = window.requestAnimationFrame(() => {
-    cardImageShellMetricsFrame = 0;
-    updateCardImageShellMetrics();
-  });
-}
-
-function scheduleCardHoverTitleToneUpdate() {
-  if (!workGrid) return;
-  if (cardHoverTitleToneFrame) {
-    window.cancelAnimationFrame(cardHoverTitleToneFrame);
-  }
-
-  cardHoverTitleToneFrame = window.requestAnimationFrame(() => {
-    cardHoverTitleToneFrame = 0;
-    updateCardHoverTitleTones();
-  });
-}
-
 function applyActiveFilter() {
   const cards = getWorkCardElements();
   const filteredCards = getFilteredCards();
@@ -817,8 +658,6 @@ function applyActiveFilter() {
     workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
   }
 
-  scheduleCardImageShellMetricsUpdate();
-  scheduleCardHoverTitleToneUpdate();
   scheduleFeaturedCardHeightUpdate();
 }
 
@@ -843,8 +682,6 @@ if (workGrid) {
     "load",
     (event) => {
       if (!event.target?.classList?.contains("card-image")) return;
-      scheduleCardImageShellMetricsUpdate();
-      scheduleCardHoverTitleToneUpdate();
       scheduleFeaturedCardHeightUpdate();
     },
     true
@@ -857,8 +694,7 @@ if (workGrid) {
     const previousCard = event.relatedTarget?.closest?.(".card");
     if (previousCard === card) return;
 
-    scheduleCardHoverActivation(card);
-    scheduleCardImageShellMetricsUpdate();
+    activateCardHover(card);
   });
 
   workGrid.addEventListener("pointerout", (event) => {
@@ -874,7 +710,6 @@ if (workGrid) {
     const card = event.target.closest(".card");
     if (!card || !workGrid.contains(card)) return;
     activateCardHover(card);
-    scheduleCardImageShellMetricsUpdate();
   });
 
   workGrid.addEventListener("focusout", (event) => {

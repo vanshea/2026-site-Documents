@@ -55,6 +55,8 @@
   --nav-link-hover-bg: rgba(255, 255, 255, 0.12);
   --mobile-menu-link-ink: var(--nav-link-ink);
   --mobile-menu-link-hover-bg: var(--nav-link-hover-bg);
+  --card-hover-ink: var(--ink);
+  --card-hover-text-shadow: none;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -90,6 +92,8 @@
     --status-success: #32d74b;
     --status-error: #ff453a;
     --status-loading: #2997ff;
+    --card-hover-ink: #ffffff;
+    --card-hover-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.62);
   }
 }
 
@@ -175,6 +179,8 @@
     --nav-link-hover-bg: rgba(255, 255, 255, 0.08);
     --mobile-menu-link-ink: var(--nav-link-ink);
     --mobile-menu-link-hover-bg: rgba(255, 255, 255, 0.08);
+    --card-hover-ink: #ffffff;
+    --card-hover-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.62);
   }
 }
 
@@ -653,20 +659,17 @@ h2 {
   position: relative;
   clip-path: inset(0 round var(--radius));
   contain: paint;
-  --card-shell-duration: 620ms;
   --card-title-duration: 540ms;
   --card-copy-duration: 260ms;
-  --card-image-return-duration: 440ms;
-  --card-image-preview-duration: 1400ms;
-  --card-image-hover-duration: 5600ms;
+  --card-image-duration: 220ms;
   transform-origin: center top;
   transition:
-    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.22s ease,
     opacity 0.28s ease,
     filter 0.28s ease,
     background-color 0.32s ease,
-    border-color var(--card-shell-duration) ease,
-    box-shadow 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .generated-card {
@@ -680,12 +683,13 @@ h2 {
   display: none;
 }
 
+.card:hover,
 .card.is-hover-active,
 .card:focus-within {
-  transform: translateY(-4px);
+  transform: translateY(-2px) scale(1.018);
   background: transparent;
   border-color: transparent;
-  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
 }
 
 .card.is-featured {
@@ -713,7 +717,6 @@ h2 {
   text-decoration: none;
   position: relative;
   isolation: isolate;
-  --card-shell-scale: 1;
 }
 
 .card-image-shell {
@@ -729,11 +732,7 @@ h2 {
   transform: translateZ(0);
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   mask-image: linear-gradient(#fff, #fff);
-  transition:
-    transform var(--card-shell-duration) cubic-bezier(0.22, 1, 0.36, 1),
-    border-radius 0.28s ease;
-  will-change: transform;
-  transform-origin: top center;
+  transition: border-radius 0.22s ease;
 }
 
 .work-link > :not(.card-image-shell) {
@@ -771,53 +770,33 @@ h2 {
 
 .card .card-image {
   transition:
-    transform var(--card-image-return-duration) cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.28s ease,
-    filter 0.28s ease;
+    transform var(--card-image-duration) ease,
+    border-color 0.22s ease,
+    filter 0.22s ease;
   transform-origin: center center;
   will-change: transform;
 }
 
-.card.is-hover-preview .card-image {
-  transition:
-    transform var(--card-image-preview-duration) cubic-bezier(0.08, 0.02, 0.2, 1),
-    border-color 0.28s ease,
-    filter 0.28s ease;
-  transform: scale(1.006) translate3d(0.06%, -0.04%, 0);
-}
-
+.card:hover .card-image,
 .card.is-hover-active .card-image,
 .card:focus-within .card-image {
-  transition:
-    transform var(--card-image-hover-duration) cubic-bezier(0.12, 0.01, 0.24, 1),
-    border-color 0.28s ease,
-    filter 0.28s ease;
-  transform: scale(1.055) translate3d(0.4%, -0.28%, 0);
+  transform: none;
 }
 
+.card:hover .card-image-shell,
 .card.is-hover-active .card-image-shell,
 .card:focus-within .card-image-shell {
-  transform: scale(var(--card-shell-scale));
   border-radius: calc(var(--radius) - 2px);
 }
 
+.card:hover h3,
+.card:hover p,
 .card.is-hover-active h3,
 .card.is-hover-active p,
 .card:focus-within h3,
 .card:focus-within p {
-  color: var(--card-hover-title-color, var(--ink));
-}
-
-.card.is-hover-active h3,
-.card:focus-within h3 {
-  transform: translateX(18px);
-}
-
-.card.is-hover-active p,
-.card:focus-within p {
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
+  color: var(--card-hover-ink);
+  text-shadow: var(--card-hover-text-shadow);
 }
 
 .card.is-featured .card-image,
@@ -1376,6 +1355,22 @@ textarea:focus {
   transform: none;
 }
 
+.card.reveal {
+  transition:
+    transform 0.22s ease,
+    opacity 0.28s ease,
+    filter 0.28s ease,
+    background-color 0.32s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.card.reveal:hover,
+.card.reveal.is-hover-active,
+.card.reveal:focus-within {
+  transform: translateY(-2px) scale(1.018);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1391,6 +1386,18 @@ textarea:focus {
 
   .reveal {
     opacity: 1;
+    transform: none;
+  }
+
+  .card:hover,
+  .card.is-hover-active,
+  .card:focus-within,
+  .card.reveal:hover,
+  .card.reveal.is-hover-active,
+  .card.reveal:focus-within,
+  .card:hover .card-image,
+  .card.is-hover-active .card-image,
+  .card:focus-within .card-image {
     transform: none;
   }
 }

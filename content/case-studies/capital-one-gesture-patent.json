@@ -9,8 +9,24 @@
     "alt": "Diagram illustrating the gesture interface patent concept.",
     "caption": "Patent concept diagram used to anchor the story."
   },
-  "featuredImages": [],
-  "galleryImages": [],
+  "featuredImages": [
+    {
+      "src": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing Capital One gesture interface patent work.",
+      "title": "Gesture Patent PDF Sample",
+      "caption": "From the PDF: the sample captures the team-building, prototype leadership, legal collaboration, and hackathon recognition behind the gesture-interface patent story."
+    }
+  ],
+  "galleryImages": [
+    {
+      "src": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing Capital One gesture interface patent work.",
+      "title": "Gesture Patent PDF Sample",
+      "caption": "From the PDF: the sample captures the team-building, prototype leadership, legal collaboration, and hackathon recognition behind the gesture-interface patent story."
+    }
+  ],
   "sections": [
     {
       "id": "opportunity",
@@ -31,6 +47,18 @@
       "id": "takeaway",
       "heading": "Strategic Takeaway",
       "bodyHtml": "<p>Van helped move the work from taxonomy cleanup to interaction strategy. The patent was one visible outcome, but the broader contribution was proving that design could step into ambiguity, build a better path, and turn a stalled or misdirected concept into a working model for innovation.</p>"
+    },
+    {
+      "id": "pdf-sample-evidence",
+      "heading": "Portfolio Sample Evidence",
+      "bodyHtml": "<p>The PDF adds a concise summary of the patent work behind this case study. Van assembled a team around information architecture problems surfaced during the redesign, led prototype creation and technology revisions, and created a concept video and presentation for senior executives and the legal team.</p><p>The sample notes that the goal was to create an interface requiring minimal education and effort because customers often said there were too many screens to find what they needed. The work won second place at a hackathon and continued through legal collaboration, ultimately supporting the patent direction.</p>",
+      "image": {
+        "src": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-thumb-760x570.webp",
+        "alt": "PDF slide summarizing Capital One gesture interface patent work.",
+        "title": "Gesture Patent PDF Sample",
+        "caption": "From the PDF: the sample captures the team-building, prototype leadership, legal collaboration, and hackathon recognition behind the gesture-interface patent story."
+      }
     }
   ],
   "metadata": {
@@ -46,5 +74,5 @@
     ]
   },
   "readingTime": "6 min read",
-  "updatedAt": "2026-04-26"
+  "updatedAt": "2026-04-29"
 }

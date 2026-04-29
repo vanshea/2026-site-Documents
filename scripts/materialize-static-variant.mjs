@@ -29,11 +29,13 @@ function getVariantSourceRoot(variant) {
 }
 
 function rewriteVariantPreviewLinks(html, variant) {
-  const prefix = `/${variant}`;
+  const prefix = variant === "livesite" ? "" : `/${variant}`;
+  const root = `${prefix}/`;
 
   const rewritten = String(html || "")
-    .replace(/href="\/"/g, `href="${prefix}/"`)
-    .replace(/action="\/"/g, `action="${prefix}/"`)
+    .replace(/href="\/"/g, `href="${root}"`)
+    .replace(/href="\/#work"/g, `href="${root}#work"`)
+    .replace(/action="\/"/g, `action="${root}"`)
     .replace(/(["'(])\/styles\.css/g, `$1${prefix}/styles.css`)
     .replace(/(["'(])\/script\.js/g, `$1${prefix}/script.js`)
     .replace(/(["'(])\/analytics\.js/g, `$1${prefix}/analytics.js`)
@@ -50,7 +52,7 @@ function rewriteVariantPreviewLinks(html, variant) {
     /(<nav id="siteNav" class="nav">)([\s\S]*?)(<\/nav>)/,
     (_match, openTag, navContents, closeTag) => {
       const caseStudyNavPattern = new RegExp(
-        `\\s*<a\\s+href="/${variant}/case-studies"[\\s\\S]*?</a>`,
+        `\\s*<a\\s+href="${prefix}/case-studies"[\\s\\S]*?</a>`,
         "g"
       );
       return `${openTag}${navContents.replace(caseStudyNavPattern, "")}${closeTag}`;

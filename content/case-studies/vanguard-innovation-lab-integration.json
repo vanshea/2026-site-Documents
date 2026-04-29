@@ -28,6 +28,20 @@
       "alt": "Research notes and concept evaluation artifacts.",
       "title": "Learning Loops",
       "caption": "The system helped teams connect research evidence, assumptions, and investment decisions."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing Vanguard smart-home voice interface strategy work.",
+      "title": "Smart-Home Voice Strategy Sample",
+      "caption": "From the PDF: the Vanguard sample framed business potential, technical pitfalls, security implications, and concept direction for smart-home voice interfaces."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-thumb-760x570.webp",
+      "alt": "PDF slide showing Vanguard credentials reset and authentication redesign screens.",
+      "title": "Credentials Reset Sample",
+      "caption": "The authentication sample shows adjacent Vanguard work around security, credentials reset, and measurable client-experience improvements."
     }
   ],
   "galleryImages": [
@@ -48,6 +62,20 @@
       "thumbSrc": "/assets/fpo-thumb-760x570.svg",
       "alt": "Concept review artifact.",
       "caption": "Concept review artifact."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
+      "alt": "PDF slide summarizing Vanguard smart-home voice interface strategy work.",
+      "title": "Smart-Home Voice Strategy Sample",
+      "caption": "From the PDF: the Vanguard sample framed business potential, technical pitfalls, security implications, and concept direction for smart-home voice interfaces."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-thumb-760x570.webp",
+      "alt": "PDF slide showing Vanguard credentials reset and authentication redesign screens.",
+      "title": "Credentials Reset Sample",
+      "caption": "The authentication sample shows adjacent Vanguard work around security, credentials reset, and measurable client-experience improvements."
     }
   ],
   "sections": [
@@ -82,6 +110,18 @@
       "id": "takeaway",
       "heading": "Strategic Takeaway",
       "bodyHtml": "<p>Van helped transform design critique from a late-stage review ritual into an early-stage strategic operating system. The work strengthened decision-making, reduced duplication, and helped innovation teams learn from one another while ideas were still flexible.</p>"
+    },
+    {
+      "id": "pdf-sample-evidence",
+      "heading": "Portfolio Sample Evidence",
+      "bodyHtml": "<p>The PDF adds adjacent Vanguard evidence around innovation strategy and security experience design. In the smart-home voice interface sample, Van led the design research point of view, balanced business potential with technical pitfalls, and art directed concepts that illustrated the strategic possibilities.</p><p>The sample helped leadership understand the level of effort and timeline for using smart-home devices in a consumer-facing strategy. The PDF notes that Vanguard digital leadership saw the need for enhanced and updated security and created teams to immediately support the technology.</p><p>The credentials reset sample adds another Vanguard security thread, showing work that reconsidered authentication flows and client-facing security experiences as part of a broader design strategy.</p>",
+      "image": {
+        "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
+        "alt": "PDF slide summarizing Vanguard smart-home voice interface strategy work.",
+        "title": "Smart-Home Voice Strategy Sample",
+        "caption": "From the PDF: the Vanguard sample framed business potential, technical pitfalls, security implications, and concept direction for smart-home voice interfaces."
+      }
     }
   ],
   "metadata": {
@@ -97,5 +137,5 @@
     ]
   },
   "readingTime": "5 min read",
-  "updatedAt": "2026-04-26"
+  "updatedAt": "2026-04-29"
 }
