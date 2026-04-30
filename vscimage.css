@@ -87,6 +87,43 @@ body {
   margin-bottom: 22px;
 }
 
+.app-header-actions {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  min-width: min(280px, 100%);
+}
+
+.app-header-actions .btn,
+.app-header-actions .back-link {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.app-header-status {
+  margin: 0;
+  max-width: 32ch;
+  text-align: right;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    display: grid;
+  }
+
+  .app-header-actions {
+    justify-items: stretch;
+    width: 100%;
+  }
+
+  .app-header-status {
+    max-width: none;
+    text-align: left;
+  }
+}
+
 .kicker {
   margin: 0 0 4px;
   font-size: 0.82rem;

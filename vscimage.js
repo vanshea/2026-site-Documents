@@ -107,6 +107,13 @@ function setWorkspaceTab(tabName) {
   }
 }
 
+function getActiveWorkspaceTab() {
+  const activeButton = workspaceTabButtons.find((button) =>
+    button.classList.contains("is-active")
+  );
+  return activeButton?.dataset.workspaceTab || "image-library";
+}
+
 function announce(message) {
   if (!a11yAnnouncer) return;
   a11yAnnouncer.textContent = "";
@@ -128,6 +135,8 @@ const uploadMsg = document.getElementById("uploadMsg");
 const generatedList = document.getElementById("generatedList");
 const workspaceTabButtons = Array.from(document.querySelectorAll("[data-workspace-tab]"));
 const workspacePanels = Array.from(document.querySelectorAll("[data-workspace-panel]"));
+const globalSaveButton = document.getElementById("globalSaveButton");
+const globalSaveMsg = document.getElementById("globalSaveMsg");
 const uploadDropzone = document.getElementById("uploadDropzone");
 const imageFileInput = document.getElementById("imageFile");
 const imageFolderInput = document.getElementById("imageFolder");
@@ -2376,7 +2385,7 @@ async function saveGalleryEditor() {
       "Edit is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
       "error"
     );
-    return;
+    return false;
   }
 
   if (state.editorMode === "batch") {
@@ -2386,7 +2395,7 @@ async function saveGalleryEditor() {
 
     if (!targetEntries.length) {
       setThumbEditorStatus("Selected thumbnails were not found.", "error");
-      return;
+      return false;
     }
 
     const batchCardDescription = normalizeCardDescription(thumbEditorCardDescription?.value || "");
@@ -2407,7 +2416,7 @@ async function saveGalleryEditor() {
     if (batchRenameMode !== "keep" && !batchRenameAssetToken) {
       setThumbEditorStatus("Enter rename text for the selected rename pattern.", "error");
       thumbEditorBatchRenameValue?.focus();
-      return;
+      return false;
     }
 
     const hasBatchEdits =
@@ -2421,7 +2430,7 @@ async function saveGalleryEditor() {
 
     if (!hasBatchEdits) {
       setThumbEditorStatus("Choose at least one change to apply to the selected images.", "error");
-      return;
+      return false;
     }
 
     thumbEditorSave.disabled = true;
@@ -2518,6 +2527,7 @@ async function saveGalleryEditor() {
           "ok"
         );
       }
+      return failedLabels.length === 0;
     } finally {
       state.galleryBusyId = "";
       state.galleryBusyAction = "";
@@ -2533,7 +2543,7 @@ async function saveGalleryEditor() {
   const entry = getGalleryEntryById(entryId);
   if (!entry) {
     setThumbEditorStatus("Thumbnail entry was not found.", "error");
-    return;
+    return false;
   }
 
   const nextName = sanitizeAssetName(thumbEditorName?.value || "");
@@ -2554,19 +2564,19 @@ async function saveGalleryEditor() {
   if (!nextName) {
     setThumbEditorStatus("Asset name cannot be empty.", "error");
     thumbEditorName?.focus();
-    return;
+    return false;
   }
 
   if (!nextTitle) {
     setThumbEditorStatus("Display title cannot be empty.", "error");
     thumbEditorTitle?.focus();
-    return;
+    return false;
   }
 
   if (nextLinkUrlRaw && !nextLinkUrl) {
     setThumbEditorStatus("Link URL must start with /, http://, https://, mailto:, or tel:.", "error");
     thumbEditorLinkUrl?.focus();
-    return;
+    return false;
   }
 
   const formData = new FormData();
@@ -2624,8 +2634,10 @@ async function saveGalleryEditor() {
       entries: snapshots
     });
     setThumbStatus("Thumbnail updated.", "ok");
+    return true;
   } catch (error) {
     setThumbEditorStatus(error.message, "error");
+    return false;
   } finally {
     state.galleryBusyId = "";
     state.galleryBusyAction = "";
@@ -3231,6 +3243,75 @@ function collectConfigFromForm() {
   return nextConfig;
 }
 
+async function saveSiteConfig({ silent = false } = {}) {
+  if (!state.apiAvailable) {
+    const message =
+      "Save is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.";
+    setStatus(configMsg, message, "error");
+    throw new Error(message);
+  }
+
+  const nextConfig = collectConfigFromForm();
+  await fetchJson(`${state.apiOrigin}/api/vscimage/config`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(nextConfig)
+  });
+  state.config = nextConfig;
+  renderPreview();
+  renderThumbAccordion();
+
+  if (!silent) {
+    setStatus(configMsg, "Site image configuration saved.", "ok");
+  }
+
+  return true;
+}
+
+async function refreshSiteCache() {
+  return fetchJson(`${state.apiOrigin}/api/vscimage/refresh-site`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  });
+}
+
+async function saveActiveWorkspaceAndRefresh() {
+  if (!state.apiAvailable) {
+    const message =
+      "Save is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.";
+    setStatus(globalSaveMsg, message, "error");
+    throw new Error(message);
+  }
+
+  const activeWorkspace = getActiveWorkspaceTab();
+  const savedLabels = [];
+
+  if (thumbEditorDialog?.open) {
+    const editorSaved = await saveGalleryEditor();
+    if (!editorSaved) {
+      throw new Error("Resolve the Image Library editor issue before refreshing the site cache.");
+    }
+    savedLabels.push("image editor");
+  }
+
+  if (activeWorkspace === "case-studies") {
+    await saveCaseStudyText({ silent: true });
+    setStatus(caseStudyTextMsg, "Case study text saved.", "ok");
+    savedLabels.push("case study text");
+  } else {
+    await saveSiteConfig({ silent: true });
+    setStatus(configMsg, "Site image configuration saved.", "ok");
+    savedLabels.push("image library config");
+  }
+
+  setStatus(globalSaveMsg, "Refreshing site cache...", "");
+  await refreshSiteCache();
+  await reloadData();
+
+  const savedText = savedLabels.length ? savedLabels.join(" and ") : "changes";
+  return `Saved ${savedText} and refreshed site cache.`;
+}
+
 function renderGeneratedOutputs(successfulEntries, failedEntries = [], skippedEntries = []) {
   generatedList.innerHTML = "";
 
@@ -3517,6 +3598,7 @@ async function reloadData() {
   const saveButton = configForm?.querySelector('button[type="submit"]');
   updateUploadButtonState();
   if (saveButton) saveButton.disabled = !state.apiAvailable;
+  if (globalSaveButton) globalSaveButton.disabled = !state.apiAvailable;
 }
 
 if (uploadForm) {
@@ -3639,28 +3721,28 @@ if (configForm) {
   configForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (!state.apiAvailable) {
-      setStatus(
-        configMsg,
-        "Save is unavailable in read-only mode. Start backend server with npm run dev and open http://localhost:3000/vscimage.",
-        "error"
-      );
-      return;
-    }
-
     try {
-      const nextConfig = collectConfigFromForm();
-      await fetchJson(`${state.apiOrigin}/api/vscimage/config`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nextConfig)
-      });
-      state.config = nextConfig;
-      renderPreview();
-      renderThumbAccordion();
-      setStatus(configMsg, "Site image configuration saved.", "ok");
+      await saveSiteConfig();
     } catch (error) {
       setStatus(configMsg, error.message, "error");
+    }
+  });
+}
+
+if (globalSaveButton) {
+  globalSaveButton.addEventListener("click", async () => {
+    if (globalSaveButton.disabled) return;
+
+    try {
+      globalSaveButton.disabled = true;
+      setStatus(globalSaveMsg, "Saving changes...", "");
+      const message = await saveActiveWorkspaceAndRefresh();
+      setStatus(globalSaveMsg, message, "ok");
+      announce(message);
+    } catch (error) {
+      setStatus(globalSaveMsg, error.message, "error");
+    } finally {
+      globalSaveButton.disabled = !state.apiAvailable;
     }
   });
 }
@@ -4020,48 +4102,59 @@ if (caseStudyTextSections) {
   });
 }
 
+async function saveCaseStudyText({ silent = false } = {}) {
+  if (!state.apiAvailable) {
+    const message = "Case study text editing is unavailable in read-only mode.";
+    setStatus(caseStudyTextMsg, message, "error");
+    throw new Error(message);
+  }
+
+  const caseStudy = getSelectedCaseStudy();
+  if (!caseStudy) {
+    const message = "Choose a case study to edit.";
+    setStatus(caseStudyTextMsg, message, "error");
+    throw new Error(message);
+  }
+
+  if (caseStudyTextSaveButton) caseStudyTextSaveButton.disabled = true;
+  setStatus(caseStudyTextMsg, "Saving case study text...", "");
+
+  try {
+    const payload = await fetchJson(
+      `${state.apiOrigin}/api/vscimage/case-studies/${encodeURIComponent(caseStudy.slug)}/text`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(collectCaseStudyTextPayload())
+      }
+    );
+
+    if (payload.caseStudy) {
+      state.caseStudies = state.caseStudies.map((item) =>
+        item.slug === payload.caseStudy.slug ? { ...item, ...payload.caseStudy } : item
+      );
+    }
+
+    renderCaseStudyImageControls();
+    renderThumbAccordion();
+    if (!silent) {
+      setStatus(caseStudyTextMsg, "Case study text saved.", "ok");
+      announce("Case study text saved.");
+    }
+    return true;
+  } finally {
+    renderCaseStudyTextControls();
+  }
+}
+
 if (caseStudyTextForm) {
   caseStudyTextForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    if (!state.apiAvailable) {
-      setStatus(caseStudyTextMsg, "Case study text editing is unavailable in read-only mode.", "error");
-      return;
-    }
-
-    const caseStudy = getSelectedCaseStudy();
-    if (!caseStudy) {
-      setStatus(caseStudyTextMsg, "Choose a case study to edit.", "error");
-      return;
-    }
-
     try {
-      if (caseStudyTextSaveButton) caseStudyTextSaveButton.disabled = true;
-      setStatus(caseStudyTextMsg, "Saving case study text...", "");
-
-      const payload = await fetchJson(
-        `${state.apiOrigin}/api/vscimage/case-studies/${encodeURIComponent(caseStudy.slug)}/text`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(collectCaseStudyTextPayload())
-        }
-      );
-
-      if (payload.caseStudy) {
-        state.caseStudies = state.caseStudies.map((item) =>
-          item.slug === payload.caseStudy.slug ? { ...item, ...payload.caseStudy } : item
-        );
-      }
-
-      renderCaseStudyImageControls();
-      renderThumbAccordion();
-      setStatus(caseStudyTextMsg, "Case study text saved.", "ok");
-      announce("Case study text saved.");
+      await saveCaseStudyText();
     } catch (error) {
       setStatus(caseStudyTextMsg, error.message, "error");
-    } finally {
-      renderCaseStudyTextControls();
     }
   });
 }

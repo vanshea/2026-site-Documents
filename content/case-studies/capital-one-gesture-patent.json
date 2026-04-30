@@ -11,52 +11,8 @@
     "title": "Patent Figure Sheet",
     "caption": "The updated PDF includes patent figure scenarios showing gesture interactions across devices and contexts."
   },
-  "featuredImages": [
-    {
-      "src": "/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-patent-figure-pdf-thumb-760x570.webp",
-      "alt": "Capital One patent figure sheet showing gesture interface scenarios across devices.",
-      "title": "Patent Figure Sheet",
-      "caption": "The updated PDF includes patent figure scenarios showing gesture interactions across mobile, television, and vehicle contexts."
-    },
-    {
-      "src": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-thumb-760x570.webp",
-      "alt": "Capital One gesture-interface patent goals, team, need, and outcomes.",
-      "title": "Gesture Patent Goals",
-      "caption": "The updated PDF summarizes the low-effort interaction goal, UX lead role, customer need, hackathon recognition, and legal collaboration outcome."
-    },
-    {
-      "src": "/assets/vscimage/generated/capital-one-gesture-patent-role-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-role-pdf-thumb-760x570.webp",
-      "alt": "UX Design Lead responsibilities for the Capital One gesture-interface patent.",
-      "title": "UX Design Lead Role",
-      "caption": "Van assembled the team, led prototype development and technology revisions, created the executive/legal presentation, and developed the legal-team conversation into a patent idea."
-    }
-  ],
-  "galleryImages": [
-    {
-      "src": "/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-patent-figure-pdf-thumb-760x570.webp",
-      "alt": "Capital One patent figure sheet showing gesture interface scenarios across devices.",
-      "title": "Patent Figure Sheet",
-      "caption": "The updated PDF includes patent figure scenarios showing gesture interactions across mobile, television, and vehicle contexts."
-    },
-    {
-      "src": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-thumb-760x570.webp",
-      "alt": "Capital One gesture-interface patent goals, team, need, and outcomes.",
-      "title": "Gesture Patent Goals",
-      "caption": "The updated PDF summarizes the low-effort interaction goal, UX lead role, customer need, hackathon recognition, and legal collaboration outcome."
-    },
-    {
-      "src": "/assets/vscimage/generated/capital-one-gesture-patent-role-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-role-pdf-thumb-760x570.webp",
-      "alt": "UX Design Lead responsibilities for the Capital One gesture-interface patent.",
-      "title": "UX Design Lead Role",
-      "caption": "Van assembled the team, led prototype development and technology revisions, created the executive/legal presentation, and developed the legal-team conversation into a patent idea."
-    }
-  ],
+  "featuredImages": [],
+  "galleryImages": [],
   "sections": [
     {
       "id": "opportunity",
@@ -66,26 +22,17 @@
     {
       "id": "approach",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van assembled a team to address information architecture problems identified during the redesign. As UX Design Lead, he led prototype development and technology revisions, earning second place at a hackathon.</p><p>He also created a concept video and presentation for the new technology, delivered to senior executives and the legal team. A follow-up conversation with the legal team helped develop the idea into a patent direction.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/capital-one-gesture-patent-role-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-role-pdf-thumb-760x570.webp",
-        "alt": "UX Design Lead responsibilities for the Capital One gesture-interface patent.",
-        "title": "UX Design Lead Role",
-        "caption": "Van assembled the team, led prototype development and technology revisions, created the executive/legal presentation, and developed the legal-team conversation into a patent idea."
-      }
+      "bodyHtml": "<p>Van assembled a team to address information architecture problems identified during the redesign. As UX Design Lead, he led prototype development and technology revisions, earning second place at a hackathon.</p><p>He also created a concept video and presentation for the new technology, delivered to senior executives and the legal team. A follow-up conversation with the legal team helped develop the idea into a patent direction.</p>"
     },
     {
       "id": "outcome",
       "heading": "Impact Beyond the Patent",
-      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The concept focused on an interface that required minimal education and effort, directly responding to customer feedback about screen overload.</li><li><strong>Technical Win:</strong> The gesture interface expanded how the team thought about interaction across devices and contexts.</li><li><strong>Organizational Win:</strong> The work showed how a small team could turn observed information architecture problems into a working prototype and executive-ready story.</li><li><strong>Innovation Win:</strong> The work earned hackathon recognition and continued through collaboration with the legal team to secure a patent.</li></ul>",
-      "image": {
-        "src": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/capital-one-gesture-patent-pdf-thumb-760x570.webp",
-        "alt": "Capital One gesture-interface patent goals, team, need, and outcomes.",
-        "title": "Gesture Patent Goals",
-        "caption": "The updated PDF summarizes the low-effort interaction goal, UX lead role, customer need, hackathon recognition, and legal collaboration outcome."
-      }
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The concept focused on an interface that required minimal education and effort, directly responding to customer feedback about screen overload.</li><li><strong>Technical Win:</strong> The gesture interface expanded how the team thought about interaction across devices and contexts.</li><li><strong>Organizational Win:</strong> The work showed how a small team could turn observed information architecture problems into a working prototype and executive-ready story.</li><li><strong>Innovation Win:</strong> The work earned hackathon recognition and continued through collaboration with the legal team to secure a patent.</li></ul>"
+    },
+    {
+      "id": "published-patent",
+      "heading": "Published Patent",
+      "bodyHtml": "<figure><iframe src=\"/assets/embeds/us20220261083a1.html\" title=\"US20220261083A1 Gesture-based user interface patent summary\" loading=\"lazy\"></iframe><figcaption>Embedded patent reference for US20220261083A1. <a href=\"https://patents.google.com/patent/US20220261083A1/\" target=\"_blank\">Open the official Google Patents page</a>.</figcaption></figure>"
     },
     {
       "id": "takeaway",

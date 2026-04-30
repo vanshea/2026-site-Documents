@@ -325,6 +325,15 @@
   gap: 8px;
 }
 
+.case-study-rich-text iframe {
+  display: block;
+  width: 100%;
+  min-height: min(760px, 78vh);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-soft);
+  background: var(--paper);
+}
+
 .case-study-rich-text img {
   width: 100%;
   height: auto;

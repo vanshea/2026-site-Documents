@@ -5,6 +5,8 @@ const path = require("path");
 const dotenv = require("dotenv");
 const fs = require("fs/promises");
 const fsSync = require("fs");
+const { execFile } = require("child_process");
+const { promisify } = require("util");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const prisma = require("./lib/prisma");
 const analytics = require("./lib/analytics");
@@ -28,6 +30,7 @@ try {
 dotenv.config();
 
 const app = express();
+const execFileAsync = promisify(execFile);
 const PORT = process.env.PORT || 3000;
 const rootDir = __dirname;
 const assetsDir = path.join(rootDir, "assets");
@@ -460,10 +463,12 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const escapedDescription = escapeHtml(displayDescription);
       const escapedLinkText = escapeHtml(normalizeLinkText(entry?.linkText || "", 80));
       const escapedLinkUrl = escapeHtml(normalizeLinkUrl(entry?.linkUrl || "", 320));
+      const escapedDetailUrl = escapeHtml(normalizeLinkUrl(entry?.detailUrl || "", 320));
+      const escapedHref = escapedDetailUrl || escapedLarge;
 
       return [
         `          <article class="${cardClasses.join(" ")}" data-category="${category}" data-generated="true"${featured ? ' data-featured="true"' : ""}>`,
-        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedLarge}" data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}"${escapedLinkText ? ` data-lightbox-link-text="${escapedLinkText}"` : ""}${escapedLinkUrl ? ` data-lightbox-link-url="${escapedLinkUrl}"` : ""}>`,
+        `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedHref}"${escapedDetailUrl ? ` data-detail-url="${escapedDetailUrl}"` : ""} data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}"${escapedLinkText ? ` data-lightbox-link-text="${escapedLinkText}"` : ""}${escapedLinkUrl ? ` data-lightbox-link-url="${escapedLinkUrl}"` : ""}>`,
         `              <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
         displayCardDescription ? `              <p>${escapedCardDescription}</p>` : "",
@@ -503,6 +508,23 @@ async function syncHomepageGeneratedGallery(galleryEntries) {
       await fs.writeFile(homepageIndexPath, nextHtml, "utf8");
     }
   }
+}
+
+async function refreshStaticSiteCache() {
+  const config = await readVscimageConfig();
+  await syncHomepageGeneratedGallery(config.gallery || []);
+
+  const scriptPath = path.join(rootDir, "scripts", "materialize-static-variant.mjs");
+  const result = await execFileAsync(process.execPath, [scriptPath, "all"], {
+    cwd: rootDir,
+    timeout: 120000,
+    maxBuffer: 1024 * 1024
+  });
+
+  return {
+    stdout: String(result.stdout || "").trim(),
+    stderr: String(result.stderr || "").trim()
+  };
 }
 
 async function ensureVscimageStorage() {
@@ -928,6 +950,232 @@ function buildGeneratedAssetWebPaths(baseName) {
   };
 }
 
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function medianChannel(values, channel) {
+  const sorted = values
+    .map((value) => value[channel])
+    .sort((left, right) => left - right);
+  return sorted[Math.floor(sorted.length / 2)] || 0;
+}
+
+async function analyzeSmartContentBounds(inputBuffer) {
+  const image = sharp(inputBuffer).rotate().ensureAlpha();
+  const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
+  const { width, height } = info;
+
+  if (!width || !height) {
+    return null;
+  }
+
+  const readPixel = (x, y) => {
+    const offset = (y * width + x) * 4;
+    return [data[offset], data[offset + 1], data[offset + 2], data[offset + 3]];
+  };
+  const edgeInset = Math.max(1, Math.min(24, Math.floor(Math.min(width, height) * 0.01)));
+  const samplePoints = [
+    [edgeInset, edgeInset],
+    [width - edgeInset - 1, edgeInset],
+    [edgeInset, height - edgeInset - 1],
+    [width - edgeInset - 1, height - edgeInset - 1],
+    [Math.floor(width / 2), edgeInset],
+    [Math.floor(width / 2), height - edgeInset - 1],
+    [edgeInset, Math.floor(height / 2)],
+    [width - edgeInset - 1, Math.floor(height / 2)]
+  ];
+  const edgeSamples = samplePoints
+    .map(([x, y]) => readPixel(clampNumber(x, 0, width - 1), clampNumber(y, 0, height - 1)))
+    .filter((pixel) => pixel[3] > 180);
+
+  const alphaBounds = {
+    minX: width,
+    minY: height,
+    maxX: -1,
+    maxY: -1,
+    count: 0
+  };
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const alpha = data[(y * width + x) * 4 + 3];
+      if (alpha <= 24) continue;
+      alphaBounds.minX = Math.min(alphaBounds.minX, x);
+      alphaBounds.minY = Math.min(alphaBounds.minY, y);
+      alphaBounds.maxX = Math.max(alphaBounds.maxX, x);
+      alphaBounds.maxY = Math.max(alphaBounds.maxY, y);
+      alphaBounds.count += 1;
+    }
+  }
+
+  const alphaCoverage = alphaBounds.count / (width * height);
+  const hasTransparentMatte = alphaCoverage > 0 && alphaCoverage < 0.92;
+  if (hasTransparentMatte && alphaBounds.maxX >= alphaBounds.minX && alphaBounds.maxY >= alphaBounds.minY) {
+    return {
+      width,
+      height,
+      bounds: alphaBounds
+    };
+  }
+
+  if (edgeSamples.length < 4) {
+    return null;
+  }
+
+  const background = [
+    medianChannel(edgeSamples, 0),
+    medianChannel(edgeSamples, 1),
+    medianChannel(edgeSamples, 2)
+  ];
+  const edgeDrift = edgeSamples.reduce((maxDistance, pixel) => {
+    const distance =
+      Math.abs(pixel[0] - background[0]) +
+      Math.abs(pixel[1] - background[1]) +
+      Math.abs(pixel[2] - background[2]);
+    return Math.max(maxDistance, distance);
+  }, 0);
+
+  if (edgeDrift > 72) {
+    return null;
+  }
+
+  const subjectBounds = {
+    minX: width,
+    minY: height,
+    maxX: -1,
+    maxY: -1,
+    count: 0
+  };
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = (y * width + x) * 4;
+      const alpha = data[offset + 3];
+      if (alpha <= 180) continue;
+
+      const distance =
+        Math.abs(data[offset] - background[0]) +
+        Math.abs(data[offset + 1] - background[1]) +
+        Math.abs(data[offset + 2] - background[2]);
+      if (distance <= 48) continue;
+
+      subjectBounds.minX = Math.min(subjectBounds.minX, x);
+      subjectBounds.minY = Math.min(subjectBounds.minY, y);
+      subjectBounds.maxX = Math.max(subjectBounds.maxX, x);
+      subjectBounds.maxY = Math.max(subjectBounds.maxY, y);
+      subjectBounds.count += 1;
+    }
+  }
+
+  if (subjectBounds.maxX < subjectBounds.minX || subjectBounds.maxY < subjectBounds.minY) {
+    return null;
+  }
+
+  const subjectWidth = subjectBounds.maxX - subjectBounds.minX + 1;
+  const subjectHeight = subjectBounds.maxY - subjectBounds.minY + 1;
+  const subjectCoverage = subjectBounds.count / (width * height);
+  const subjectAreaRatio = (subjectWidth * subjectHeight) / (width * height);
+  const coversNearlyFullFrame = subjectWidth / width > 0.92 && subjectHeight / height > 0.92;
+
+  if (
+    subjectCoverage < 0.001 ||
+    subjectAreaRatio > 0.88 ||
+    coversNearlyFullFrame
+  ) {
+    return null;
+  }
+
+  return {
+    width,
+    height,
+    bounds: subjectBounds
+  };
+}
+
+function buildSmartCropRegion(analysis, targetWidth, targetHeight) {
+  if (!analysis?.bounds || !targetWidth || !targetHeight) {
+    return null;
+  }
+
+  const { width, height, bounds } = analysis;
+  const boundsWidth = bounds.maxX - bounds.minX + 1;
+  const boundsHeight = bounds.maxY - bounds.minY + 1;
+  if (boundsWidth <= 1 || boundsHeight <= 1) {
+    return null;
+  }
+
+  const padX = Math.max(Math.round(boundsWidth * 0.18), Math.round(width * 0.03), 24);
+  const padY = Math.max(Math.round(boundsHeight * 0.35), Math.round(height * 0.04), 24);
+  const padded = {
+    minX: clampNumber(bounds.minX - padX, 0, width - 1),
+    minY: clampNumber(bounds.minY - padY, 0, height - 1),
+    maxX: clampNumber(bounds.maxX + padX, 0, width - 1),
+    maxY: clampNumber(bounds.maxY + padY, 0, height - 1)
+  };
+
+  const targetAspect = targetWidth / targetHeight;
+  let cropWidth = padded.maxX - padded.minX + 1;
+  let cropHeight = cropWidth / targetAspect;
+  const paddedHeight = padded.maxY - padded.minY + 1;
+
+  if (cropHeight < paddedHeight) {
+    cropHeight = paddedHeight;
+    cropWidth = cropHeight * targetAspect;
+  }
+  if (cropWidth > width) {
+    cropWidth = width;
+    cropHeight = cropWidth / targetAspect;
+  }
+  if (cropHeight > height) {
+    cropHeight = height;
+    cropWidth = cropHeight * targetAspect;
+  }
+  if (cropWidth > width) {
+    cropWidth = width;
+  }
+
+  cropWidth = Math.max(1, Math.round(cropWidth));
+  cropHeight = Math.max(1, Math.round(cropHeight));
+
+  const centerX = (bounds.minX + bounds.maxX + 1) / 2;
+  const centerY = (bounds.minY + bounds.maxY + 1) / 2;
+  let left = Math.round(centerX - cropWidth / 2);
+  let top = Math.round(centerY - cropHeight / 2);
+
+  left = clampNumber(left, 0, width - cropWidth);
+  top = clampNumber(top, 0, height - cropHeight);
+
+  if (cropWidth >= boundsWidth) {
+    if (left > bounds.minX) left = bounds.minX;
+    if (left + cropWidth - 1 < bounds.maxX) left = bounds.maxX - cropWidth + 1;
+  }
+  if (cropHeight >= boundsHeight) {
+    if (top > bounds.minY) top = bounds.minY;
+    if (top + cropHeight - 1 < bounds.maxY) top = bounds.maxY - cropHeight + 1;
+  }
+
+  left = clampNumber(Math.round(left), 0, width - cropWidth);
+  top = clampNumber(Math.round(top), 0, height - cropHeight);
+
+  const nearlyFullFrame = cropWidth / width > 0.96 && cropHeight / height > 0.96;
+  if (nearlyFullFrame) {
+    return null;
+  }
+
+  return {
+    left,
+    top,
+    width: cropWidth,
+    height: cropHeight
+  };
+}
+
+function applySmartCrop(pipeline, analysis, targetWidth, targetHeight) {
+  const crop = buildSmartCropRegion(analysis, targetWidth, targetHeight);
+  return crop ? pipeline.extract(crop) : pipeline;
+}
+
 async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
   const baseName = sanitizeName(options.baseName) || `image-${Date.now()}`;
   const requestedOutputs = Array.isArray(options.outputs) ? options.outputs : [];
@@ -944,10 +1192,10 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
   const backgroundColor = toSharpColor(options.backgroundColor);
   const fullscreenBackground = backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 };
   const pipeline = sharp(inputBuffer).rotate();
+  const smartCropAnalysis = await analyzeSmartContentBounds(inputBuffer);
 
   if (outputs.includes("logo")) {
-    await pipeline
-      .clone()
+    await applySmartCrop(pipeline.clone(), smartCropAnalysis, 240, 240)
       .resize(240, 240, {
         fit: "contain",
         background: { r: 0, g: 0, b: 0, alpha: 0 }
@@ -962,7 +1210,7 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
     if (backgroundColor) {
       thumbPipeline = thumbPipeline.flatten({ background: backgroundColor });
     }
-    await thumbPipeline
+    await applySmartCrop(thumbPipeline, smartCropAnalysis, 760, 570)
       .resize(760, 570, {
         fit: "cover",
         position: "attention"
@@ -977,7 +1225,12 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
     if (backgroundColor) {
       featuredPipeline = featuredPipeline.flatten({ background: backgroundColor });
     }
-    await featuredPipeline
+    await applySmartCrop(
+      featuredPipeline,
+      smartCropAnalysis,
+      featuredThumbSize.width,
+      featuredThumbSize.height
+    )
       .resize(featuredThumbSize.width, featuredThumbSize.height, {
         fit: "cover",
         position: "attention"
@@ -992,7 +1245,7 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
     if (backgroundColor) {
       largePipeline = largePipeline.flatten({ background: backgroundColor });
     }
-    await largePipeline
+    await applySmartCrop(largePipeline, smartCropAnalysis, 1900, 1600)
       .resize(1900, 1600, {
         fit: "cover",
         position: "attention"
@@ -1007,7 +1260,7 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
     if (backgroundColor) {
       fullscreenPipeline = fullscreenPipeline.flatten({ background: backgroundColor });
     }
-    await fullscreenPipeline
+    await applySmartCrop(fullscreenPipeline, smartCropAnalysis, 3200, 1800)
       .resize(3200, 1800, {
         fit: "contain",
         background: fullscreenBackground
@@ -1040,9 +1293,10 @@ async function copyManagedGalleryAsset(sourceAssetPath, targetFilePath, label) {
 async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, options = {}) {
   const backgroundColor = toSharpColor(options.backgroundColor);
   const pipeline = sharp(inputBuffer).rotate();
+  const smartCropAnalysis = await analyzeSmartContentBounds(inputBuffer);
 
   if (outputKey === "logo") {
-    await pipeline
+    await applySmartCrop(pipeline, smartCropAnalysis, 240, 240)
       .resize(240, 240, {
         fit: "contain",
         background: { r: 0, g: 0, b: 0, alpha: 0 }
@@ -1057,7 +1311,7 @@ async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, 
     if (backgroundColor) {
       outputPipeline = outputPipeline.flatten({ background: backgroundColor });
     }
-    await outputPipeline
+    await applySmartCrop(outputPipeline, smartCropAnalysis, 760, 570)
       .resize(760, 570, {
         fit: "cover",
         position: "attention"
@@ -1072,7 +1326,7 @@ async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, 
     if (backgroundColor) {
       outputPipeline = outputPipeline.flatten({ background: backgroundColor });
     }
-    await outputPipeline
+    await applySmartCrop(outputPipeline, smartCropAnalysis, 1900, 1600)
       .resize(1900, 1600, {
         fit: "cover",
         position: "attention"
@@ -1087,7 +1341,12 @@ async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, 
     if (backgroundColor) {
       outputPipeline = outputPipeline.flatten({ background: backgroundColor });
     }
-    await outputPipeline
+    await applySmartCrop(
+      outputPipeline,
+      smartCropAnalysis,
+      featuredThumbSize.width,
+      featuredThumbSize.height
+    )
       .resize(featuredThumbSize.width, featuredThumbSize.height, {
         fit: "cover",
         position: "attention"
@@ -1102,7 +1361,7 @@ async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, 
     if (backgroundColor) {
       outputPipeline = outputPipeline.flatten({ background: backgroundColor });
     }
-    await outputPipeline
+    await applySmartCrop(outputPipeline, smartCropAnalysis, 3200, 1800)
       .resize(3200, 1800, {
         fit: "contain",
         background: backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 }
@@ -2604,6 +2863,20 @@ app.post("/api/vscimage/config", requireAnalyticsAdminApi, async (req, res) => {
   } catch (error) {
     console.error("Unable to save VSCimage config:", error);
     return res.status(500).json({ error: "Unable to save image config." });
+  }
+});
+
+app.post("/api/vscimage/refresh-site", requireAnalyticsAdminApi, async (_req, res) => {
+  try {
+    const result = await refreshStaticSiteCache();
+    return res.status(200).json({
+      ok: true,
+      refreshed: ["homepage", "livesite", "build"],
+      ...result
+    });
+  } catch (error) {
+    console.error("Unable to refresh VSCimage site cache:", error);
+    return res.status(500).json({ error: "Unable to refresh site cache." });
   }
 });
 
