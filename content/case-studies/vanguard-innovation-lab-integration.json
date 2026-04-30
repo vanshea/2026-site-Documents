@@ -1,141 +1,152 @@
 {
   "slug": "vanguard-innovation-lab-integration",
   "sortOrder": 2,
-  "title": "Vanguard Innovation Lab Integration",
-  "subtitle": "A structured critique system that helped innovation teams share learning earlier, pressure-test ideas, and improve decision quality.",
-  "summary": "Vanguard had strong innovation talent and research instincts, but ideas and insights were often developing in pockets. Van introduced a recurring critique system that turned isolated project learning into a shared operating rhythm.",
+  "title": "Vanguard Smart Home Voice & Security Strategy",
+  "subtitle": "A design research and strategy effort that helped Vanguard evaluate smart-home voice interfaces, security implications, and the operational readiness needed to support them.",
+  "summary": "Vanguard needed a market point of view on smart-home voice interfaces while protecting client trust. Van led the design research strategy, prototyped real solutions, and connected security concepts to business, analytics, and legacy systems.",
   "cardImage": {
-    "src": "/assets/fpo-large-atlas-1900x1600.svg",
-    "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-    "alt": "Abstract system map representing cross-team innovation critique."
+    "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
+    "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
+    "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
+    "title": "Privacy and Security Problem Roadmap",
+    "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
   },
   "heroImage": {
-    "src": "/assets/fpo-large-atlas-1900x1600.svg",
-    "alt": "Abstract system map representing innovation lab integration.",
-    "caption": "A shared critique system helped teams learn from one another while concepts were still flexible."
+    "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
+    "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
+    "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
+    "title": "Privacy and Security Problem Roadmap",
+    "caption": "The roadmap framed smart-home voice opportunities around client trust, privacy, security, device capabilities, and measurable adoption signals."
   },
   "featuredImages": [
     {
-      "src": "/assets/fpo-large-atlas-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Innovation critique system concept board.",
-      "title": "Critique System",
-      "caption": "A recurring forum for evaluating emerging concepts before teams over-invested."
-    },
-    {
-      "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Research notes and concept evaluation artifacts.",
-      "title": "Learning Loops",
-      "caption": "The system helped teams connect research evidence, assumptions, and investment decisions."
+      "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
+      "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
+      "title": "Privacy and Security Problem Roadmap",
+      "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
     },
     {
       "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
       "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
-      "alt": "PDF slide summarizing Vanguard smart-home voice interface strategy work.",
-      "title": "Smart-Home Voice Strategy Sample",
-      "caption": "From the PDF: the Vanguard sample framed business potential, technical pitfalls, security implications, and concept direction for smart-home voice interfaces."
+      "alt": "Vanguard smart-home voice strategy goals, team, market need, and outcomes.",
+      "title": "Smart-Home Voice Strategy Goals",
+      "caption": "The updated PDF frames the strategy around level of effort, consumer-facing potential, market timing, and security readiness."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-thumb-760x570.webp",
+      "alt": "UX Strategist responsibilities for Vanguard smart-home voice and security strategy.",
+      "title": "UX Strategist Role",
+      "caption": "Van led research strategy, prototyped real solutions, connected security strategy to analytics and legacy systems, and art directed smart-home concepts."
     },
     {
       "src": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-fullscreen-3200x1800.webp",
       "thumbSrc": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-thumb-760x570.webp",
-      "alt": "PDF slide showing Vanguard credentials reset and authentication redesign screens.",
-      "title": "Credentials Reset Sample",
-      "caption": "The authentication sample shows adjacent Vanguard work around security, credentials reset, and measurable client-experience improvements."
+      "alt": "Vanguard credentials reset authentication redesign screens.",
+      "title": "Credentials Reset Experience",
+      "caption": "The authentication work began with credentials reset and extended into safer, clearer client security experiences."
     }
   ],
   "galleryImages": [
     {
-      "src": "/assets/fpo-large-atlas-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Innovation critique framework.",
-      "caption": "Critique framework."
-    },
-    {
-      "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Shared learning notes.",
-      "caption": "Shared learning notes."
-    },
-    {
-      "src": "/assets/fpo-large-wren-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Concept review artifact.",
-      "caption": "Concept review artifact."
+      "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
+      "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
+      "title": "Privacy and Security Problem Roadmap",
+      "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
     },
     {
       "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
       "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
-      "alt": "PDF slide summarizing Vanguard smart-home voice interface strategy work.",
-      "title": "Smart-Home Voice Strategy Sample",
-      "caption": "From the PDF: the Vanguard sample framed business potential, technical pitfalls, security implications, and concept direction for smart-home voice interfaces."
+      "alt": "Vanguard smart-home voice strategy goals, team, market need, and outcomes.",
+      "title": "Smart-Home Voice Strategy Goals",
+      "caption": "The updated PDF frames the strategy around level of effort, consumer-facing potential, market timing, and security readiness."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-thumb-760x570.webp",
+      "alt": "UX Strategist responsibilities for Vanguard smart-home voice and security strategy.",
+      "title": "UX Strategist Role",
+      "caption": "Van led research strategy, prototyped real solutions, connected security strategy to analytics and legacy systems, and art directed smart-home concepts."
     },
     {
       "src": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-fullscreen-3200x1800.webp",
       "thumbSrc": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-thumb-760x570.webp",
-      "alt": "PDF slide showing Vanguard credentials reset and authentication redesign screens.",
-      "title": "Credentials Reset Sample",
-      "caption": "The authentication sample shows adjacent Vanguard work around security, credentials reset, and measurable client-experience improvements."
+      "alt": "Vanguard credentials reset authentication redesign screens.",
+      "title": "Credentials Reset Experience",
+      "caption": "The authentication work began with credentials reset and extended into safer, clearer client security experiences."
+    },
+    {
+      "src": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-fullscreen-3200x1800.webp",
+      "thumbSrc": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-thumb-760x570.webp",
+      "alt": "Vanguard security experience improvement showing old and new contact information update flows.",
+      "title": "Security Experience Improvements",
+      "caption": "The sample shows a problematic security experience converted into a quicker, more measurable prompt to update the client security profile."
     }
   ],
   "sections": [
     {
       "id": "conflict",
       "heading": "The Conflict",
-      "bodyHtml": "<p>Vanguard had innovation talent, strong research instincts, and emerging concepts, but the work was often happening in pockets. Innovation teams were generating ideas, prototypes, and insights without a consistent system for sharing what they were learning across teams.</p><p>The risk was that valuable knowledge stayed trapped inside individual projects, while other teams repeated similar discovery work or refined solutions too late in the process.</p>",
+      "bodyHtml": "<p>Smart-home devices were becoming a serious consumer technology category, but financial services could not treat voice interfaces as a novelty. The PDF frames the core problem clearly: clients did not yet trust security and privacy on voice technology.</p><p>Vanguard needed to understand the level of effort and timeline for using smart-home devices in a consumer-facing strategy. The opportunity was large, but the strategy had to account for client trust, security messaging, current systems, usage data, and legacy technology constraints.</p>",
       "image": {
-        "src": "/assets/fpo-large-atlas-1900x1600.svg",
-        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-        "alt": "Abstract map of isolated innovation efforts.",
-        "caption": "The challenge was not talent. It was the absence of a repeatable feedback mechanism."
+        "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
+        "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
+        "title": "Privacy and Security Problem Roadmap",
+        "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
       }
     },
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van recognized that the issue was cultural and operational. The organization did not simply need better presentation polish. It needed a better feedback mechanism. He introduced a structured Design Critique system that gave teams a shared forum to examine concepts while they were still forming.</p><p>The critique model shifted the conversation from subjective preference to decision quality. Teams were encouraged to ask sharper questions: What user problem is this solving? What evidence supports this direction? What assumptions still need to be tested? What trade-offs are we making? What should we learn before investing further?</p>"
+      "bodyHtml": "<p>Van led the design research strategy and prototyped real solutions while staying aware of current systems and client usage data for smart-home devices. He also led design and research delivery for security enhancements, connecting strategy to business analytics, system analytics, and legacy technology.</p><p>The work combined research, product strategy, and art direction. Van created and art directed smart-home concepts that illustrated the learnings and possibilities, giving leadership a clearer way to evaluate the market, the client experience, and the internal readiness required to move forward.</p>",
+      "image": {
+        "src": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-thumb-760x570.webp",
+        "alt": "UX Strategist responsibilities for Vanguard smart-home voice and security strategy.",
+        "title": "UX Strategist Role",
+        "caption": "Van led research strategy, prototyped real solutions, connected security strategy to analytics and legacy systems, and art directed smart-home concepts."
+      }
     },
     {
       "id": "impact",
-      "heading": "Impact Beyond the Critique System",
-      "bodyHtml": "<ul><li><strong>Customer Win:</strong> Helped teams pressure-test ideas earlier, before they hardened into expensive solutions. This increased the likelihood that concepts were grounded in real user needs rather than internal assumptions.</li><li><strong>Organizational Win:</strong> Reduced innovation isolation by creating a recurring structure for cross-team learning, peer review, and shared design judgment.</li><li><strong>Strategic Win:</strong> Repositioned critique as a tool for better investment decisions, not just visual refinement. The system helped teams move from “polishing outputs” to improving the quality of the thinking behind those outputs.</li><li><strong>Execution Win:</strong> Accelerated iteration cycles by moving feedback upstream into the concept stage, where teams could still adapt quickly and cheaply.</li></ul>",
+      "heading": "Impact Beyond the Roadmap",
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The work treated privacy and security as core experience requirements, not late-stage compliance considerations.</li><li><strong>Strategic Win:</strong> Vanguard gained a clearer market point of view on smart-home voice interfaces at a time when smart-home product sales and consumption were expected to exceed $500 billion by 2030.</li><li><strong>Organizational Win:</strong> The PDF notes that Vanguard digital leadership saw the need for enhanced and updated security and created teams to immediately support the technology.</li><li><strong>Execution Win:</strong> Adjacent authentication samples show how the strategy connected to concrete client security experiences, including credentials reset and profile-update flows.</li></ul>",
       "image": {
-        "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-        "alt": "Research and critique artifacts used to improve decision quality.",
-        "caption": "Critique became a decision-quality tool, not a late-stage review ritual."
+        "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
+        "alt": "Vanguard smart-home voice strategy goals, team, market need, and outcomes.",
+        "title": "Smart-Home Voice Strategy Goals",
+        "caption": "The updated PDF frames the strategy around level of effort, consumer-facing potential, market timing, and security readiness."
       }
     },
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van helped transform design critique from a late-stage review ritual into an early-stage strategic operating system. The work strengthened decision-making, reduced duplication, and helped innovation teams learn from one another while ideas were still flexible.</p>"
-    },
-    {
-      "id": "pdf-sample-evidence",
-      "heading": "Portfolio Sample Evidence",
-      "bodyHtml": "<p>The PDF adds adjacent Vanguard evidence around innovation strategy and security experience design. In the smart-home voice interface sample, Van led the design research point of view, balanced business potential with technical pitfalls, and art directed concepts that illustrated the strategic possibilities.</p><p>The sample helped leadership understand the level of effort and timeline for using smart-home devices in a consumer-facing strategy. The PDF notes that Vanguard digital leadership saw the need for enhanced and updated security and created teams to immediately support the technology.</p><p>The credentials reset sample adds another Vanguard security thread, showing work that reconsidered authentication flows and client-facing security experiences as part of a broader design strategy.</p>",
+      "bodyHtml": "<p>Van helped Vanguard move from an abstract question about voice devices to a more practical strategy for consumer-facing smart-home experiences. The work connected market opportunity, client trust, security readiness, current systems, and prototype direction into a roadmap leadership could act on.</p>",
       "image": {
-        "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
-        "alt": "PDF slide summarizing Vanguard smart-home voice interface strategy work.",
-        "title": "Smart-Home Voice Strategy Sample",
-        "caption": "From the PDF: the Vanguard sample framed business potential, technical pitfalls, security implications, and concept direction for smart-home voice interfaces."
+        "src": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-fullscreen-3200x1800.webp",
+        "thumbSrc": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-thumb-760x570.webp",
+        "alt": "Vanguard security experience improvement showing old and new contact information update flows.",
+        "title": "Security Experience Improvements",
+        "caption": "The sample shows a problematic security experience converted into a quicker, more measurable prompt to update the client security profile."
       }
     }
   ],
   "metadata": {
     "client": "Vanguard",
-    "role": "Design Strategy Lead",
+    "role": "Lead UX Strategist",
     "year": "2018",
     "industry": "Financial Services",
     "services": [
-      "Design Strategy",
-      "Innovation Operations",
-      "Design Critique",
-      "Research Synthesis"
+      "Design Research",
+      "UX Strategy",
+      "Security Experience Design",
+      "Concept Prototyping"
     ]
   },
   "readingTime": "5 min read",
-  "updatedAt": "2026-04-29"
+  "updatedAt": "2026-04-30"
 }
