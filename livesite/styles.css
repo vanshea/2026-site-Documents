@@ -817,15 +817,18 @@ h2 {
   background: var(--lightbox-control-bg);
   color: var(--lightbox-control-ink);
   cursor: pointer;
+  opacity: 0.5;
   display: grid;
   place-items: center;
   z-index: 2;
   font-size: 1.3rem;
   line-height: 1;
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .card-fullscreen:hover {
-  transform: translateY(-1px);
+  opacity: 1;
+  transform: translateY(-1px) scale(1.15);
 }
 
 .card-fullscreen:focus-visible {
@@ -1194,6 +1197,10 @@ textarea:focus {
 :root[data-theme="theme3"] label,
 :root[data-theme="theme3"] .project-inquiry-status {
   font-weight: 600;
+}
+
+:root[data-theme="theme3"] .card-fullscreen {
+  opacity: 1;
 }
 
 .lightbox {

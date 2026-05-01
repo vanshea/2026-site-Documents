@@ -820,6 +820,7 @@ h2 {
   background: var(--lightbox-control-bg);
   color: var(--lightbox-control-ink);
   cursor: pointer;
+  opacity: 0.5;
   display: grid;
   place-items: center;
   z-index: 2;
@@ -1197,6 +1198,10 @@ textarea:focus {
 :root[data-theme="theme3"] label,
 :root[data-theme="theme3"] .project-inquiry-status {
   font-weight: 600;
+}
+
+:root[data-theme="theme3"] .card-fullscreen {
+  opacity: 1;
 }
 
 .lightbox {
