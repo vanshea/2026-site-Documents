@@ -266,65 +266,69 @@
         <section class="panel case-study-workspace-panel" id="caseStudyImagePanel">
           <h2>Case Study Images</h2>
           <p class="subhead">
-            Upload or edit images in the Image Library, then assign them to case studies here
-            without opening JSON.
+            Pick a case study, pick an image from the library, then choose where it appears on
+            the page.
           </p>
 
           <form id="caseStudyImageForm" class="case-study-image-form">
             <div class="case-study-image-grid">
               <label>
-                Case Study
+                1. Case study
                 <select id="caseStudySelect"></select>
               </label>
               <label>
-                VSCimage Asset
+                2. Image from library
                 <select id="caseStudyAssetSelect"></select>
               </label>
               <label>
-                Destination
+                3. Put it here
                 <select id="caseStudySlotSelect">
-                  <option value="heroImage">Hero image</option>
-                  <option value="cardImage">Index card image</option>
-                  <option value="featuredImages">Add to featured image viewer</option>
-                  <option value="galleryImages">Add to gallery</option>
-                  <option value="sectionImage">Replace section image</option>
+                  <option value="heroImage">Top hero image</option>
+                  <option value="cardImage">Case study card image</option>
+                  <option value="sectionImage">A story section image</option>
+                  <option value="featuredImages">Add to image strip</option>
+                  <option value="galleryImages">Add to bottom gallery</option>
                 </select>
+                <span id="caseStudyPlacementHint" class="field-hint"></span>
               </label>
               <label id="caseStudySectionLabel" hidden>
-                Section
+                Which story section?
                 <select id="caseStudySectionSelect"></select>
               </label>
             </div>
 
-            <div class="case-study-image-grid">
-              <label>
-                Alt Text
-                <input
-                  id="caseStudyAltInput"
-                  type="text"
-                  maxlength="180"
-                  placeholder="Briefly describe the image"
-                />
-              </label>
-              <label>
-                Image Title
-                <input
-                  id="caseStudyTitleInput"
-                  type="text"
-                  maxlength="120"
-                  placeholder="Optional display title"
-                />
-              </label>
-              <label>
-                Caption
-                <input
-                  id="caseStudyCaptionInput"
-                  type="text"
-                  maxlength="240"
-                  placeholder="Optional caption"
-                />
-              </label>
-            </div>
+            <details class="case-study-advanced">
+              <summary>Optional image text</summary>
+              <div class="case-study-image-grid">
+                <label>
+                  Alt text
+                  <input
+                    id="caseStudyAltInput"
+                    type="text"
+                    maxlength="180"
+                    placeholder="Briefly describe the image"
+                  />
+                </label>
+                <label>
+                  Display title
+                  <input
+                    id="caseStudyTitleInput"
+                    type="text"
+                    maxlength="120"
+                    placeholder="Optional display title"
+                  />
+                </label>
+                <label>
+                  Caption
+                  <input
+                    id="caseStudyCaptionInput"
+                    type="text"
+                    maxlength="240"
+                    placeholder="Optional caption"
+                  />
+                </label>
+              </div>
+            </details>
 
             <div class="case-study-image-actions">
               <button id="caseStudyAssignButton" class="btn" type="submit">Save To Case Study</button>
@@ -333,6 +337,10 @@
               </a>
             </div>
           </form>
+
+          <p id="caseStudyImageMsg" class="status" role="status" aria-live="polite"></p>
+          <div id="caseStudyImagePreview" class="case-study-image-preview"></div>
+          <div id="caseStudyCurrentImages" class="case-study-current-images"></div>
 
           <form id="caseStudyTextForm" class="case-study-text-form">
             <div class="case-study-text-header">
@@ -371,9 +379,6 @@
             <p id="caseStudyTextMsg" class="status" role="status" aria-live="polite"></p>
           </form>
 
-          <p id="caseStudyImageMsg" class="status" role="status" aria-live="polite"></p>
-          <div id="caseStudyImagePreview" class="case-study-image-preview"></div>
-          <div id="caseStudyCurrentImages" class="case-study-current-images"></div>
         </section>
       </div>
     </main>

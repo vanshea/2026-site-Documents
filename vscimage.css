@@ -930,6 +930,30 @@ th {
   margin-top: 14px;
 }
 
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.case-study-advanced {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-alt);
+  padding: 10px 12px;
+}
+
+.case-study-advanced summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.case-study-advanced .case-study-image-grid {
+  margin-top: 12px;
+}
+
 .case-study-image-grid {
   display: grid;
   gap: 12px;
@@ -1005,6 +1029,23 @@ th {
   background: var(--surface-alt);
   padding: 10px;
   position: relative;
+}
+
+.case-study-current-image.is-empty {
+  border-style: dashed;
+}
+
+.case-study-current-placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  aspect-ratio: 4 / 3;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-weight: 800;
+  text-align: center;
 }
 
 .case-study-current-image p {

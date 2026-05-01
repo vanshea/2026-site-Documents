@@ -5,134 +5,41 @@
   "subtitle": "A design research and strategy effort that helped Vanguard evaluate smart-home voice interfaces, security implications, and the operational readiness needed to support them.",
   "summary": "Vanguard needed a market point of view on smart-home voice interfaces while protecting client trust. Van led the design research strategy, prototyped real solutions, and connected security concepts to business, analytics, and legacy systems.",
   "cardImage": {
-    "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
-    "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
-    "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
-    "title": "Privacy and Security Problem Roadmap",
-    "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
+    "src": "/assets/vscimage/generated/vanguard-md2-fullscreen-3200x1800.webp",
+    "thumbSrc": "/assets/vscimage/generated/vanguard-md2-thumb-760x570.webp",
+    "alt": "Vanguard concepts slide showing 154 concepts.",
+    "title": "Concept Exploration",
+    "caption": "The concept work turned research signals into 154 directions for evaluating smart-home voice experiences."
   },
   "heroImage": {
-    "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
-    "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
-    "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
-    "title": "Privacy and Security Problem Roadmap",
-    "caption": "The roadmap framed smart-home voice opportunities around client trust, privacy, security, device capabilities, and measurable adoption signals."
+    "src": "/assets/vscimage/generated/vanguard-md1-fullscreen-3200x1800.webp",
+    "thumbSrc": "/assets/vscimage/generated/vanguard-md1-thumb-760x570.webp",
+    "alt": "Vanguard research metrics showing 334 video snippets, 248 survey responses, and 24 interviews.",
+    "title": "Research Metrics",
+    "caption": "Research synthesis included 334 video snippets, 248 survey responses, and 24 interviews."
   },
-  "featuredImages": [
-    {
-      "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
-      "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
-      "title": "Privacy and Security Problem Roadmap",
-      "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
-      "alt": "Vanguard smart-home voice strategy goals, team, market need, and outcomes.",
-      "title": "Smart-Home Voice Strategy Goals",
-      "caption": "The updated PDF frames the strategy around level of effort, consumer-facing potential, market timing, and security readiness."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-thumb-760x570.webp",
-      "alt": "UX Strategist responsibilities for Vanguard smart-home voice and security strategy.",
-      "title": "UX Strategist Role",
-      "caption": "Van led research strategy, prototyped real solutions, connected security strategy to analytics and legacy systems, and art directed smart-home concepts."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-thumb-760x570.webp",
-      "alt": "Vanguard credentials reset authentication redesign screens.",
-      "title": "Credentials Reset Experience",
-      "caption": "The authentication work began with credentials reset and extended into safer, clearer client security experiences."
-    }
-  ],
-  "galleryImages": [
-    {
-      "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
-      "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
-      "title": "Privacy and Security Problem Roadmap",
-      "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
-      "alt": "Vanguard smart-home voice strategy goals, team, market need, and outcomes.",
-      "title": "Smart-Home Voice Strategy Goals",
-      "caption": "The updated PDF frames the strategy around level of effort, consumer-facing potential, market timing, and security readiness."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-thumb-760x570.webp",
-      "alt": "UX Strategist responsibilities for Vanguard smart-home voice and security strategy.",
-      "title": "UX Strategist Role",
-      "caption": "Van led research strategy, prototyped real solutions, connected security strategy to analytics and legacy systems, and art directed smart-home concepts."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-credentials-reset-pdf-thumb-760x570.webp",
-      "alt": "Vanguard credentials reset authentication redesign screens.",
-      "title": "Credentials Reset Experience",
-      "caption": "The authentication work began with credentials reset and extended into safer, clearer client security experiences."
-    },
-    {
-      "src": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-fullscreen-3200x1800.webp",
-      "thumbSrc": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-thumb-760x570.webp",
-      "alt": "Vanguard security experience improvement showing old and new contact information update flows.",
-      "title": "Security Experience Improvements",
-      "caption": "The sample shows a problematic security experience converted into a quicker, more measurable prompt to update the client security profile."
-    }
-  ],
+  "featuredImages": [],
+  "galleryImages": [],
   "sections": [
     {
       "id": "conflict",
       "heading": "The Conflict",
-      "bodyHtml": "<p>Smart-home devices were becoming a serious consumer technology category, but financial services could not treat voice interfaces as a novelty. The PDF frames the core problem clearly: clients did not yet trust security and privacy on voice technology.</p><p>Vanguard needed to understand the level of effort and timeline for using smart-home devices in a consumer-facing strategy. The opportunity was large, but the strategy had to account for client trust, security messaging, current systems, usage data, and legacy technology constraints.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-security-roadmap-pdf-thumb-760x570.webp",
-        "alt": "Device enablement privacy and security problem roadmap for Vanguard smart-home voice interfaces.",
-        "title": "Privacy and Security Problem Roadmap",
-        "caption": "The roadmap framed client trust, device capabilities, security messaging, and product opportunities for voice technology."
-      }
+      "bodyHtml": "<p>Smart-home devices were becoming a serious consumer technology category, but financial services could not treat voice interfaces as a novelty. The PDF frames the core problem clearly: clients did not yet trust security and privacy on voice technology.</p><p>Vanguard needed to understand the level of effort and timeline for using smart-home devices in a consumer-facing strategy. The opportunity was large, but the strategy had to account for client trust, security messaging, current systems, usage data, and legacy technology constraints.</p>"
     },
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van led the design research strategy and prototyped real solutions while staying aware of current systems and client usage data for smart-home devices. He also led design and research delivery for security enhancements, connecting strategy to business analytics, system analytics, and legacy technology.</p><p>The work combined research, product strategy, and art direction. Van created and art directed smart-home concepts that illustrated the learnings and possibilities, giving leadership a clearer way to evaluate the market, the client experience, and the internal readiness required to move forward.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-role-pdf-thumb-760x570.webp",
-        "alt": "UX Strategist responsibilities for Vanguard smart-home voice and security strategy.",
-        "title": "UX Strategist Role",
-        "caption": "Van led research strategy, prototyped real solutions, connected security strategy to analytics and legacy systems, and art directed smart-home concepts."
-      }
+      "bodyHtml": "<p>Van led the design research strategy and prototyped real solutions while staying aware of current systems and client usage data for smart-home devices. He also led design and research delivery for security enhancements, connecting strategy to business analytics, system analytics, and legacy technology.</p><p>The work combined research, product strategy, and art direction. Van created and art directed smart-home concepts that illustrated the learnings and possibilities, giving leadership a clearer way to evaluate the market, the client experience, and the internal readiness required to move forward.</p>"
     },
     {
       "id": "impact",
       "heading": "Impact Beyond the Roadmap",
-      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The work treated privacy and security as core experience requirements, not late-stage compliance considerations.</li><li><strong>Strategic Win:</strong> Vanguard gained a clearer market point of view on smart-home voice interfaces at a time when smart-home product sales and consumption were expected to exceed $500 billion by 2030.</li><li><strong>Organizational Win:</strong> The PDF notes that Vanguard digital leadership saw the need for enhanced and updated security and created teams to immediately support the technology.</li><li><strong>Execution Win:</strong> Adjacent authentication samples show how the strategy connected to concrete client security experiences, including credentials reset and profile-update flows.</li></ul>",
-      "image": {
-        "src": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-smart-home-voice-strategy-pdf-thumb-760x570.webp",
-        "alt": "Vanguard smart-home voice strategy goals, team, market need, and outcomes.",
-        "title": "Smart-Home Voice Strategy Goals",
-        "caption": "The updated PDF frames the strategy around level of effort, consumer-facing potential, market timing, and security readiness."
-      }
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The work treated privacy and security as core experience requirements, not late-stage compliance considerations.</li><li><strong>Strategic Win:</strong> Vanguard gained a clearer market point of view on smart-home voice interfaces at a time when smart-home product sales and consumption were expected to exceed $500 billion by 2030.</li><li><strong>Organizational Win:</strong> The PDF notes that Vanguard digital leadership saw the need for enhanced and updated security and created teams to immediately support the technology.</li><li><strong>Execution Win:</strong> Adjacent authentication samples show how the strategy connected to concrete client security experiences, including credentials reset and profile-update flows.</li></ul>"
     },
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van helped Vanguard move from an abstract question about voice devices to a more practical strategy for consumer-facing smart-home experiences. The work connected market opportunity, client trust, security readiness, current systems, and prototype direction into a roadmap leadership could act on.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-security-quick-solutions-pdf-thumb-760x570.webp",
-        "alt": "Vanguard security experience improvement showing old and new contact information update flows.",
-        "title": "Security Experience Improvements",
-        "caption": "The sample shows a problematic security experience converted into a quicker, more measurable prompt to update the client security profile."
-      }
+      "bodyHtml": "<p>Van helped Vanguard move from an abstract question about voice devices to a more practical strategy for consumer-facing smart-home experiences. The work connected market opportunity, client trust, security readiness, current systems, and prototype direction into a roadmap leadership could act on.</p>"
     }
   ],
   "metadata": {
@@ -148,5 +55,5 @@
     ]
   },
   "readingTime": "5 min read",
-  "updatedAt": "2026-04-30"
+  "updatedAt": "2026-05-01"
 }

@@ -823,10 +823,12 @@ h2 {
   z-index: 2;
   font-size: 1.3rem;
   line-height: 1;
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 
 .card-fullscreen:hover {
-  transform: translateY(-1px);
+  opacity: 1;
+  transform: translateY(-1px) scale(1.15);
 }
 
 .card-fullscreen:focus-visible {
