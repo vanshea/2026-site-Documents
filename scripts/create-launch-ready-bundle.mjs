@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { access, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const projectRoot = process.cwd();
@@ -76,6 +76,12 @@ function shouldCopy(sourcePath) {
 async function copyIntoUpload(relativePath) {
   const sourcePath = path.join(projectRoot, relativePath);
   const destinationPath = path.join(uploadRoot, relativePath);
+
+  try {
+    await access(sourcePath);
+  } catch (error) {
+    return;
+  }
 
   await cp(sourcePath, destinationPath, {
     recursive: true,

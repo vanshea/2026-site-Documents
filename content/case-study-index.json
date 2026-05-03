@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Case Studies | Van Shea Creative",
+  "metaDescription": "Selected UX, strategy, service design, and product case studies from Van Shea Creative.",
+  "heroEyebrow": "Selected Work",
+  "heroTitle": "Case studies for high-level review.",
+  "heroLead": "Each entry below is work that I am proud of, done by myself and many others.",
+  "topImage": {
+    "src": "/assets/vscimage/generated/case-studies-fullscreen-3200x1800.webp",
+    "thumbSrc": "/assets/vscimage/generated/case-studies-thumb-760x570.webp",
+    "alt": "case-studies",
+    "title": "case-studies",
+    "caption": ""
+  },
+  "galleryEyebrow": "Gallery",
+  "galleryTitle": "Case Study Index"
+}

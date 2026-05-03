@@ -28,6 +28,19 @@
           </p>
         </div>
         <div class="app-header-actions">
+          <a
+            id="vscimageLoginLink"
+            class="btn btn-secondary"
+            href="/login?next=/vscimage"
+          >
+            Login
+          </a>
+          <form id="vscimageLogoutForm" class="vscimage-session-form" method="post" action="/logout">
+            <button class="btn btn-secondary" type="submit">Logout</button>
+          </form>
+          <button id="resetVscimageButton" class="btn btn-secondary" type="button">
+            Reset VSCimage
+          </button>
           <button id="globalSaveButton" class="btn btn-primary" type="button">
             Save
           </button>
@@ -264,11 +277,72 @@
         hidden
       >
         <section class="panel case-study-workspace-panel" id="caseStudyImagePanel">
-          <h2>Case Study Images</h2>
+          <h2>Case Studies</h2>
           <p class="subhead">
-            Pick a case study, pick an image from the library, then choose where it appears on
-            the page.
+            Edit the case study index page, then manage the images and text for each individual
+            case study.
           </p>
+
+          <form id="caseStudyIndexForm" class="case-study-index-form">
+            <div class="case-study-text-header">
+              <h3>Case Study Index Page</h3>
+              <button id="caseStudyIndexSaveButton" class="btn" type="submit">
+                Save Index Text
+              </button>
+            </div>
+
+            <div class="case-study-image-grid">
+              <label>
+                Browser title
+                <input id="caseStudyIndexPageTitle" type="text" maxlength="120" />
+              </label>
+              <label>
+                Meta description
+                <input id="caseStudyIndexMetaDescription" type="text" maxlength="240" />
+              </label>
+            </div>
+
+            <div class="case-study-image-grid">
+              <label>
+                Hero eyebrow
+                <input id="caseStudyIndexHeroEyebrow" type="text" maxlength="80" />
+              </label>
+              <label>
+                Hero headline
+                <input id="caseStudyIndexHeroTitle" type="text" maxlength="180" />
+              </label>
+            </div>
+
+            <label>
+              Hero intro text
+              <textarea id="caseStudyIndexHeroLead" rows="3" maxlength="520"></textarea>
+            </label>
+
+            <div class="case-study-image-grid">
+              <label>
+                Top image
+                <select id="caseStudyIndexTopImageSelect"></select>
+                <span class="field-hint">
+                  Appears beside the intro text at the top of /case-studies.
+                </span>
+              </label>
+            </div>
+
+            <div id="caseStudyIndexTopImagePreview" class="case-study-image-preview"></div>
+
+            <div class="case-study-image-grid">
+              <label>
+                Gallery eyebrow
+                <input id="caseStudyIndexGalleryEyebrow" type="text" maxlength="80" />
+              </label>
+              <label>
+                Gallery heading
+                <input id="caseStudyIndexGalleryTitle" type="text" maxlength="120" />
+              </label>
+            </div>
+
+            <p id="caseStudyIndexMsg" class="status" role="status" aria-live="polite"></p>
+          </form>
 
           <form id="caseStudyImageForm" class="case-study-image-form">
             <div class="case-study-image-grid">

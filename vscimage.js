@@ -11,6 +11,7 @@ const state = {
   config: null,
   files: [],
   caseStudies: [],
+  caseStudyIndex: null,
   apiAvailable: true,
   apiOrigin: window.location.origin,
   uploadDroppedFiles: [],
@@ -37,7 +38,8 @@ const state = {
   dragEntryId: "",
   dropTargetEntryId: "",
   caseStudyFocusedSectionId: "",
-  undoAction: null
+  undoAction: null,
+  viewportLock: null
 };
 
 const THUMB_CARD_MIN_WIDTH = 210;
@@ -45,6 +47,8 @@ const THUMB_ROWS_PER_BATCH = 3;
 const UPLOAD_DRAFT_KEY = "vscimage.uploadDraft";
 const FILTER_DRAFT_KEY = "vscimage.galleryFilters";
 const EDITOR_DRAFT_PREFIX = "vscimage.editorDraft.";
+const WORKSPACE_DRAFT_KEY = "vscimage.activeWorkspace";
+const VSCIMAGE_STORAGE_PREFIX = "vscimage.";
 
 const API_ORIGIN_CANDIDATES = (() => {
   const origins = [window.location.origin];
@@ -56,6 +60,14 @@ const API_ORIGIN_CANDIDATES = (() => {
 
   return origins;
 })();
+
+function cssEscape(value) {
+  if (window.CSS?.escape) {
+    return window.CSS.escape(String(value || ""));
+  }
+
+  return String(value || "").replace(/["\\]/g, "\\$&");
+}
 
 function cloneJson(value) {
   return JSON.parse(JSON.stringify(value));
@@ -87,7 +99,144 @@ function removeLocalStorageKey(key) {
   }
 }
 
-function setWorkspaceTab(tabName) {
+function getStorageKeys(storage) {
+  try {
+    return Array.from({ length: storage.length }, (_, index) => storage.key(index)).filter(Boolean);
+  } catch (error) {
+    return [];
+  }
+}
+
+function clearVscimageStorageKeys() {
+  [window.localStorage, window.sessionStorage].forEach((storage) => {
+    if (!storage) return;
+    getStorageKeys(storage).forEach((key) => {
+      if (!key.startsWith(VSCIMAGE_STORAGE_PREFIX)) return;
+      try {
+        storage.removeItem(key);
+      } catch (error) {
+        return;
+      }
+    });
+  });
+}
+
+async function clearVscimageCacheStorage() {
+  if (!window.caches?.keys) return 0;
+
+  try {
+    const cacheNames = await window.caches.keys();
+    const vscimageCacheNames = cacheNames.filter((cacheName) =>
+      /vscimage|van.?shea|portfolio/i.test(cacheName)
+    );
+
+    await Promise.all(vscimageCacheNames.map((cacheName) => window.caches.delete(cacheName)));
+    return vscimageCacheNames.length;
+  } catch (error) {
+    return 0;
+  }
+}
+
+function resetVscimageRuntimeState() {
+  state.uploadDroppedFiles = [];
+  state.editorEntryId = "";
+  state.editorMode = "single";
+  state.editorBatchIds = [];
+  state.editorDraftKey = "";
+  state.editorPreviewUrl = "";
+  state.galleryBusyId = "";
+  state.galleryBusyAction = "";
+  state.thumbSectionOpen = { process: false, archived: false };
+  state.thumbBatchOpen = {};
+  state.selectedEntryIds = new Set();
+  state.galleryFilters = {
+    query: "",
+    status: "all",
+    category: "all",
+    featured: "all",
+    sort: "homepage"
+  };
+  state.dragEntryId = "";
+  state.dropTargetEntryId = "";
+  state.caseStudyFocusedSectionId = "";
+  state.undoAction = null;
+  state.viewportLock = null;
+
+  uploadForm?.reset();
+  thumbEditorForm?.reset();
+  cleanupEditorPreviewUrl();
+  closeGalleryEditor();
+}
+
+function deriveInPlaceSelector(element) {
+  if (!element) return "";
+
+  const thumbCard = element.closest?.("[data-entry-id]");
+  if (thumbCard?.dataset.entryId) {
+    return `[data-entry-id="${cssEscape(thumbCard.dataset.entryId)}"]`;
+  }
+
+  const caseStudyRow = element.closest?.("[data-case-study-row-id]");
+  if (caseStudyRow?.dataset.caseStudyRowId) {
+    return `[data-case-study-row-id="${cssEscape(caseStudyRow.dataset.caseStudyRowId)}"]`;
+  }
+
+  const actionElement = element.closest?.("[data-thumb-action]");
+  if (actionElement?.dataset.thumbAction) {
+    return `[data-thumb-action="${cssEscape(actionElement.dataset.thumbAction)}"]`;
+  }
+
+  const idElement = element.id ? element : element.closest?.("[id]");
+  if (idElement?.id) {
+    return `#${cssEscape(idElement.id)}`;
+  }
+
+  return "";
+}
+
+function beginInPlaceInteraction(element, selector = "") {
+  const target = element?.closest?.("button, input, select, textarea, summary, [data-entry-id], [id]") || element;
+  const rect = target?.getBoundingClientRect?.();
+  const anchorSelector = selector || deriveInPlaceSelector(target);
+
+  if (!rect || !anchorSelector) return;
+
+  state.viewportLock = {
+    selector: anchorSelector,
+    top: rect.top,
+    scrollY: window.scrollY,
+    createdAt: Date.now()
+  };
+}
+
+function restoreInPlaceInteraction() {
+  const lock = state.viewportLock;
+  if (!lock) return;
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const currentLock = state.viewportLock;
+      if (!currentLock || currentLock !== lock) return;
+
+      const target = document.querySelector(currentLock.selector);
+      if (target) {
+        const nextTop = target.getBoundingClientRect().top;
+        const delta = nextTop - currentLock.top;
+        if (Math.abs(delta) > 1) {
+          window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+        }
+      } else {
+        window.scrollTo({ top: currentLock.scrollY, left: window.scrollX, behavior: "auto" });
+      }
+
+      if (Date.now() - currentLock.createdAt > 500) {
+        state.viewportLock = null;
+      }
+    });
+  });
+}
+
+function setWorkspaceTab(tabName, { persist = true } = {}) {
   const nextTab = String(tabName || "image-library").trim() || "image-library";
 
   workspaceTabButtons.forEach((button) => {
@@ -104,6 +253,10 @@ function setWorkspaceTab(tabName) {
 
   if (nextTab === "case-studies") {
     renderCaseStudyImageControls();
+  }
+
+  if (persist) {
+    writeLocalStorageJson(WORKSPACE_DRAFT_KEY, nextTab);
   }
 }
 
@@ -122,6 +275,25 @@ function announce(message) {
   });
 }
 
+function handlePotentialInPlaceControl(event) {
+  const control = event.target.closest?.(
+    "button, input[type='checkbox'], select, summary, [data-thumb-action], [data-case-study-assign-target]"
+  );
+  if (!control || !document.querySelector(".app")?.contains(control)) return;
+  beginInPlaceInteraction(control);
+}
+
+document.addEventListener("pointerdown", handlePotentialInPlaceControl, true);
+document.addEventListener("change", handlePotentialInPlaceControl, true);
+document.addEventListener(
+  "keydown",
+  (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    handlePotentialInPlaceControl(event);
+  },
+  true
+);
+
 function toAssetUrl(filePath) {
   if (!filePath) return "";
   if (/^(https?:)?\/\//.test(filePath)) return filePath;
@@ -135,6 +307,8 @@ const uploadMsg = document.getElementById("uploadMsg");
 const generatedList = document.getElementById("generatedList");
 const workspaceTabButtons = Array.from(document.querySelectorAll("[data-workspace-tab]"));
 const workspacePanels = Array.from(document.querySelectorAll("[data-workspace-panel]"));
+const resetVscimageButton = document.getElementById("resetVscimageButton");
+const vscimageLogoutForm = document.getElementById("vscimageLogoutForm");
 const globalSaveButton = document.getElementById("globalSaveButton");
 const globalSaveMsg = document.getElementById("globalSaveMsg");
 const uploadDropzone = document.getElementById("uploadDropzone");
@@ -160,6 +334,18 @@ const previewGrid = document.getElementById("previewGrid");
 const thumbAccordion = document.getElementById("thumbAccordion");
 const thumbMsg = document.getElementById("thumbMsg");
 const caseStudyImageForm = document.getElementById("caseStudyImageForm");
+const caseStudyIndexForm = document.getElementById("caseStudyIndexForm");
+const caseStudyIndexPageTitle = document.getElementById("caseStudyIndexPageTitle");
+const caseStudyIndexMetaDescription = document.getElementById("caseStudyIndexMetaDescription");
+const caseStudyIndexHeroEyebrow = document.getElementById("caseStudyIndexHeroEyebrow");
+const caseStudyIndexHeroTitle = document.getElementById("caseStudyIndexHeroTitle");
+const caseStudyIndexHeroLead = document.getElementById("caseStudyIndexHeroLead");
+const caseStudyIndexTopImageSelect = document.getElementById("caseStudyIndexTopImageSelect");
+const caseStudyIndexTopImagePreview = document.getElementById("caseStudyIndexTopImagePreview");
+const caseStudyIndexGalleryEyebrow = document.getElementById("caseStudyIndexGalleryEyebrow");
+const caseStudyIndexGalleryTitle = document.getElementById("caseStudyIndexGalleryTitle");
+const caseStudyIndexSaveButton = document.getElementById("caseStudyIndexSaveButton");
+const caseStudyIndexMsg = document.getElementById("caseStudyIndexMsg");
 const caseStudySelect = document.getElementById("caseStudySelect");
 const caseStudyAssetSelect = document.getElementById("caseStudyAssetSelect");
 const caseStudySlotSelect = document.getElementById("caseStudySlotSelect");
@@ -988,6 +1174,132 @@ function getCaseStudyAssetEntry() {
   return getGalleryEntryById(caseStudyAssetSelect?.value || "");
 }
 
+function getCaseStudyIndexTopImageEntry() {
+  return getGalleryEntryById(caseStudyIndexTopImageSelect?.value || "");
+}
+
+function toCaseStudyImageFromGalleryEntry(entry) {
+  if (!entry) return null;
+
+  const src = toAssetUrl(entry.fullscreen || entry.large || entry.thumb || "");
+  if (!src) return null;
+
+  const thumbSrc = toAssetUrl(entry.thumb || entry.large || entry.fullscreen || src);
+  const title = entry.title || "";
+
+  return {
+    src,
+    thumbSrc,
+    alt: title,
+    title,
+    caption: entry.description || entry.cardDescription || ""
+  };
+}
+
+function renderCaseStudyIndexTopImageSelect() {
+  if (!caseStudyIndexTopImageSelect) return;
+
+  const currentEntry = findGalleryEntryForCaseStudyImage(state.caseStudyIndex?.topImage);
+  const previousValue = caseStudyIndexTopImageSelect.value || currentEntry?.id || "";
+  const entries = getActiveGalleryEntries();
+  caseStudyIndexTopImageSelect.innerHTML = "";
+
+  const emptyOption = document.createElement("option");
+  emptyOption.value = "";
+  emptyOption.textContent = "No top image";
+  caseStudyIndexTopImageSelect.appendChild(emptyOption);
+
+  entries.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.id;
+    option.textContent = entry.title;
+    caseStudyIndexTopImageSelect.appendChild(option);
+  });
+
+  const nextValue = entries.some((entry) => entry.id === previousValue)
+    ? previousValue
+    : currentEntry?.id || "";
+  caseStudyIndexTopImageSelect.value = entries.some((entry) => entry.id === nextValue)
+    ? nextValue
+    : "";
+}
+
+function updateCaseStudyIndexTopImagePreview() {
+  if (!caseStudyIndexTopImagePreview) return;
+
+  const entry = getCaseStudyIndexTopImageEntry();
+  caseStudyIndexTopImagePreview.innerHTML = "";
+
+  if (!entry) {
+    return;
+  }
+
+  const image = document.createElement("img");
+  image.src = toAssetUrl(entry.large || entry.fullscreen || entry.thumb);
+  image.alt = entry.title;
+  image.loading = "lazy";
+
+  const copy = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = entry.title;
+  const path = document.createElement("p");
+  path.className = "path";
+  path.textContent = entry.large || entry.fullscreen || entry.thumb;
+
+  copy.appendChild(title);
+  copy.appendChild(path);
+  caseStudyIndexTopImagePreview.appendChild(image);
+  caseStudyIndexTopImagePreview.appendChild(copy);
+}
+
+function renderCaseStudyIndexControls() {
+  if (!caseStudyIndexForm) return;
+
+  const content = state.caseStudyIndex || {};
+  renderCaseStudyIndexTopImageSelect();
+  updateCaseStudyIndexTopImagePreview();
+  if (caseStudyIndexPageTitle) caseStudyIndexPageTitle.value = content.pageTitle || "";
+  if (caseStudyIndexMetaDescription) {
+    caseStudyIndexMetaDescription.value = content.metaDescription || "";
+  }
+  if (caseStudyIndexHeroEyebrow) caseStudyIndexHeroEyebrow.value = content.heroEyebrow || "";
+  if (caseStudyIndexHeroTitle) caseStudyIndexHeroTitle.value = content.heroTitle || "";
+  if (caseStudyIndexHeroLead) caseStudyIndexHeroLead.value = content.heroLead || "";
+  if (caseStudyIndexGalleryEyebrow) {
+    caseStudyIndexGalleryEyebrow.value = content.galleryEyebrow || "";
+  }
+  if (caseStudyIndexGalleryTitle) caseStudyIndexGalleryTitle.value = content.galleryTitle || "";
+
+  [
+    caseStudyIndexPageTitle,
+    caseStudyIndexMetaDescription,
+    caseStudyIndexHeroEyebrow,
+    caseStudyIndexHeroTitle,
+    caseStudyIndexHeroLead,
+    caseStudyIndexTopImageSelect,
+    caseStudyIndexGalleryEyebrow,
+    caseStudyIndexGalleryTitle,
+    caseStudyIndexSaveButton
+  ].forEach((element) => {
+    if (element) element.disabled = !state.apiAvailable;
+  });
+
+  restoreInPlaceInteraction();
+}
+
+function collectCaseStudyIndexPayload() {
+  return {
+    pageTitle: caseStudyIndexPageTitle?.value || "",
+    metaDescription: caseStudyIndexMetaDescription?.value || "",
+    heroEyebrow: caseStudyIndexHeroEyebrow?.value || "",
+    heroTitle: caseStudyIndexHeroTitle?.value || "",
+    heroLead: caseStudyIndexHeroLead?.value || "",
+    topImage: toCaseStudyImageFromGalleryEntry(getCaseStudyIndexTopImageEntry()),
+    galleryEyebrow: caseStudyIndexGalleryEyebrow?.value || "",
+    galleryTitle: caseStudyIndexGalleryTitle?.value || ""
+  };
+}
+
 function getCaseStudySlotLabel(slot) {
   return (
     {
@@ -1287,6 +1599,7 @@ function fillCaseStudyImageTextFromAsset({ force = false } = {}) {
 function createCaseStudyImageRow({ label, image, slot, index = -1, sectionId = "" }) {
   const row = document.createElement("article");
   row.className = "case-study-current-image";
+  row.dataset.caseStudyRowId = `${slot || "image"}-${sectionId || index}`;
   if (!image) {
     row.classList.add("is-empty");
   }
@@ -1446,6 +1759,7 @@ function renderCaseStudyImageControls() {
     caseStudyAssignButton.disabled =
       !state.apiAvailable || !caseStudySelect?.value || !caseStudyAssetSelect?.value;
   }
+  restoreInPlaceInteraction();
 }
 
 function ensureConfigShape(config) {
@@ -3091,6 +3405,7 @@ function renderThumbAccordion() {
       ? "No images match the current filters. Adjust the search or upload a new image."
       : "No generated thumbnails yet. Upload an image to start the gallery.";
     thumbAccordion.appendChild(empty);
+    restoreInPlaceInteraction();
     return;
   }
 
@@ -3151,6 +3466,8 @@ function renderThumbAccordion() {
       collapsedByDefault: true
     })
   );
+
+  restoreInPlaceInteraction();
 }
 
 function renderSelect(selectElement, selectedValue) {
@@ -3323,6 +3640,25 @@ async function refreshSiteCache() {
   });
 }
 
+async function resetVscimageApp() {
+  clearVscimageStorageKeys();
+  resetVscimageRuntimeState();
+  setWorkspaceTab("image-library", { persist: false });
+
+  const deletedCacheCount = await clearVscimageCacheStorage();
+
+  if (state.apiAvailable) {
+    await refreshSiteCache();
+  }
+
+  await reloadData();
+
+  const cacheText = deletedCacheCount
+    ? ` Deleted ${deletedCacheCount} browser cache ${deletedCacheCount === 1 ? "entry" : "entries"}.`
+    : "";
+  return `VSCimage reset complete. Local drafts, filters, selection, and workspace state were cleared.${cacheText}`;
+}
+
 async function saveActiveWorkspaceAndRefresh() {
   if (!state.apiAvailable) {
     const message =
@@ -3343,9 +3679,15 @@ async function saveActiveWorkspaceAndRefresh() {
   }
 
   if (activeWorkspace === "case-studies") {
-    await saveCaseStudyText({ silent: true });
-    setStatus(caseStudyTextMsg, "Case study text saved.", "ok");
-    savedLabels.push("case study text");
+    await saveCaseStudyIndexText({ silent: true });
+    setStatus(caseStudyIndexMsg, "Case study index text saved.", "ok");
+    savedLabels.push("case study index text");
+
+    if (caseStudySelect?.value) {
+      await saveCaseStudyText({ silent: true });
+      setStatus(caseStudyTextMsg, "Case study text saved.", "ok");
+      savedLabels.push("case study text");
+    }
   } else {
     await saveSiteConfig({ silent: true });
     setStatus(configMsg, "Site image configuration saved.", "ok");
@@ -3599,6 +3941,7 @@ async function reloadData() {
       config = await fetchJson(`${state.apiOrigin}/api/vscimage/config`);
       const filesPayload = await fetchJson(`${state.apiOrigin}/api/vscimage/files`);
       const caseStudiesPayload = await fetchJson(`${state.apiOrigin}/api/vscimage/case-studies`);
+      state.caseStudyIndex = caseStudiesPayload.caseStudyIndex || null;
       files = Array.isArray(filesPayload.files) ? filesPayload.files : [];
       state.caseStudies = Array.isArray(caseStudiesPayload.caseStudies)
         ? caseStudiesPayload.caseStudies
@@ -3611,6 +3954,7 @@ async function reloadData() {
         config = {};
       }
       files = collectConfigImagePaths(config);
+      state.caseStudyIndex = null;
       state.caseStudies = [];
       setStatus(
         configMsg,
@@ -3641,7 +3985,11 @@ async function reloadData() {
   renderConfigControls();
   renderPreview();
   renderThumbAccordion();
+  renderCaseStudyIndexControls();
   renderCaseStudyImageControls();
+  setWorkspaceTab(readLocalStorageJson(WORKSPACE_DRAFT_KEY, getActiveWorkspaceTab()), {
+    persist: false
+  });
 
   const saveButton = configForm?.querySelector('button[type="submit"]');
   updateUploadButtonState();
@@ -3792,6 +4140,33 @@ if (globalSaveButton) {
     } finally {
       globalSaveButton.disabled = !state.apiAvailable;
     }
+  });
+}
+
+if (resetVscimageButton) {
+  resetVscimageButton.addEventListener("click", async () => {
+    const shouldReset = window.confirm(
+      "Reset VSCimage on this browser? This clears local drafts, filters, selections, and browser cache entries for VSCimage. Uploaded images and saved site content will stay in place."
+    );
+    if (!shouldReset) return;
+
+    try {
+      resetVscimageButton.disabled = true;
+      setStatus(globalSaveMsg, "Resetting VSCimage...", "");
+      const message = await resetVscimageApp();
+      setStatus(globalSaveMsg, message, "ok");
+      announce(message);
+    } catch (error) {
+      setStatus(globalSaveMsg, error.message, "error");
+    } finally {
+      resetVscimageButton.disabled = false;
+    }
+  });
+}
+
+if (vscimageLogoutForm) {
+  vscimageLogoutForm.addEventListener("submit", () => {
+    clearVscimageStorageKeys();
   });
 }
 
@@ -4111,6 +4486,12 @@ if (caseStudyAssetSelect) {
   });
 }
 
+if (caseStudyIndexTopImageSelect) {
+  caseStudyIndexTopImageSelect.addEventListener("change", () => {
+    updateCaseStudyIndexTopImagePreview();
+  });
+}
+
 if (caseStudySlotSelect) {
   caseStudySlotSelect.addEventListener("change", () => {
     renderCaseStudySectionSelect();
@@ -4197,6 +4578,40 @@ async function saveCaseStudyText({ silent = false } = {}) {
   }
 }
 
+async function saveCaseStudyIndexText({ silent = false } = {}) {
+  if (!state.apiAvailable) {
+    const message = "Case study index editing is unavailable in read-only mode.";
+    setStatus(caseStudyIndexMsg, message, "error");
+    throw new Error(message);
+  }
+
+  if (caseStudyIndexSaveButton) caseStudyIndexSaveButton.disabled = true;
+  if (!silent) {
+    setStatus(caseStudyIndexMsg, "Saving case study index text...", "");
+  }
+
+  try {
+    const payload = await fetchJson(`${state.apiOrigin}/api/vscimage/case-study-index`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collectCaseStudyIndexPayload())
+    });
+
+    state.caseStudyIndex = payload.caseStudyIndex || state.caseStudyIndex;
+    renderCaseStudyIndexControls();
+    if (!silent) {
+      setStatus(caseStudyIndexMsg, "Case study index text saved and static pages refreshed.", "ok");
+      announce("Case study index text saved.");
+    }
+    return true;
+  } catch (error) {
+    setStatus(caseStudyIndexMsg, error.message, "error");
+    throw error;
+  } finally {
+    if (caseStudyIndexSaveButton) caseStudyIndexSaveButton.disabled = !state.apiAvailable;
+  }
+}
+
 async function assignSelectedImageToCaseStudy({ slotOverride = "", sectionIdOverride = "" } = {}) {
   if (!state.apiAvailable) {
     const message = "Case study assignment is unavailable in read-only mode.";
@@ -4270,6 +4685,18 @@ if (caseStudyTextForm) {
       await saveCaseStudyText();
     } catch (error) {
       setStatus(caseStudyTextMsg, error.message, "error");
+    }
+  });
+}
+
+if (caseStudyIndexForm) {
+  caseStudyIndexForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    try {
+      await saveCaseStudyIndexText();
+    } catch (error) {
+      setStatus(caseStudyIndexMsg, error.message, "error");
     }
   });
 }

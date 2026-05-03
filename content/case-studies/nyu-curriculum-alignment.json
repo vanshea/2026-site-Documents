@@ -4,63 +4,20 @@
   "title": "NYU Curriculum Alignment",
   "subtitle": "A curriculum redesign that connected Information Architecture education to modern UX practice, research, and evidence-based decision-making.",
   "summary": "At NYU, Van expanded Information Architecture beyond static classification methods and reframed it as part of a broader human-centered UX process.",
-  "cardImage": {
-    "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-    "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-    "alt": "Abstract field notes representing curriculum design and UX education."
-  },
   "heroImage": {
-    "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-    "alt": "Abstract field notes representing UX curriculum alignment.",
-    "caption": "The course became a bridge between academic design training and professional UX practice."
+    "src": "/assets/vscimage/generated/nyu-2000-1-2000x1000-fullscreen-3200x1800.webp",
+    "thumbSrc": "/assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp",
+    "alt": "NYU Contributions",
+    "title": "NYU Contributions",
+    "caption": ""
   },
-  "featuredImages": [
-    {
-      "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Curriculum planning notes.",
-      "title": "Curriculum Strategy",
-      "caption": "Information Architecture was reframed as part of a larger human-centered process."
-    },
-    {
-      "src": "/assets/fpo-large-wren-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Student learning model visualization.",
-      "title": "Learning Model",
-      "caption": "Students connected structure, behavior, research, and testing."
-    }
-  ],
-  "galleryImages": [
-    {
-      "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "UX curriculum notes.",
-      "caption": "Curriculum notes."
-    },
-    {
-      "src": "/assets/fpo-large-wren-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Learning model board.",
-      "caption": "Learning model."
-    },
-    {
-      "src": "/assets/fpo-large-hollow-creek-1900x1600.svg",
-      "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-      "alt": "Research and usability principles board.",
-      "caption": "Research principles."
-    }
-  ],
+  "featuredImages": [],
+  "galleryImages": [],
   "sections": [
     {
       "id": "conflict",
       "heading": "The Conflict",
-      "bodyHtml": "<p>At NYU, students were learning Information Architecture at a moment when the UX field was rapidly changing. Traditional IA methods still mattered, but students were at risk of learning structure without enough exposure to user behavior, research, testing, and evidence-based decision-making.</p><p>They could create site maps and navigation systems, but many had not yet learned how to validate whether those structures made sense to real people.</p>",
-      "image": {
-        "src": "/assets/fpo-large-field-notes-1900x1600.svg",
-        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-        "alt": "Information architecture curriculum notes.",
-        "caption": "The course needed to reflect where the UX field was going, not only where IA had been."
-      }
+      "bodyHtml": "<p>At NYU, students were learning Information Architecture at a moment when the UX field was rapidly changing. Traditional IA methods still mattered, but students were at risk of learning structure without enough exposure to user behavior, research, testing, and evidence-based decision-making.</p><p>They could create site maps and navigation systems, but many had not yet learned how to validate whether those structures made sense to real people.</p>"
     },
     {
       "id": "strategic-action",
@@ -70,13 +27,7 @@
     {
       "id": "impact",
       "heading": "Impact Beyond the Classroom",
-      "bodyHtml": "<ul><li><strong>Student Win:</strong> Helped students understand that good design begins with evidence, not personal preference or internal logic.</li><li><strong>Professional Win:</strong> Created a UX-centered learning experience for 60+ students annually, influencing the career development of roughly 300 designers over time.</li><li><strong>Industry Win:</strong> Prepared students for the actual expectations of modern design teams, where research, testing, iteration, and cross-functional collaboration are core skills.</li><li><strong>Strategic Win:</strong> Shifted the educational focus from “structured site maps” to “evidence-based design decisions.”</li><li><strong>Teaching Win:</strong> Turned curriculum design into a service design problem: who are the students, what do they need to become capable of, and why does that matter in the professional world they are entering?</li></ul>",
-      "image": {
-        "src": "/assets/fpo-large-wren-1900x1600.svg",
-        "thumbSrc": "/assets/fpo-thumb-760x570.svg",
-        "alt": "Student-centered UX learning model.",
-        "caption": "Curriculum design became a way to prepare emerging designers for modern practice."
-      }
+      "bodyHtml": "<ul><li><strong>Student Win:</strong> Helped students understand that good design begins with evidence, not personal preference or internal logic.</li><li><strong>Professional Win:</strong> Created a UX-centered learning experience for 60+ students annually, influencing the career development of roughly 300 designers over time.</li><li><strong>Industry Win:</strong> Prepared students for the actual expectations of modern design teams, where research, testing, iteration, and cross-functional collaboration are core skills.</li><li><strong>Strategic Win:</strong> Shifted the educational focus from “structured site maps” to “evidence-based design decisions.”</li><li><strong>Teaching Win:</strong> Turned curriculum design into a service design problem: who are the students, what do they need to become capable of, and why does that matter in the professional world they are entering?</li></ul>"
     },
     {
       "id": "takeaway",
@@ -97,5 +48,5 @@
     ]
   },
   "readingTime": "5 min read",
-  "updatedAt": "2026-04-26"
+  "updatedAt": "2026-05-01"
 }

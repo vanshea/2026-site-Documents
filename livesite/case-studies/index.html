@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
 <title>Case Studies | Van Shea Creative</title>
-<meta name="description" content="Structured, reusable case studies for Van Shea Creative client and concept work." />
+<meta name="description" content="Selected UX, strategy, service design, and product case studies from Van Shea Creative." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
@@ -59,21 +59,34 @@
     >
       Experience
     </a>
+    <a
+      href="/case-studies"
+      aria-current=&#34;page&#34;
+    >
+      Case Studies
+    </a>
   </nav>
 </header>
 
+    
 
     <main id="top">
-      <section class="hero case-study-index-hero reveal">
+      <section class="hero case-study-index-hero case-study-index-hero-has-image reveal">
         <div class="case-study-index-copy">
           <p class="eyebrow">Selected Work</p>
-          <h1>Case studies built from structured content, not duplicated templates.</h1>
-          <p class="lead">
-            Each entry below is powered by a reusable slug route and a JSON content file,
-            so future case studies can be added in VS Code without rebuilding layout
-            components.
-          </p>
+          <h1>Case studies for high-level review.</h1>
+          <p class="lead">Each entry below is work that I am proud of, done by myself and many others.</p>
         </div>
+
+        
+          <figure class="case-study-index-media">
+            <img
+              src="/assets/vscimage/generated/case-studies-fullscreen-3200x1800.webp"
+              alt="case-studies"
+            />
+            
+          </figure>
+        
       </section>
 
       <section class="case-study-block reveal" aria-labelledby="caseStudiesIndexHeading">
@@ -139,8 +152,8 @@
       <span class="card-image-shell case-study-card-image-shell">
         <img
           class="card-image case-study-card-image"
-          src="/assets/vscimage/generated/vanguard-md2-thumb-760x570.webp"
-          alt="Vanguard concepts slide showing 154 concepts."
+          src="/assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp"
+          alt="vanguard3200x1800"
           loading="lazy"
         />
       </span>
@@ -186,8 +199,8 @@
       <span class="card-image-shell case-study-card-image-shell">
         <img
           class="card-image case-study-card-image"
-          src="/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp"
-          alt="Current-state B2B lending journey map for M&amp;T Bank commercial lending."
+          src="/assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp"
+          alt="M&amp;T Bank Case Study"
           loading="lazy"
         />
       </span>
@@ -233,8 +246,8 @@
       <span class="card-image-shell case-study-card-image-shell">
         <img
           class="card-image case-study-card-image"
-          src="/assets/fpo-thumb-760x570.svg"
-          alt="Abstract field notes representing curriculum design and UX education."
+          src="/assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp"
+          alt="NYU Contributions"
           loading="lazy"
         />
       </span>
@@ -301,41 +314,14 @@
         href="https://drive.google.com/file/d/1QXv1FpxqmIzxF5zZQfSkBliALbQFwfXT/view?usp=sharing"
         target="_blank"
         rel="noreferrer noopener"
-        data-analytics="resume_download"
-        data-analytics-location="footer"
+       
+       
       >
         Resume
       </a>
-      <button class="theme-link consent-manage-btn" id="consentManageBtn" type="button">
-        Privacy Settings
-      </button>
-    </div>
+</div>
   </div>
 </footer>
-
-    <aside
-  class="consent-banner"
-  id="consentBanner"
-  role="dialog"
-  aria-live="polite"
-  aria-label="Analytics consent"
-  hidden
->
-  <p class="consent-text">
-    We use privacy-first analytics to measure meaningful actions, not personal identity.
-  </p>
-  <div class="consent-actions">
-    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
-      Deny
-    </button>
-    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
-      Allow Analytics
-    </button>
-  </div>
-</aside>
-
-
-    <script src="/analytics.js"></script>
-    <script src="/script.js"></script>
+<script src="/script.js"></script>
   </body>
 </html>

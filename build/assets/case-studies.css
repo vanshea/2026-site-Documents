@@ -31,6 +31,36 @@
   max-width: 66ch;
 }
 
+.case-study-index-hero-has-image {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.case-study-index-media {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.case-study-index-media img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px);
+  background: var(--paper);
+}
+
+.case-study-index-media figcaption {
+  color: var(--ink-soft);
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .case-study-card-grid {
   align-items: stretch;
 }
@@ -413,6 +443,7 @@ body.case-study-lightbox-open {
 
 @media (max-width: 980px) {
   .case-study-hero,
+  .case-study-index-hero-has-image,
   .case-study-section-has-image {
     grid-template-columns: 1fr;
   }

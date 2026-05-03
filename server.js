@@ -11,7 +11,12 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const prisma = require("./lib/prisma");
 const analytics = require("./lib/analytics");
 const analyticsApi = require("./lib/analytics-api");
-const { listCaseStudies, getCaseStudyBySlug } = require("./lib/case-studies");
+const {
+  getCaseStudyIndexContent,
+  getCaseStudyBySlug,
+  listCaseStudies,
+  updateCaseStudyIndexContent
+} = require("./lib/case-studies");
 let multer = null;
 let sharp = null;
 
@@ -2800,13 +2805,14 @@ app.get("/vscimage", requireAnalyticsAdmin, (req, res) => {
 
 app.get("/case-studies", async (req, res) => {
   try {
+    const caseStudyIndex = await getCaseStudyIndexContent();
     const caseStudies = await listCaseStudies();
 
     return res.render("case-studies/index", {
-      pageTitle: "Case Studies | Van Shea Creative",
-      metaDescription:
-        "Structured, reusable case studies for Van Shea Creative client and concept work.",
+      pageTitle: caseStudyIndex.pageTitle,
+      metaDescription: caseStudyIndex.metaDescription,
       currentPath: req.path,
+      caseStudyIndex,
       caseStudies
     });
   } catch (error) {
@@ -2896,15 +2902,30 @@ app.get("/api/vscimage/files", requireAnalyticsAdminApi, async (req, res) => {
 
 app.get("/api/vscimage/case-studies", requireAnalyticsAdminApi, async (req, res) => {
   try {
+    const caseStudyIndex = await getCaseStudyIndexContent();
     const caseStudies = (await readCaseStudyContentFiles()).map(
       ({ fileName, filePath, ...caseStudy }) => caseStudy
     );
-    return res.status(200).json({ caseStudies });
+    return res.status(200).json({ caseStudyIndex, caseStudies });
   } catch (error) {
     console.error("Unable to list VSCimage case studies:", error);
     return res.status(500).json({ error: "Unable to list case studies." });
   }
 });
+
+async function updateCaseStudyIndexFromRequest(req, res) {
+  try {
+    const caseStudyIndex = await updateCaseStudyIndexContent(req.body || {});
+    const refreshed = await refreshStaticSiteCache();
+    return res.status(200).json({ ok: true, caseStudyIndex, refreshed });
+  } catch (error) {
+    console.error("Unable to update case study index content:", error);
+    return res.status(500).json({ error: "Unable to update case study index text." });
+  }
+}
+
+app.post("/api/vscimage/case-study-index", requireAnalyticsAdminApi, updateCaseStudyIndexFromRequest);
+app.post("/api/vscimage/case-studies/index", requireAnalyticsAdminApi, updateCaseStudyIndexFromRequest);
 
 app.post("/api/vscimage/case-studies/:slug/text", requireAnalyticsAdminApi, async (req, res) => {
   const slug = sanitizeName(req.params.slug);
