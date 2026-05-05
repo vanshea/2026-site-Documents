@@ -513,9 +513,10 @@ function getWorkCardsPerPage() {
 }
 
 function normalizeWorkCategory(value) {
-  return String(value || "")
+  const normalized = String(value || "")
     .trim()
     .toLowerCase();
+  return normalized === "web" ? "ux-design" : normalized;
 }
 
 function getAvailableWorkFilters() {
@@ -585,8 +586,9 @@ function getFilteredCards() {
     : cards;
 
   return displayCards.filter((card) => {
-    const category = card.dataset.category;
-    return target === "all" || category === target;
+    const category = normalizeWorkCategory(card.dataset.category);
+    const normalizedTarget = normalizeWorkCategory(target);
+    return normalizedTarget === "all" || category === normalizedTarget;
   });
 }
 

@@ -19,7 +19,7 @@ if (variants.length === 0) {
   process.exit(1);
 }
 
-const excludedNames = new Set([".DS_Store", "originals"]);
+const excludedNames = new Set([".DS_Store", "backups", "originals"]);
 const caseStudyIndexTemplatePath = path.join(projectRoot, "views", "case-studies", "index.ejs");
 const caseStudyShowTemplatePath = path.join(projectRoot, "views", "case-studies", "show.ejs");
 const snapshotVariants = new Set(["livesite", "build"]);

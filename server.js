@@ -48,10 +48,13 @@ const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
 const vscimageConfigPath = path.join(vscimageDir, "config.json");
 const caseStudiesContentDir = path.join(rootDir, "content", "case-studies");
+const vscimageSyncLivesite = /^(1|true|yes)$/i.test(
+  String(process.env.VSCIMAGE_SYNC_LIVESITE || "").trim()
+);
 const homepageIndexPaths = [
   path.join(rootDir, "index.html"),
-  path.join(livesiteDir, "index.html"),
-  path.join(comingsoonDir, "index.html")
+  path.join(comingsoonDir, "index.html"),
+  ...(vscimageSyncLivesite ? [path.join(livesiteDir, "index.html")] : [])
 ];
 const featuredThumbSize = {
   width: 2400,
@@ -520,15 +523,30 @@ async function refreshStaticSiteCache() {
   await syncHomepageGeneratedGallery(config.gallery || []);
 
   const scriptPath = path.join(rootDir, "scripts", "materialize-static-variant.mjs");
-  const result = await execFileAsync(process.execPath, [scriptPath, "all"], {
-    cwd: rootDir,
-    timeout: 120000,
-    maxBuffer: 1024 * 1024
-  });
+  const variants = vscimageSyncLivesite ? ["all"] : ["build"];
+  const results = [];
+
+  for (const variant of variants) {
+    const result = await execFileAsync(process.execPath, [scriptPath, variant], {
+      cwd: rootDir,
+      timeout: 120000,
+      maxBuffer: 1024 * 1024
+    });
+
+    results.push({
+      stdout: String(result.stdout || "").trim(),
+      stderr: String(result.stderr || "").trim()
+    });
+  }
 
   return {
-    stdout: String(result.stdout || "").trim(),
-    stderr: String(result.stderr || "").trim()
+    refreshed: [
+      "homepage",
+      ...variants.flatMap((variant) => (variant === "all" ? ["livesite", "build"] : [variant]))
+    ],
+    skipped: vscimageSyncLivesite ? [] : ["livesite"],
+    stdout: results.map((result) => result.stdout).filter(Boolean).join("\n"),
+    stderr: results.map((result) => result.stderr).filter(Boolean).join("\n")
   };
 }
 
@@ -707,7 +725,8 @@ function normalizeGalleryCategory(value) {
   const normalized = String(value || "")
     .trim()
     .toLowerCase();
-  return ["branding", "web", "illustration", "all"].includes(normalized)
+  if (normalized === "web") return "ux-design";
+  return ["branding", "ux-design", "service-design", "education", "illustration", "all"].includes(normalized)
     ? normalized
     : "all";
 }
@@ -2877,7 +2896,6 @@ app.post("/api/vscimage/refresh-site", requireAnalyticsAdminApi, async (_req, re
     const result = await refreshStaticSiteCache();
     return res.status(200).json({
       ok: true,
-      refreshed: ["homepage", "livesite", "build"],
       ...result
     });
   } catch (error) {

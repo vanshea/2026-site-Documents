@@ -588,7 +588,8 @@ function normalizeGalleryCategory(value) {
   const normalized = String(value || "")
     .trim()
     .toLowerCase();
-  return ["branding", "web", "illustration", "all"].includes(normalized)
+  if (normalized === "web") return "ux-design";
+  return ["branding", "ux-design", "service-design", "education", "illustration", "all"].includes(normalized)
     ? normalized
     : "all";
 }
@@ -1832,7 +1833,8 @@ function getGalleryEntryOutputSummaries(entry) {
 }
 
 function entryMatchesGalleryFilters(entry) {
-  const { query, status, category, featured } = state.galleryFilters;
+  const { query, status, featured } = state.galleryFilters;
+  const category = normalizeGalleryCategory(state.galleryFilters.category);
   const normalizedQuery = String(query || "").trim().toLowerCase();
 
   if (status !== "all" && getGalleryEntryStatusKey(entry) !== status) {
@@ -3778,7 +3780,7 @@ function restoreGalleryFilters() {
     ...state.galleryFilters,
     query: String(draft.query || ""),
     status: String(draft.status || "all"),
-    category: String(draft.category || "all"),
+    category: normalizeGalleryCategory(draft.category || "all"),
     featured: String(draft.featured || "all"),
     sort: String(draft.sort || "homepage")
   };

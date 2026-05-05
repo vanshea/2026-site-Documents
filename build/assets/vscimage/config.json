@@ -36,7 +36,7 @@
       "detailUrl": "/case-studies/capital-one-gesture-patent",
       "linkText": "",
       "linkUrl": "http://www.vanshea.com/case-studies/capital-one-gesture-patent",
-      "category": "all",
+      "category": "ux-design",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp",
@@ -51,7 +51,7 @@
       "archivedAt": "",
       "sourceHash": "",
       "createdAt": "2026-03-01T02:41:12.992Z",
-      "updatedAt": "2026-05-02T19:13:46.421Z"
+      "updatedAt": "2026-05-03T17:31:53.951Z"
     },
     {
       "id": "m-t3200x1800-1777582622640",
@@ -61,7 +61,7 @@
       "detailUrl": "/case-studies/mt-bank-commercial-banking-transformation",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "service-design",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp",
@@ -76,7 +76,7 @@
       "archivedAt": "",
       "sourceHash": "c82d17c36cb6ff41da529629deacd2bc79ffef03951138dc8d5472e2f77fda42",
       "createdAt": "2026-04-30T20:57:02.640Z",
-      "updatedAt": "2026-05-01T18:39:20.856Z"
+      "updatedAt": "2026-05-03T17:32:16.412Z"
     },
     {
       "id": "vanguard3200x1800-1777582623149",
@@ -86,7 +86,7 @@
       "detailUrl": "/case-studies/vanguard-innovation-lab-integration",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "service-design",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp",
@@ -101,7 +101,7 @@
       "archivedAt": "",
       "sourceHash": "649d9537d9f7852ab736768c1aa2a74a4860b38bd8521e3ebd1aeb5364c01d08",
       "createdAt": "2026-04-30T20:57:03.149Z",
-      "updatedAt": "2026-05-01T18:39:05.630Z"
+      "updatedAt": "2026-05-03T17:32:38.938Z"
     },
     {
       "id": "large-web-portfolio-fluidx3200x1800-1772332870827",
@@ -110,7 +110,7 @@
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "ux-design",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp",
@@ -125,7 +125,7 @@
       "archivedAt": "",
       "sourceHash": "",
       "createdAt": "2026-03-01T02:41:10.827Z",
-      "updatedAt": "2026-03-04T19:52:05.118Z"
+      "updatedAt": "2026-05-03T17:32:49.585Z"
     },
     {
       "id": "nyu-2000-1-2000x1000-1777582589877",
@@ -135,7 +135,7 @@
       "detailUrl": "/case-studies/nyu-curriculum-alignment",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "education",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp",
@@ -150,7 +150,7 @@
       "archivedAt": "",
       "sourceHash": "2359eef04132823a7aa55a17d7d13f7236bf2e15d0d324def97b478076e3f650",
       "createdAt": "2026-04-30T20:56:29.877Z",
-      "updatedAt": "2026-05-01T18:39:41.273Z"
+      "updatedAt": "2026-05-03T17:34:12.861Z"
     },
     {
       "id": "exchange-1440-v01-default-1776702887536",
@@ -159,7 +159,7 @@
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "ux-design",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/exchange-1440-v01-default-thumb-760x570.webp",
@@ -174,7 +174,7 @@
       "archivedAt": "",
       "sourceHash": "5c7bc50ac09ad6baa5d30a6440acfadf2c9e2c4670b1544a4901c74e03889eba",
       "createdAt": "2026-04-20T16:34:47.536Z",
-      "updatedAt": "2026-04-20T16:36:05.847Z"
+      "updatedAt": "2026-05-03T17:36:42.369Z"
     },
     {
       "id": "large-web-portfolio-greif3200x1800-1772332871783",
@@ -198,7 +198,7 @@
       "archivedAt": "",
       "sourceHash": "",
       "createdAt": "2026-03-01T02:41:11.783Z",
-      "updatedAt": "2026-04-20T15:24:23.136Z"
+      "updatedAt": "2026-05-03T17:37:13.558Z"
     },
     {
       "id": "large-web-portfolio-gore3200x1800-1772332871171",
@@ -207,7 +207,7 @@
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "illustration",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/large-web-portfolio-gore3200x1800-thumb-760x570.webp",
@@ -222,7 +222,7 @@
       "archivedAt": "",
       "sourceHash": "",
       "createdAt": "2026-03-01T02:41:11.171Z",
-      "updatedAt": "2026-04-20T15:24:03.375Z"
+      "updatedAt": "2026-05-03T17:37:30.065Z"
     },
     {
       "id": "large-web-portfolio-greif-1772332871523",
@@ -255,7 +255,7 @@
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "illustration",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-thumb-760x570.webp",
@@ -270,7 +270,7 @@
       "archivedAt": "",
       "sourceHash": "",
       "createdAt": "2026-03-01T02:41:10.266Z",
-      "updatedAt": "2026-04-20T15:23:17.421Z"
+      "updatedAt": "2026-05-03T17:37:52.866Z"
     },
     {
       "id": "nft-1776703281219",
@@ -279,7 +279,7 @@
       "cardDescription": "",
       "linkText": "for sale here",
       "linkUrl": "https://opensea.io/item/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/16558468591630651215346334032891504440586029420939591605290779045548959727617",
-      "category": "all",
+      "category": "illustration",
       "homepageVisible": true,
       "featured": false,
       "thumb": "assets/vscimage/generated/sketches-and-nfts-thumb-760x570.webp",
@@ -294,7 +294,7 @@
       "archivedAt": "",
       "sourceHash": "896623076548d81ace0b975a923f1e5b5c722bcd3ae494e89476389ff48197f5",
       "createdAt": "2026-04-20T16:41:21.219Z",
-      "updatedAt": "2026-04-20T17:07:23.052Z"
+      "updatedAt": "2026-05-03T17:38:44.844Z"
     },
     {
       "id": "large-web-portfolio-linedraw-01-3200x1800-1772332872067",
@@ -351,7 +351,7 @@
       "cardDescription": "Concept exploration count for Vanguard smart-home voice strategy.",
       "linkText": "",
       "linkUrl": "",
-      "category": "all",
+      "category": "ux-design",
       "homepageVisible": false,
       "featured": false,
       "thumb": "assets/vscimage/generated/vanguard-md2-thumb-760x570.webp",
@@ -366,7 +366,7 @@
       "archivedAt": "",
       "sourceHash": "c37c4b0ece89be04b85628bccfb98f42f04444bf1dbeb53f9f9ccd987416948e",
       "createdAt": "2026-05-01T00:00:00.000Z",
-      "updatedAt": "2026-05-01T00:00:00.000Z"
+      "updatedAt": "2026-05-03T17:34:26.738Z"
     },
     {
       "id": "vanguard-md1-1777658601688",

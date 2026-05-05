@@ -23,6 +23,7 @@ id_rsa
 id_dsa
 
 assets/vscimage/originals/
+assets/vscimage/backups/
 
 .DS_Store
 logs/
