@@ -89,6 +89,16 @@ class Email_Service {
 	protected $sg_mail_from_name;
 
 	/**
+	 * Mail From Email Address.
+	 *
+	 * @since  1.6.1
+	 *
+	 * @var    string
+	 * @access protected
+	 */
+	protected $sg_mail_from_address = false;
+
+	/**
 	 * Initiate the email service.
 	 *
 	 * @since 1.0.0
@@ -151,6 +161,9 @@ class Email_Service {
 			add_filter( 'wp_mail_from_name', array( $this, 'set_mail_from_name' ) );
 		}
 
+		// Set a same-domain email address as the From address.
+		$this->set_default_from_mail_address();
+
 		// Sent the email.
 		$result = wp_mail(
 			$receipients,
@@ -158,6 +171,9 @@ class Email_Service {
 			$body,
 			$this->sg_mail_headers
 		);
+
+		// Remove the default From mail address.
+		$this->remove_default_from_mail_address();
 
 		// Remove the from name if it is set.
 		if ( false !== $this->sg_mail_from_name ) {
@@ -211,5 +227,83 @@ class Email_Service {
 
 		// Unschedule the event.
 		return wp_unschedule_event( $timestamp, $this->sg_cron_name );
+	}
+
+	/**
+	 * Sets a default From email address.
+	 *
+	 * @since 1.6.1
+	 */
+	public function set_default_from_mail_address() {
+		$host = wp_parse_url( home_url(), PHP_URL_HOST );
+		$host = preg_replace( '/^www\./', '', $host );
+
+		if ( empty( $host ) ) {
+			return;
+		}
+
+		// Set the default wp_mail() from address.
+		$this->sg_mail_from_address = 'wordpress@' . $host;
+		add_filter( 'wp_mail_from', array( $this, 'set_mail_from_address' ), PHP_INT_MAX );
+
+		// Also set the PHP Mailer from address.
+		add_action( 'phpmailer_init', array( $this, 'set_phpmailer_from_address' ), PHP_INT_MAX );
+	}
+
+	/**
+	 * Removes the default From email address.
+	 *
+	 * @since 1.6.1
+	 */
+	public function remove_default_from_mail_address() {
+		// Remove the PHP Mailer from address first.
+		if ( false !== $this->sg_mail_from_address ) {
+			remove_action( 'phpmailer_init', array( $this, 'set_phpmailer_from_address' ), PHP_INT_MAX );
+		}
+
+		// Remove the default wp_mail() filter.
+		remove_filter( 'wp_mail_from', array( $this, 'set_mail_from_address' ), PHP_INT_MAX );
+
+		$this->sg_mail_from_address = false;
+	}
+
+	/**
+	 * Returns the default email address.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param string $from_email The original From email address.
+	 *
+	 * @return string The default From email address.
+	 */
+	public function set_mail_from_address( $from_email ) {
+		return $this->sg_mail_from_address;
+	}
+
+	/**
+	 * Sets PHP Mailer from address and force server mail transport instead of configured SMTP.
+	 *
+	 * @since 1.6.1
+	 *
+	 * @param object The PHPMailer object.
+	 */
+	public function set_phpmailer_from_address( $phpmailer ) {
+		if ( ! is_object( $phpmailer ) || ! method_exists( $phpmailer, 'setFrom' ) ) {
+			return;
+		}
+
+		// Force local/server mail transport instead of configured SMTP.
+		if ( method_exists( $phpmailer, 'isMail' ) ) {
+			$phpmailer->isMail();
+		}
+
+		$phpmailer->setFrom(
+			$this->sg_mail_from_address,
+			$this->sg_mail_from_name,
+			true
+		);
+
+		// Force the envelope sender / Return-Path too.
+		$phpmailer->Sender = $this->sg_mail_from_address;
 	}
 }
