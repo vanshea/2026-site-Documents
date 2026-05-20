@@ -1,4 +1,5 @@
 const yearEl = document.getElementById("year");
+const currentScriptUrl = document.currentScript?.src || "";
 if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
@@ -56,6 +57,7 @@ const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 820px)");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
+const animatedFooters = document.querySelectorAll("[data-animated-footer]");
 
 function toSitePath(filePath) {
   if (!filePath) return "";
@@ -73,6 +75,102 @@ function normalizeAsciiText(value) {
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
+}
+
+async function hydrateAnimatedFooter(footer) {
+  const artHost = footer.querySelector("[data-footer-art]");
+  if (!artHost) return;
+
+  try {
+    const footerPieceNames = ["p02"];
+    const footerPieces = await Promise.all(
+      footerPieceNames.map(async (pieceName) => {
+        const pieceUrl = currentScriptUrl
+          ? new URL(`assets/footer-elements/${pieceName}.svg`, currentScriptUrl)
+          : new URL(`/assets/footer-elements/${pieceName}.svg`, window.location.href);
+        const response = await fetch(pieceUrl);
+        if (!response.ok) return "";
+        return `<div class="site-footer-piece site-footer-piece-${pieceName}">${await response.text()}</div>`;
+      })
+    );
+
+    artHost.innerHTML = footerPieces.join("");
+
+    artHost.querySelectorAll("svg").forEach((svg) => {
+      svg.setAttribute("focusable", "false");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    });
+  } catch (error) {
+    // The footer remains fully usable if decorative artwork cannot load.
+  }
+}
+
+function initAnimatedFooters() {
+  if (animatedFooters.length === 0) return;
+
+  animatedFooters.forEach((footer) => {
+    hydrateAnimatedFooter(footer);
+  });
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (prefersReducedMotion.matches) {
+    animatedFooters.forEach((footer) => {
+      footer.style.setProperty("--footer-progress", "1");
+    });
+    return;
+  }
+
+  let animationFrame = null;
+  const footerStates = new Map(
+    [...animatedFooters].map((footer) => [footer, { current: 0, target: 0 }])
+  );
+
+  const updateFooterTargets = () => {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    animatedFooters.forEach((footer) => {
+      const rect = footer.getBoundingClientRect();
+      const animationStart = viewportHeight * 0.9;
+      const animationDistance = Math.max(1, rect.height - viewportHeight * 0.25);
+      const rawProgress = (animationStart - rect.top) / animationDistance;
+      const state = footerStates.get(footer);
+      state.target = Math.min(1, Math.max(0, rawProgress));
+    });
+  };
+
+  const animateFooterProgress = () => {
+    animationFrame = null;
+    let shouldContinue = false;
+
+    footerStates.forEach((state, footer) => {
+      state.current += (state.target - state.current) * 0.085;
+
+      if (Math.abs(state.target - state.current) > 0.0005) {
+        shouldContinue = true;
+      } else {
+        state.current = state.target;
+      }
+
+      const easedProgress = state.current * state.current * (3 - 2 * state.current);
+      footer.style.setProperty("--footer-progress", easedProgress.toFixed(4));
+    });
+
+    if (shouldContinue) {
+      animationFrame = window.requestAnimationFrame(animateFooterProgress);
+    }
+  };
+
+  const requestFooterUpdate = () => {
+    updateFooterTargets();
+    if (animationFrame !== null) return;
+    animationFrame = window.requestAnimationFrame(animateFooterProgress);
+  };
+
+  updateFooterTargets();
+  animateFooterProgress();
+  window.addEventListener("scroll", requestFooterUpdate, { passive: true });
+  window.addEventListener("resize", requestFooterUpdate);
 }
 
 function buildAsciiSectionText(section) {
@@ -1118,3 +1216,4 @@ refreshWorkCardState();
 visibleWorkCards = getWorkCardsPerPage();
 applyActiveFilter();
 loadSiteImageConfig();
+initAnimatedFooters();

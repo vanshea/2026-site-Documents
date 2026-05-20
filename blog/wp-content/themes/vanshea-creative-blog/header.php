@@ -52,7 +52,6 @@
 		} else {
 			?>
 			<a href="https://www.vanshea.com/#work"><?php esc_html_e( 'Work', 'vanshea-creative-blog' ); ?></a>
-			<a href="https://www.vanshea.com/experience.html"><?php esc_html_e( 'Experience', 'vanshea-creative-blog' ); ?></a>
 			<a href="https://www.vanshea.com/case-studies"><?php esc_html_e( 'Case Studies', 'vanshea-creative-blog' ); ?></a>
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-current="page"><?php esc_html_e( 'Blog', 'vanshea-creative-blog' ); ?></a>
 			<?php
