@@ -27,6 +27,133 @@ function vanshea_creative_blog_setup() {
 }
 add_action( 'after_setup_theme', 'vanshea_creative_blog_setup' );
 
+function vanshea_creative_blog_theme_choices() {
+	return array(
+		'theme1' => __( 'Theme 1', 'vanshea-creative-blog' ),
+		'theme2' => __( 'Theme 2', 'vanshea-creative-blog' ),
+		'theme3' => __( 'High Contrast', 'vanshea-creative-blog' ),
+	);
+}
+
+function vanshea_creative_blog_sanitize_theme_choice( $value ) {
+	$choices = vanshea_creative_blog_theme_choices();
+
+	return array_key_exists( $value, $choices ) ? $value : 'theme2';
+}
+
+function vanshea_creative_blog_sanitize_checkbox( $checked ) {
+	return (bool) $checked;
+}
+
+function vanshea_creative_blog_get_default_theme() {
+	return vanshea_creative_blog_sanitize_theme_choice( get_theme_mod( 'vsc_default_theme', 'theme2' ) );
+}
+
+function vanshea_creative_blog_customizer( $wp_customize ) {
+	$wp_customize->add_section(
+		'vsc_theme_options',
+		array(
+			'title'       => __( 'Van Shea Theme Options', 'vanshea-creative-blog' ),
+			'description' => __( 'Controls for the blog footer, footer artwork, and visitor theme switcher.', 'vanshea-creative-blog' ),
+			'priority'    => 160,
+		)
+	);
+
+	$wp_customize->add_setting(
+		'vsc_default_theme',
+		array(
+			'default'           => 'theme2',
+			'sanitize_callback' => 'vanshea_creative_blog_sanitize_theme_choice',
+			'transport'         => 'refresh',
+		)
+	);
+
+	$wp_customize->add_control(
+		'vsc_default_theme',
+		array(
+			'label'   => __( 'Default theme', 'vanshea-creative-blog' ),
+			'section' => 'vsc_theme_options',
+			'type'    => 'select',
+			'choices' => vanshea_creative_blog_theme_choices(),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'vsc_show_theme_switcher',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'vanshea_creative_blog_sanitize_checkbox',
+			'transport'         => 'refresh',
+		)
+	);
+
+	$wp_customize->add_control(
+		'vsc_show_theme_switcher',
+		array(
+			'label'   => __( 'Show footer theme switcher', 'vanshea-creative-blog' ),
+			'section' => 'vsc_theme_options',
+			'type'    => 'checkbox',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'vsc_footer_text',
+		array(
+			'default'           => __( 'Van Shea Sedita. All rights reserved.', 'vanshea-creative-blog' ),
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'refresh',
+		)
+	);
+
+	$wp_customize->add_control(
+		'vsc_footer_text',
+		array(
+			'label'   => __( 'Footer text after year', 'vanshea-creative-blog' ),
+			'section' => 'vsc_theme_options',
+			'type'    => 'text',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'vsc_show_footer_art',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'vanshea_creative_blog_sanitize_checkbox',
+			'transport'         => 'refresh',
+		)
+	);
+
+	$wp_customize->add_control(
+		'vsc_show_footer_art',
+		array(
+			'label'   => __( 'Show footer artwork', 'vanshea-creative-blog' ),
+			'section' => 'vsc_theme_options',
+			'type'    => 'checkbox',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'vsc_footer_art',
+		array(
+			'default'           => get_template_directory_uri() . '/assets/footer-art/site-footer-02_all-02.png',
+			'sanitize_callback' => 'esc_url_raw',
+			'transport'         => 'refresh',
+		)
+	);
+
+	$wp_customize->add_control(
+		new WP_Customize_Image_Control(
+			$wp_customize,
+			'vsc_footer_art',
+			array(
+				'label'   => __( 'Footer artwork image', 'vanshea-creative-blog' ),
+				'section' => 'vsc_theme_options',
+			)
+		)
+	);
+}
+add_action( 'customize_register', 'vanshea_creative_blog_customizer' );
+
 function vanshea_creative_blog_assets() {
 	wp_enqueue_style(
 		'vanshea-creative-fonts',

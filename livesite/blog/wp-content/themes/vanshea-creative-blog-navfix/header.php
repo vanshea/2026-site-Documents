@@ -5,7 +5,7 @@
  * @package VanSheaCreativeBlog
  */
 ?><!doctype html>
-<html <?php language_attributes(); ?>>
+<html <?php language_attributes(); ?> data-theme="<?php echo esc_attr( vanshea_creative_blog_get_default_theme() ); ?>">
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
