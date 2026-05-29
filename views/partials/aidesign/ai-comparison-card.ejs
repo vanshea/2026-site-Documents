@@ -1,0 +1,14 @@
+<details class="aide-comparison-card" <%= platform.name === "Codex" ? "open" : "" %>>
+  <summary>
+    <span><%= platform.name %></span>
+    <span class="aide-comparison-status">Notes pending</span>
+  </summary>
+  <dl>
+    <% platform.fields.forEach((field) => { %>
+      <div>
+        <dt><%= field.label %>:</dt>
+        <dd><%= field.value %></dd>
+      </div>
+    <% }) %>
+  </dl>
+</details>

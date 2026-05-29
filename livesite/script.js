@@ -210,6 +210,9 @@ const siteHeader = document.querySelector(".site-header");
 const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 820px)");
+const recommendationsTrack = document.querySelector(".recommendations-track");
+const recommendationsPrevButton = document.querySelector(".recommendations-nav-prev");
+const recommendationsNextButton = document.querySelector(".recommendations-nav-next");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
 
 function toSitePath(filePath) {
@@ -642,6 +645,124 @@ if (projectInquiryForm) {
       if (projectInquirySubmit) {
         projectInquirySubmit.removeAttribute("disabled");
       }
+    }
+  });
+}
+
+function getRecommendationCards(track) {
+  if (!track) return [];
+  return Array.from(track.querySelectorAll(".recommendation-card"));
+}
+
+function getRecommendationScrollBehavior() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
+
+function getRecommendationScrollStep(track) {
+  const firstCard = track?.querySelector(".recommendation-card");
+  if (!track || !firstCard) return 0;
+
+  const trackStyles = window.getComputedStyle(track);
+  const gap = Number.parseFloat(trackStyles.columnGap || trackStyles.gap || "0") || 0;
+  return firstCard.getBoundingClientRect().width + gap;
+}
+
+function getClosestRecommendationIndex(track) {
+  const cards = getRecommendationCards(track);
+  if (!track || !cards.length) return 0;
+
+  const trackRect = track.getBoundingClientRect();
+  const trackCenter = trackRect.left + trackRect.width / 2;
+  let closestIndex = 0;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card, index) => {
+    const cardRect = card.getBoundingClientRect();
+    const cardCenter = cardRect.left + cardRect.width / 2;
+    const distance = Math.abs(trackCenter - cardCenter);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  });
+
+  return closestIndex;
+}
+
+function scrollRecommendationIntoView(track, index) {
+  const cards = getRecommendationCards(track);
+  const target = cards[index];
+  if (!target) return;
+
+  target.scrollIntoView({
+    behavior: getRecommendationScrollBehavior(),
+    block: "nearest",
+    inline: "center"
+  });
+}
+
+function scrollRecommendationsBy(direction) {
+  if (!recommendationsTrack) return;
+
+  const step = getRecommendationScrollStep(recommendationsTrack);
+  if (!step) return;
+
+  const isRtl =
+    window.getComputedStyle(recommendationsTrack).direction.toLowerCase() === "rtl";
+  const scrollLeft = isRtl ? -direction * step : direction * step;
+  const startPosition = recommendationsTrack.scrollLeft;
+
+  recommendationsTrack.scrollBy({
+    left: scrollLeft,
+    behavior: getRecommendationScrollBehavior()
+  });
+
+  window.setTimeout(() => {
+    const moved = Math.abs(recommendationsTrack.scrollLeft - startPosition) > 1;
+    if (moved) return;
+
+    const closestIndex = getClosestRecommendationIndex(recommendationsTrack);
+    scrollRecommendationIntoView(recommendationsTrack, closestIndex + direction);
+  }, 140);
+}
+
+if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButton) {
+  recommendationsPrevButton.addEventListener("click", () => {
+    scrollRecommendationsBy(-1);
+  });
+
+  recommendationsNextButton.addEventListener("click", () => {
+    scrollRecommendationsBy(1);
+  });
+
+  recommendationsTrack.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollRecommendationsBy(1);
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollRecommendationsBy(-1);
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      scrollRecommendationIntoView(recommendationsTrack, 0);
+      return;
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      scrollRecommendationIntoView(
+        recommendationsTrack,
+        getRecommendationCards(recommendationsTrack).length - 1
+      );
     }
   });
 }

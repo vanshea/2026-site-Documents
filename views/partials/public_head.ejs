@@ -11,3 +11,7 @@
 />
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="/assets/case-studies.css" />
+<% const resolvedExtraStyles = typeof extraStyles !== "undefined" && Array.isArray(extraStyles) ? extraStyles : []; %>
+<% resolvedExtraStyles.forEach((href) => { %>
+<link rel="stylesheet" href="<%= href %>" />
+<% }) %>

@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const ejs = require("ejs");
 const { getCaseStudyIndexContent, listCaseStudies } = require("../lib/case-studies.js");
+const { getAiDesignLandingContent, listAiDesignExperiments } = require("../lib/aidesign.js");
 
 const projectRoot = process.cwd();
 const requestedVariant = String(process.argv[2] || "all").trim().toLowerCase();
@@ -22,6 +23,19 @@ if (variants.length === 0) {
 const excludedNames = new Set([".DS_Store", "backups", "originals"]);
 const caseStudyIndexTemplatePath = path.join(projectRoot, "views", "case-studies", "index.ejs");
 const caseStudyShowTemplatePath = path.join(projectRoot, "views", "case-studies", "show.ejs");
+const aiDesignIndexTemplatePath = path.join(projectRoot, "views", "aidesign", "index.ejs");
+const aiDesignExperimentsTemplatePath = path.join(
+  projectRoot,
+  "views",
+  "aidesign",
+  "experiments.ejs"
+);
+const aiDesignStockTemplatePath = path.join(
+  projectRoot,
+  "views",
+  "aidesign",
+  "stock-performance-test.ejs"
+);
 const snapshotVariants = new Set(["livesite", "build"]);
 const staticUploadVariants = new Set(["livesite"]);
 
@@ -42,6 +56,7 @@ function rewriteVariantPreviewLinks(html, variant) {
     .replace(/(["'(])\/analytics\.js/g, `$1${prefix}/analytics.js`)
     .replace(/(["'(])\/experience\.html/g, `$1${prefix}/experience.html`)
     .replace(/(["'(])\/case-studies\b/g, `$1${prefix}/case-studies`)
+    .replace(/(["'(])\/aidesign\b/g, `$1${prefix}/aidesign`)
     .replace(/(["'(])\/assets\//g, `$1${prefix}/assets/`)
     .replace(/(["'(])\/large_web_portfolio\//g, `$1${prefix}/large_web_portfolio/`);
 
@@ -207,6 +222,62 @@ async function writeCaseStudies(variant) {
   }
 }
 
+async function writeAiDesign(variant) {
+  const variantRoot = path.join(projectRoot, variant);
+  const aiDesignRoot = path.join(variantRoot, "aidesign");
+  const landing = getAiDesignLandingContent();
+  const experiments = listAiDesignExperiments();
+
+  await rm(aiDesignRoot, { recursive: true, force: true });
+  await mkdir(aiDesignRoot, { recursive: true });
+
+  const landingHtml = await ejs.renderFile(aiDesignIndexTemplatePath, {
+    pageTitle: landing.pageTitle,
+    metaDescription: landing.metaDescription,
+    currentPath: "/aidesign",
+    landing
+  });
+  const rewrittenLandingHtml = rewriteHtmlForVariant(landingHtml, variant);
+  await writeFile(path.join(aiDesignRoot, "index.html"), rewrittenLandingHtml, "utf8");
+
+  const indexAliasDir = path.join(aiDesignRoot, "index");
+  await mkdir(indexAliasDir, { recursive: true });
+  await writeFile(path.join(indexAliasDir, "index.html"), rewrittenLandingHtml, "utf8");
+
+  const experimentsRoot = path.join(aiDesignRoot, "experiments");
+  await mkdir(experimentsRoot, { recursive: true });
+  const experimentsHtml = await ejs.renderFile(aiDesignExperimentsTemplatePath, {
+    pageTitle: "AI Design Lab Experiments | Van Shea Creative",
+    metaDescription:
+      "A running index of AI application experiments comparing platform output, UX judgment, code quality, and responsible product thinking.",
+    currentPath: "/aidesign/experiments",
+    landing,
+    experiments
+  });
+  await writeFile(
+    path.join(experimentsRoot, "index.html"),
+    rewriteHtmlForVariant(experimentsHtml, variant),
+    "utf8"
+  );
+
+  for (const experiment of experiments) {
+    const experimentHtml = await ejs.renderFile(aiDesignStockTemplatePath, {
+      pageTitle: `${experiment.title} | AI Design Lab | Van Shea Creative`,
+      metaDescription: experiment.description,
+      currentPath: experiment.routePath,
+      experiment
+    });
+
+    const experimentDir = path.join(experimentsRoot, experiment.slug);
+    await mkdir(experimentDir, { recursive: true });
+    await writeFile(
+      path.join(experimentDir, "index.html"),
+      rewriteHtmlForVariant(experimentHtml, variant),
+      "utf8"
+    );
+  }
+}
+
 async function cleanStaticUploadVariant(variantRoot) {
   await rm(path.join(variantRoot, "analytics.js"), { force: true });
   await rm(path.join(variantRoot, "assets", "vscimage", "originals"), {
@@ -227,6 +298,7 @@ async function materializeVariant(variant) {
     await rewriteTopLevelHtmlFiles(variant);
     await rewriteStaticScriptFile(variant);
     await writeCaseStudies(variant);
+    await writeAiDesign(variant);
     if (staticUploadVariants.has(variant)) {
       await cleanStaticUploadVariant(variantRoot);
     }
@@ -237,6 +309,7 @@ async function materializeVariant(variant) {
   await copyDirectory("assets", path.join(variantRoot, "assets"));
   await copyDirectory("large_web_portfolio", path.join(variantRoot, "large_web_portfolio"));
   await writeCaseStudies(variant);
+  await writeAiDesign(variant);
   await writeVariantHtaccess(variantRoot);
 }
 

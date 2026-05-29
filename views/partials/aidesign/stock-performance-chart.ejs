@@ -1,0 +1,29 @@
+<section class="stock-chart-panel" aria-labelledby="stockChartHeading">
+  <div class="stock-panel-head">
+    <div>
+      <p class="aide-mini-label">Historical Performance</p>
+      <h3 id="stockChartHeading">One-year price movement</h3>
+    </div>
+    <p class="stock-data-note" data-stock-data-note>Demo data fallback</p>
+  </div>
+  <div class="stock-chart-shell">
+    <svg
+      class="stock-chart"
+      data-stock-chart
+      role="img"
+      aria-labelledby="stockChartTitle stockChartDescription"
+      viewBox="0 0 720 340"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <title id="stockChartTitle">Stock performance chart</title>
+      <desc id="stockChartDescription">
+        A responsive line chart showing historical demo prices and a modeled projection.
+      </desc>
+    </svg>
+  </div>
+  <div class="stock-chart-legend" aria-label="Chart legend">
+    <span><i class="stock-legend-line stock-legend-history"></i>Historical</span>
+    <span><i class="stock-legend-line stock-legend-projection"></i>Modeled projection</span>
+    <span><i class="stock-legend-band"></i>Uncertainty range</span>
+  </div>
+</section>

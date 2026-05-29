@@ -17,6 +17,11 @@ const {
   listCaseStudies,
   updateCaseStudyIndexContent
 } = require("./lib/case-studies");
+const {
+  getAiDesignLandingContent,
+  getAiDesignExperimentBySlug,
+  listAiDesignExperiments
+} = require("./lib/aidesign");
 let multer = null;
 let sharp = null;
 
@@ -2232,6 +2237,31 @@ function serveFolderIndex(routePrefix, absoluteIndexPath) {
   });
 }
 
+function serveNestedFolderIndexes(routePrefix, absoluteRootPath) {
+  app.get(`${routePrefix}/*`, (req, res, next) => {
+    const baseName = path.basename(req.path);
+    if (baseName.startsWith(".") || baseName.includes(".")) {
+      return next();
+    }
+
+    const relativeRequestPath = req.path
+      .slice(routePrefix.length)
+      .replace(/^\/+/, "");
+    const indexPath = path.resolve(absoluteRootPath, relativeRequestPath, "index.html");
+    const relativeIndexPath = path.relative(absoluteRootPath, indexPath);
+
+    if (relativeIndexPath.startsWith("..") || path.isAbsolute(relativeIndexPath)) {
+      return next();
+    }
+
+    if (!fsSync.existsSync(indexPath)) {
+      return next();
+    }
+
+    return res.sendFile(indexPath);
+  });
+}
+
 app.use((req, res, next) => {
   if (!["GET", "HEAD"].includes(req.method)) {
     return next();
@@ -2272,6 +2302,9 @@ app.use((req, res, next) => {
 serveFolderIndex("/livesite", path.join(livesiteDir, "index.html"));
 serveFolderIndex("/comingsoon", path.join(comingsoonDir, "index.html"));
 serveFolderIndex("/build", path.join(buildDir, "index.html"));
+serveNestedFolderIndexes("/livesite", livesiteDir);
+serveNestedFolderIndexes("/comingsoon", comingsoonDir);
+serveNestedFolderIndexes("/build", buildDir);
 
 app.get("/app", (req, res) => {
   res.redirect("/analytics");
@@ -2820,6 +2853,48 @@ app.post("/api/contact", async (req, res) => {
 
 app.get("/vscimage", requireAnalyticsAdmin, (req, res) => {
   res.sendFile(path.join(rootDir, "vscimage.html"));
+});
+
+function renderAiDesignLanding(req, res) {
+  const landing = getAiDesignLandingContent();
+
+  return res.render("aidesign/index", {
+    pageTitle: landing.pageTitle,
+    metaDescription: landing.metaDescription,
+    currentPath: "/aidesign",
+    landing
+  });
+}
+
+app.get(["/aidesign", "/aidesign/", "/aidesign/index", "/aidesign/index/"], renderAiDesignLanding);
+
+app.get(["/aidesign/experiments", "/aidesign/experiments/"], (req, res) => {
+  const landing = getAiDesignLandingContent();
+  const experiments = listAiDesignExperiments();
+
+  return res.render("aidesign/experiments", {
+    pageTitle: "AI Design Lab Experiments | Van Shea Creative",
+    metaDescription:
+      "A running index of AI application experiments comparing platform output, UX judgment, code quality, and responsible product thinking.",
+    currentPath: req.path,
+    landing,
+    experiments
+  });
+});
+
+app.get("/aidesign/experiments/:slug", (req, res) => {
+  const experiment = getAiDesignExperimentBySlug(req.params.slug);
+
+  if (!experiment) {
+    return res.status(404).send("AI Design Lab experiment not found.");
+  }
+
+  return res.render("aidesign/stock-performance-test", {
+    pageTitle: `${experiment.title} | AI Design Lab | Van Shea Creative`,
+    metaDescription: experiment.description,
+    currentPath: req.path,
+    experiment
+  });
 });
 
 app.get("/case-studies", async (req, res) => {

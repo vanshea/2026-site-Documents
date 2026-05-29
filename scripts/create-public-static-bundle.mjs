@@ -54,6 +54,7 @@ function rewriteVariantLinks(html) {
     .replace(new RegExp(`(["'(])\\/${variant}\\/experience\\.html`, "g"), "$1/experience.html")
     .replace(new RegExp(`(["'(])\\/${variant}\\/index\\.html`, "g"), "$1/index.html")
     .replace(new RegExp(`(["'(])\\/${variant}\\/case-studies`, "g"), "$1/case-studies")
+    .replace(new RegExp(`(["'(])\\/${variant}\\/aidesign`, "g"), "$1/aidesign")
     .replace(new RegExp(`(["'(])\\/${variant}\\/`, "g"), "$1/")
     .replace(new RegExp(`href="\\/${variant}"`, "g"), 'href="/"')
     .replace(new RegExp(`action="\\/${variant}"`, "g"), 'action="/"');
@@ -258,6 +259,7 @@ Included:
 - \`styles.css\`
 - \`script.js\`
 - \`case-studies/\`
+- \`aidesign/\`
 - \`assets/\`
 - \`.htaccess\`
 

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="theme2">
+  <head>
+    <%- include("../partials/public_head", {
+      pageTitle,
+      metaDescription,
+      extraStyles: ["/assets/aidesign.css"]
+    }) %>
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <%- include("../partials/public_header", { currentPath }) %>
+
+    <main id="top" class="aide-main">
+      <nav class="aide-breadcrumb" aria-label="AI Design Lab breadcrumb">
+        <a href="/aidesign">AI Design Lab</a>
+        <span aria-hidden="true">/</span>
+        <span>Experiments</span>
+      </nav>
+
+      <section class="aide-hero aide-compact-hero reveal">
+        <div class="aide-hero-copy">
+          <p class="eyebrow">Experiment Index</p>
+          <h1>AI Application Experiments</h1>
+          <p class="lead">
+            A running set of small prototypes for comparing how different AI platforms interpret
+            prompts, make interface decisions, handle uncertainty, and support human-centered
+            judgment.
+          </p>
+        </div>
+      </section>
+
+      <section class="aide-section reveal" aria-labelledby="experimentListHeading">
+        <div class="section-head aide-section-head">
+          <div>
+            <p class="eyebrow">Current tests</p>
+            <h2 id="experimentListHeading">Published Experiments</h2>
+          </div>
+        </div>
+
+        <div class="aide-card-grid">
+          <% experiments.forEach((experiment) => { %>
+            <%- include("../partials/aidesign/experiment-card", { experiment }) %>
+          <% }) %>
+        </div>
+      </section>
+
+      <section class="aide-section aide-two-column reveal" aria-labelledby="howToReadHeading">
+        <div>
+          <p class="eyebrow">How to read these</p>
+          <h2 id="howToReadHeading">A prototype is only part of the answer.</h2>
+        </div>
+        <div class="aide-section-copy">
+          <p>
+            Each result is reviewed as a design artifact and as a software artifact. I am looking
+            for what the tool notices, what it ignores, how it explains uncertainty, and whether
+            the interface helps someone make a better decision.
+          </p>
+          <p>
+            The interesting comparison is rarely just whether the code works. It is whether the
+            generated product thinking deserves trust.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <%- include("../partials/public_footer") %>
+    <%- include("../partials/consent_banner") %>
+
+    <script src="/analytics.js"></script>
+    <script src="/script.js"></script>
+  </body>
+</html>

@@ -40,7 +40,7 @@
       rel="stylesheet"
     />
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260524-footer-after" />
+    <link rel="stylesheet" href="styles.css?v=20260529-recommendations-round-nav" />
   </head>
   <body>
     <div class="bg-shape bg-shape-a"></div>
@@ -80,6 +80,7 @@
       <nav id="siteNav" class="nav">
         <a href="#work" aria-current="page">Work</a>
         <a href="/case-studies">Case Studies</a>
+        <a href="/aidesign">AI Design Lab</a>
         <a href="/blog/">Blog</a>
       </nav>
     </header>
@@ -334,6 +335,139 @@
           identity systems, websites, and campaign visuals across food, health,
           and culture spaces.
         </h3>
+      </section>
+
+      <section class="recommendations-gallery reveal" aria-labelledby="recommendations-heading">
+        <div class="recommendations-header">
+          <h2 id="recommendations-heading">Recommendations</h2>
+          <p>
+            Reflections from collaborators, students, and design leaders who
+            have worked with me across UX, AI, research, education, and
+            strategy.
+          </p>
+        </div>
+
+        <div class="recommendations-shell">
+          <button
+            class="recommendations-nav recommendations-nav-prev"
+            type="button"
+            aria-label="Previous recommendation"
+            aria-controls="recommendationsTrack"
+          >
+            <span aria-hidden="true">&lsaquo;</span>
+          </button>
+
+          <div
+            id="recommendationsTrack"
+            class="recommendations-track"
+            dir="rtl"
+            tabindex="0"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Recommendations carousel"
+          >
+            <!-- Recommendation cards are plain HTML so new quotes can be added by duplicating an article. -->
+            <article
+              class="recommendation-card"
+              dir="ltr"
+              tabindex="0"
+              aria-label="Recommendation from Ashley Montgomery"
+            >
+              <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
+              <blockquote>
+                <p>
+                  &ldquo;Van brings rare clarity, composure, and strategic
+                  imagination to complex situations, helping people turn
+                  uncertainty and diverse perspectives into stronger, more
+                  actionable outcomes.&rdquo;
+                </p>
+              </blockquote>
+              <footer>
+                <cite>Ashley Montgomery, B.S., B.S.</cite>
+                <span>
+                  Master&rsquo;s in AI Leadership Candidate &mdash; AI
+                  Governance &amp; Ethics | Policy, Compliance, and Responsible
+                  Innovation
+                </span>
+              </footer>
+            </article>
+
+            <article
+              class="recommendation-card"
+              dir="ltr"
+              tabindex="0"
+              aria-label="Recommendation from Patti Carlson"
+            >
+              <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
+              <blockquote>
+                <p>
+                  &ldquo;Van is an exceptional human-centered designer who leads
+                  with kindness, inclusion, and collaboration, making every team
+                  he joins stronger and more thoughtful.&rdquo;
+                </p>
+              </blockquote>
+              <footer>
+                <cite>Patti Carlson</cite>
+                <span>
+                  Experienced Research Leader | UX Research Mentor at
+                  uxcoffeehours.com
+                </span>
+              </footer>
+            </article>
+
+            <article
+              class="recommendation-card"
+              dir="ltr"
+              tabindex="0"
+              aria-label="Recommendation from Claudio Baptista"
+            >
+              <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
+              <blockquote>
+                <p>
+                  &ldquo;Van is a dynamic UX educator and design leader whose deep
+                  expertise, positive energy, and ability to inspire make him a
+                  trusted resource for emerging designers.&rdquo;
+                </p>
+              </blockquote>
+              <footer>
+                <cite>Claudio Baptista</cite>
+                <span>Principal Design Director @ Microsoft AI | AI Monetization</span>
+              </footer>
+            </article>
+
+            <article
+              class="recommendation-card"
+              dir="ltr"
+              tabindex="0"
+              aria-label="Recommendation from Jan Grabski"
+            >
+              <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
+              <blockquote>
+                <p>
+                  &ldquo;Van brings strategic structure to complex collaboration,
+                  helping teams develop clearer communication, stronger
+                  alignment, and more effective ways of working.&rdquo;
+                </p>
+              </blockquote>
+              <footer>
+                <cite>Jan Grabski</cite>
+                <span>
+                  Technology Consulting at PwC Middle East | Ex-ConsenSys,
+                  Ex-Accenture
+                </span>
+              </footer>
+            </article>
+          </div>
+
+          <button
+            class="recommendations-nav recommendations-nav-next"
+            type="button"
+            aria-label="Next recommendation"
+            aria-controls="recommendationsTrack"
+          >
+            <span aria-hidden="true">&rsaquo;</span>
+          </button>
+        </div>
       </section>
 
       <section id="contact" class="contact reveal" data-analytics-location="contact">

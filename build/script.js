@@ -1,12 +1,60 @@
 const yearEl = document.getElementById("year");
-const currentScriptUrl = document.currentScript?.src || "";
 if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
+const footerAnimationMeta = document.getElementById("footerAnimationMeta");
+const siteFooter = document.getElementById("siteFooter");
+
+function placeFooterAnimationMeta() {
+  if (!footerAnimationMeta || !siteFooter) return;
+
+  const footerRect = siteFooter.getBoundingClientRect();
+  const metaRect = footerAnimationMeta.getBoundingClientRect();
+  const edgePadding = 24;
+  const reservedBottom = 18;
+  const maxX = Math.max(edgePadding, footerRect.width - metaRect.width - edgePadding);
+  const maxY = Math.max(edgePadding, footerRect.height - metaRect.height - reservedBottom);
+  const x = edgePadding + Math.random() * Math.max(1, maxX - edgePadding);
+  const y = edgePadding + Math.random() * Math.max(1, maxY - edgePadding);
+
+  footerAnimationMeta.style.setProperty("--footer-meta-x", `${x.toFixed(1)}px`);
+  footerAnimationMeta.style.setProperty("--footer-meta-y", `${y.toFixed(1)}px`);
+}
+
+function formatGenerationCount(count) {
+  const value = Number(count) || 0;
+  return `${value} ${value === 1 ? "time" : "times"}`;
+}
+
+async function syncFooterAnimationMeta() {
+  if (!footerAnimationMeta) return;
+
+  try {
+    const response = await fetch("assets/footer-animation-log.json", {
+      cache: "no-store"
+    });
+    if (!response.ok) return;
+
+    const log = await response.json();
+    const generatedCount = formatGenerationCount(log.generationCount);
+    const generatedAt = log.lastGeneratedDisplay || log.lastGeneratedAt;
+    if (!generatedAt) return;
+
+    footerAnimationMeta.textContent = `Animation generated ${generatedCount} · ${generatedAt}`;
+    placeFooterAnimationMeta();
+  } catch (error) {
+    // Keep the static fallback text if the log cannot be read.
+    placeFooterAnimationMeta();
+  }
+}
+
+syncFooterAnimationMeta();
+window.addEventListener("load", placeFooterAnimationMeta);
+
 const rootEl = document.documentElement;
 const themeButtons = document.querySelectorAll(".theme-link");
-const themeStorageKey = "vsc-site-theme";
+const themeStorageKey = "vsc-site-theme-v2";
 const availableThemes = new Set(["theme1", "theme2", "theme3"]);
 
 function applyTheme(theme) {
@@ -20,7 +68,7 @@ function applyTheme(theme) {
   });
 }
 
-let initialTheme = "theme2";
+let initialTheme = "theme1";
 try {
   const savedTheme = localStorage.getItem(themeStorageKey);
   if (savedTheme && availableThemes.has(savedTheme)) {
@@ -47,6 +95,112 @@ themeButtons.forEach((button) => {
   });
 });
 
+const footerPatternHosts = document.querySelectorAll("[data-footer-pattern]");
+
+function buildFooterPattern(patternHost) {
+  const patternLayer = patternHost.querySelector(".footer-pattern-layer");
+  if (!patternLayer) return;
+
+  const width = 1600;
+  const height = 1200;
+  const rand = (min, max) => min + Math.random() * (max - min);
+  const patternCircles = [];
+
+  for (let i = 0; i < 38; i += 1) {
+    const radius = rand(8, 24);
+    const white = Math.round(rand(214, 255));
+    const fill = `rgb(${white}, ${white}, ${white})`;
+    const isBright = i % 7 === 0;
+    patternCircles.push(`
+      <circle
+        class="footer-pattern-circle${isBright ? " is-bright" : ""}"
+        cx="${rand(radius, width - radius).toFixed(1)}"
+        cy="${rand(radius, height - radius).toFixed(1)}"
+        r="${radius.toFixed(1)}"
+        fill="${fill}"
+        stroke="${fill}"
+        stroke-width="${rand(isBright ? 10 : 5, isBright ? 24 : 14).toFixed(1)}"
+        stroke-opacity="${isBright ? "0.5" : "0.26"}"
+        opacity="${rand(isBright ? 0.56 : 0.28, isBright ? 0.86 : 0.58).toFixed(2)}"
+        filter="url(#footerPatternGlow)"
+        style="--particle-delay: ${rand(0, 320).toFixed(0)}ms; --particle-drift-x: ${rand(-180, 180).toFixed(1)}px; --particle-drift-y: ${rand(-160, 160).toFixed(1)}px;"
+      />
+    `);
+  }
+
+  patternLayer.innerHTML = `
+    <svg class="footer-pattern-svg" viewBox="0 0 ${width} ${height}" role="img" focusable="false" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <filter id="footerPatternGlow" x="-90%" y="-90%" width="280%" height="280%" color-interpolation-filters="sRGB">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="12" result="softGlow"/>
+          <feColorMatrix in="softGlow" type="matrix" values="1.15 0 0 0 0  0 1.15 0 0 0  0 0 1.15 0 0  0 0 0 0.62 0" result="whiteGlow"/>
+          <feMerge>
+            <feMergeNode in="whiteGlow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="${width}" height="${height}" fill="none"/>
+      <g class="footer-pattern-field">${patternCircles.join("")}</g>
+    </svg>
+  `;
+
+  const circles = Array.from(patternLayer.querySelectorAll(".footer-pattern-circle"));
+  const artTrigger = patternHost.querySelector("[data-footer-art-trigger]");
+  let patternTimer = 0;
+  const playPattern = () => {
+    window.clearTimeout(patternTimer);
+    patternHost.classList.remove("is-pattern-active");
+    window.requestAnimationFrame(() => {
+      patternHost.classList.add("is-pattern-active");
+      patternTimer = window.setTimeout(() => {
+        patternHost.classList.remove("is-pattern-active");
+      }, 2000);
+    });
+  };
+  const movePatternCircles = () => {
+    circles.forEach((circle) => {
+      const radius = Number(circle.getAttribute("r")) || 12;
+      circle.setAttribute("cx", rand(radius, width - radius).toFixed(1));
+      circle.setAttribute("cy", rand(radius, height - radius).toFixed(1));
+    });
+  };
+
+  circles.forEach((circle) => {
+    circle.addEventListener("pointerenter", movePatternCircles);
+  });
+
+  if (artTrigger) {
+    artTrigger.addEventListener("click", playPattern);
+    artTrigger.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      playPattern();
+    });
+  }
+}
+
+if (footerPatternHosts.length) {
+  footerPatternHosts.forEach(buildFooterPattern);
+
+  if ("IntersectionObserver" in window) {
+    const footerArtObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    footerPatternHosts.forEach((footer) => footerArtObserver.observe(footer));
+  } else {
+    footerPatternHosts.forEach((footer) => footer.classList.add("is-visible"));
+  }
+}
+
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
 const experienceResumeSection = document.getElementById("experienceResumeSection");
@@ -56,8 +210,10 @@ const siteHeader = document.querySelector(".site-header");
 const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
 const mobileNavMedia = window.matchMedia("(max-width: 820px)");
+const recommendationsTrack = document.querySelector(".recommendations-track");
+const recommendationsPrevButton = document.querySelector(".recommendations-nav-prev");
+const recommendationsNextButton = document.querySelector(".recommendations-nav-next");
 const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
-const animatedFooters = document.querySelectorAll("[data-animated-footer]");
 
 function toSitePath(filePath) {
   if (!filePath) return "";
@@ -75,102 +231,6 @@ function normalizeAsciiText(value) {
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
-}
-
-async function hydrateAnimatedFooter(footer) {
-  const artHost = footer.querySelector("[data-footer-art]");
-  if (!artHost) return;
-
-  try {
-    const footerPieceNames = ["p02"];
-    const footerPieces = await Promise.all(
-      footerPieceNames.map(async (pieceName) => {
-        const pieceUrl = currentScriptUrl
-          ? new URL(`assets/footer-elements/${pieceName}.svg`, currentScriptUrl)
-          : new URL(`/assets/footer-elements/${pieceName}.svg`, window.location.href);
-        const response = await fetch(pieceUrl);
-        if (!response.ok) return "";
-        return `<div class="site-footer-piece site-footer-piece-${pieceName}">${await response.text()}</div>`;
-      })
-    );
-
-    artHost.innerHTML = footerPieces.join("");
-
-    artHost.querySelectorAll("svg").forEach((svg) => {
-      svg.setAttribute("focusable", "false");
-      svg.setAttribute("aria-hidden", "true");
-      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    });
-  } catch (error) {
-    // The footer remains fully usable if decorative artwork cannot load.
-  }
-}
-
-function initAnimatedFooters() {
-  if (animatedFooters.length === 0) return;
-
-  animatedFooters.forEach((footer) => {
-    hydrateAnimatedFooter(footer);
-  });
-
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (prefersReducedMotion.matches) {
-    animatedFooters.forEach((footer) => {
-      footer.style.setProperty("--footer-progress", "1");
-    });
-    return;
-  }
-
-  let animationFrame = null;
-  const footerStates = new Map(
-    [...animatedFooters].map((footer) => [footer, { current: 0, target: 0 }])
-  );
-
-  const updateFooterTargets = () => {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-
-    animatedFooters.forEach((footer) => {
-      const rect = footer.getBoundingClientRect();
-      const animationStart = viewportHeight * 0.9;
-      const animationDistance = Math.max(1, rect.height - viewportHeight * 0.25);
-      const rawProgress = (animationStart - rect.top) / animationDistance;
-      const state = footerStates.get(footer);
-      state.target = Math.min(1, Math.max(0, rawProgress));
-    });
-  };
-
-  const animateFooterProgress = () => {
-    animationFrame = null;
-    let shouldContinue = false;
-
-    footerStates.forEach((state, footer) => {
-      state.current += (state.target - state.current) * 0.085;
-
-      if (Math.abs(state.target - state.current) > 0.0005) {
-        shouldContinue = true;
-      } else {
-        state.current = state.target;
-      }
-
-      const easedProgress = state.current * state.current * (3 - 2 * state.current);
-      footer.style.setProperty("--footer-progress", easedProgress.toFixed(4));
-    });
-
-    if (shouldContinue) {
-      animationFrame = window.requestAnimationFrame(animateFooterProgress);
-    }
-  };
-
-  const requestFooterUpdate = () => {
-    updateFooterTargets();
-    if (animationFrame !== null) return;
-    animationFrame = window.requestAnimationFrame(animateFooterProgress);
-  };
-
-  updateFooterTargets();
-  animateFooterProgress();
-  window.addEventListener("scroll", requestFooterUpdate, { passive: true });
-  window.addEventListener("resize", requestFooterUpdate);
 }
 
 function buildAsciiSectionText(section) {
@@ -585,6 +645,124 @@ if (projectInquiryForm) {
       if (projectInquirySubmit) {
         projectInquirySubmit.removeAttribute("disabled");
       }
+    }
+  });
+}
+
+function getRecommendationCards(track) {
+  if (!track) return [];
+  return Array.from(track.querySelectorAll(".recommendation-card"));
+}
+
+function getRecommendationScrollBehavior() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
+
+function getRecommendationScrollStep(track) {
+  const firstCard = track?.querySelector(".recommendation-card");
+  if (!track || !firstCard) return 0;
+
+  const trackStyles = window.getComputedStyle(track);
+  const gap = Number.parseFloat(trackStyles.columnGap || trackStyles.gap || "0") || 0;
+  return firstCard.getBoundingClientRect().width + gap;
+}
+
+function getClosestRecommendationIndex(track) {
+  const cards = getRecommendationCards(track);
+  if (!track || !cards.length) return 0;
+
+  const trackRect = track.getBoundingClientRect();
+  const trackCenter = trackRect.left + trackRect.width / 2;
+  let closestIndex = 0;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card, index) => {
+    const cardRect = card.getBoundingClientRect();
+    const cardCenter = cardRect.left + cardRect.width / 2;
+    const distance = Math.abs(trackCenter - cardCenter);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  });
+
+  return closestIndex;
+}
+
+function scrollRecommendationIntoView(track, index) {
+  const cards = getRecommendationCards(track);
+  const target = cards[index];
+  if (!target) return;
+
+  target.scrollIntoView({
+    behavior: getRecommendationScrollBehavior(),
+    block: "nearest",
+    inline: "center"
+  });
+}
+
+function scrollRecommendationsBy(direction) {
+  if (!recommendationsTrack) return;
+
+  const step = getRecommendationScrollStep(recommendationsTrack);
+  if (!step) return;
+
+  const isRtl =
+    window.getComputedStyle(recommendationsTrack).direction.toLowerCase() === "rtl";
+  const scrollLeft = isRtl ? -direction * step : direction * step;
+  const startPosition = recommendationsTrack.scrollLeft;
+
+  recommendationsTrack.scrollBy({
+    left: scrollLeft,
+    behavior: getRecommendationScrollBehavior()
+  });
+
+  window.setTimeout(() => {
+    const moved = Math.abs(recommendationsTrack.scrollLeft - startPosition) > 1;
+    if (moved) return;
+
+    const closestIndex = getClosestRecommendationIndex(recommendationsTrack);
+    scrollRecommendationIntoView(recommendationsTrack, closestIndex + direction);
+  }, 140);
+}
+
+if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButton) {
+  recommendationsPrevButton.addEventListener("click", () => {
+    scrollRecommendationsBy(-1);
+  });
+
+  recommendationsNextButton.addEventListener("click", () => {
+    scrollRecommendationsBy(1);
+  });
+
+  recommendationsTrack.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollRecommendationsBy(1);
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollRecommendationsBy(-1);
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      scrollRecommendationIntoView(recommendationsTrack, 0);
+      return;
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      scrollRecommendationIntoView(
+        recommendationsTrack,
+        getRecommendationCards(recommendationsTrack).length - 1
+      );
     }
   });
 }
@@ -1216,4 +1394,3 @@ refreshWorkCardState();
 visibleWorkCards = getWorkCardsPerPage();
 applyActiveFilter();
 loadSiteImageConfig();
-initAnimatedFooters();

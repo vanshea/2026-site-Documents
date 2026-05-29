@@ -1,0 +1,23 @@
+<article class="aide-experiment-card">
+  <a class="aide-experiment-card-link" href="<%= experiment.routePath %>">
+    <span class="aide-card-visual" aria-hidden="true">
+      <svg viewBox="0 0 280 132" focusable="false">
+        <path class="aide-card-gridline" d="M0 34H280M0 72H280M0 110H280" />
+        <path
+          class="aide-card-line aide-card-line-muted"
+          d="M2 95 C32 80 48 92 70 70 S112 44 136 54 180 88 206 62 244 30 278 38"
+        />
+        <path
+          class="aide-card-line"
+          d="M2 100 C30 86 52 90 76 72 S118 42 142 50 174 84 204 66 246 34 278 42"
+        />
+        <circle cx="204" cy="66" r="4" />
+        <path class="aide-card-projection" d="M204 66 C226 58 248 48 278 42" />
+      </svg>
+    </span>
+    <span class="aide-card-meta"><%= experiment.eyebrow %> · <%= experiment.status %></span>
+    <h3><%= experiment.title %></h3>
+    <p><%= experiment.description %></p>
+    <span class="aide-card-action">View Experiment</span>
+  </a>
+</article>
