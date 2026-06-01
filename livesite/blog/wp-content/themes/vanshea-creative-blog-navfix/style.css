@@ -3,7 +3,7 @@ Theme Name: Van Shea Creative Blog Nav Fix
 Theme URI: https://www.vanshea.com/blog
 Author: Van Shea Creative
 Description: A custom blog theme matching the vanshea.com portfolio design.
-Version: 1.2.2
+Version: 1.2.6
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -752,6 +752,7 @@ input[type="submit"] {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   padding: clamp(34px, 5vw, 74px) 0 42px;
+  position: relative;
 }
 
 :root[data-theme="theme3"] .site-footer {
@@ -759,13 +760,18 @@ input[type="submit"] {
 }
 
 .site-footer-art {
+  --footer-art-width: min(1280px, 100vw);
+  cursor: pointer;
+  display: block;
+  overflow: hidden;
+  position: relative;
   width: 100%;
-  height: clamp(260px, 32vw, 520px);
+  height: clamp(420px, 58vw, 780px);
   margin: 0 auto 92px;
   opacity: 0;
+  pointer-events: auto;
   transform: translateY(14px);
   transition: opacity 900ms ease-out, transform 900ms ease-out;
-  pointer-events: none;
 }
 
 .site-footer-art.is-visible {
@@ -773,39 +779,66 @@ input[type="submit"] {
   transform: translateY(0);
 }
 
-.site-footer-art svg {
+.site-footer-art img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: 100%;
+  object-fit: contain;
   margin: 0 auto;
+  pointer-events: none;
 }
 
-.site-footer-kaleidoscope {
-  color: #ffffff;
+.site-footer-art:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.72);
+  outline-offset: -8px;
 }
 
-.site-footer-kaleidoscope .footer-kaleidoscope-wheel {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: footerKaleidoscopeSpin 36s linear infinite;
+.footer-click-effect-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.site-footer-kaleidoscope .footer-kaleidoscope-orbit {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: footerKaleidoscopePulse 7s ease-in-out infinite alternate;
+.footer-click-circle {
+  position: absolute;
+  width: var(--circle-size, 72px);
+  height: var(--circle-size, 72px);
+  border: var(--circle-stroke, 2px) solid rgba(255, 255, 255, var(--circle-opacity, 0.42));
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.72);
+  display: grid;
+  place-items: center;
+  font-size: var(--pi-size, 0.82rem);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  transform: translate(-50%, -50%) scale(0.72);
+  animation: footerClickCircle 3000ms ease-out forwards;
+  will-change: opacity, transform;
 }
 
-@keyframes footerKaleidoscopeSpin {
-  to {
-    transform: rotate(360deg);
+.footer-click-pi {
+  max-width: 78%;
+  opacity: 0.88;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.18);
+}
+
+@keyframes footerClickCircle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72);
   }
-}
 
-@keyframes footerKaleidoscopePulse {
-  to {
-    opacity: 0.58;
-    transform: scale(1.035);
+  16% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.22);
   }
 }
 
@@ -816,9 +849,22 @@ input[type="submit"] {
     transform: none;
   }
 
-  .site-footer-kaleidoscope .footer-kaleidoscope-wheel,
-  .site-footer-kaleidoscope .footer-kaleidoscope-orbit {
-    animation: none;
+  .footer-click-circle {
+    animation: footerClickCircleReduced 3000ms ease-out forwards;
+  }
+}
+
+@keyframes footerClickCircleReduced {
+  0% {
+    opacity: 0;
+  }
+
+  16% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
   }
 }
 
@@ -826,23 +872,45 @@ input[type="submit"] {
   width: min(1120px, 88vw);
   margin: 0 auto;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 20px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 16px;
 }
 
 .site-footer p {
   margin: 0;
   color: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}
+
+.site-footer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  margin-bottom: 100px;
+}
+
+.footer-actions {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .theme-switcher {
   display: inline-flex;
   align-items: center;
+  width: max-content;
+  max-width: 100%;
   gap: 8px;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .theme-link {
@@ -997,6 +1065,7 @@ input[type="submit"] {
   }
 
   .site-footer-art {
+    --footer-art-width: min(620px, 96vw);
     width: 100%;
     height: clamp(250px, 70vw, 380px);
     margin-bottom: 34px;
@@ -1010,11 +1079,32 @@ input[type="submit"] {
     gap: 12px;
   }
 
+  .site-footer-controls {
+    display: flex;
+    width: min(590px, 80vw);
+    max-width: calc(100vw - 48px);
+    align-self: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .footer-actions {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
   .theme-switcher {
-    display: grid;
-    width: min(360px, 100%);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    width: 100%;
+    flex-direction: column;
     justify-content: center;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .site-footer .theme-link {

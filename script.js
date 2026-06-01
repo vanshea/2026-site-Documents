@@ -147,16 +147,58 @@ function buildFooterPattern(patternHost) {
 
   const circles = Array.from(patternLayer.querySelectorAll(".footer-pattern-circle"));
   const artTrigger = patternHost.querySelector("[data-footer-art-trigger]");
-  let patternTimer = 0;
-  const playPattern = () => {
-    window.clearTimeout(patternTimer);
-    patternHost.classList.remove("is-pattern-active");
-    window.requestAnimationFrame(() => {
-      patternHost.classList.add("is-pattern-active");
-      patternTimer = window.setTimeout(() => {
-        patternHost.classList.remove("is-pattern-active");
-      }, 2000);
-    });
+  const effectLayer = document.createElement("div");
+  effectLayer.className = "footer-click-effect-layer";
+  effectLayer.setAttribute("aria-hidden", "true");
+  patternHost.appendChild(effectLayer);
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+  const piOptions = ["π", "π ≈ 3.14159", "C = 2πr", "A = πr²"];
+  const createFooterClickEffect = (event) => {
+    if (!artTrigger || !effectLayer) return;
+
+    const footerRect = patternHost.getBoundingClientRect();
+    const artRect = artTrigger.getBoundingClientRect();
+    const circleCount = 3 + Math.floor(Math.random() * 3);
+    const piIndex = Math.floor(Math.random() * circleCount);
+    const baseX = typeof event?.clientX === "number" ? event.clientX : artRect.left + artRect.width / 2;
+    const baseY = typeof event?.clientY === "number" ? event.clientY : artRect.top + artRect.height / 2;
+    const smallestArtSide = Math.max(1, Math.min(artRect.width, artRect.height));
+
+    for (let i = 0; i < circleCount; i += 1) {
+      const circle = document.createElement("span");
+      const size = rand(Math.max(34, smallestArtSide * 0.08), Math.max(68, smallestArtSide * 0.26));
+      const x = clamp(
+        baseX + rand(-artRect.width * 0.34, artRect.width * 0.34) - footerRect.left,
+        size / 2,
+        footerRect.width - size / 2
+      );
+      const y = clamp(
+        baseY + rand(-artRect.height * 0.34, artRect.height * 0.34) - footerRect.top,
+        size / 2,
+        footerRect.height - size / 2
+      );
+
+      circle.className = "footer-click-circle";
+      circle.style.left = `${x.toFixed(1)}px`;
+      circle.style.top = `${y.toFixed(1)}px`;
+      circle.style.setProperty("--circle-size", `${size.toFixed(1)}px`);
+      circle.style.setProperty("--circle-stroke", `${rand(1.2, 2.8).toFixed(1)}px`);
+      circle.style.setProperty("--circle-opacity", `${rand(0.22, 0.54).toFixed(2)}`);
+      circle.style.setProperty("--pi-size", `${rand(0.68, 0.92).toFixed(2)}rem`);
+      circle.style.animationDuration = `${rand(2600, 3000).toFixed(0)}ms`;
+
+      if (i === piIndex) {
+        const piText = document.createElement("span");
+        piText.className = "footer-click-pi";
+        piText.textContent = piOptions[Math.floor(Math.random() * piOptions.length)];
+        circle.appendChild(piText);
+      }
+
+      const removeCircle = () => circle.remove();
+      circle.addEventListener("animationend", removeCircle, { once: true });
+      window.setTimeout(removeCircle, 3100);
+      effectLayer.appendChild(circle);
+    }
   };
   const movePatternCircles = () => {
     circles.forEach((circle) => {
@@ -171,11 +213,11 @@ function buildFooterPattern(patternHost) {
   });
 
   if (artTrigger) {
-    artTrigger.addEventListener("click", playPattern);
+    artTrigger.addEventListener("click", createFooterClickEffect);
     artTrigger.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
-      playPattern();
+      createFooterClickEffect();
     });
   }
 }
@@ -704,6 +746,57 @@ function scrollRecommendationIntoView(track, index) {
   });
 }
 
+function getRecommendationLeftEdgeScroll(track) {
+  if (!track) return 0;
+
+  const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+  if (!maxScroll) return 0;
+
+  const isRtl = window.getComputedStyle(track).direction.toLowerCase() === "rtl";
+  if (!isRtl) return 0;
+
+  track.scrollLeft = -maxScroll;
+  if (Math.abs(track.scrollLeft + maxScroll) <= 1) return -maxScroll;
+
+  track.scrollLeft = maxScroll;
+  if (Math.abs(track.scrollLeft - maxScroll) <= 1) return maxScroll;
+
+  return 0;
+}
+
+function scrollRecommendationsToLeftEdge(track) {
+  if (!track) return;
+
+  window.requestAnimationFrame(() => {
+    track.scrollLeft = getRecommendationLeftEdgeScroll(track);
+    updateRecommendationNavState();
+  });
+}
+
+function updateRecommendationNavState() {
+  if (!recommendationsTrack || !recommendationsPrevButton || !recommendationsNextButton) {
+    return;
+  }
+
+  const maxScroll = Math.max(
+    0,
+    recommendationsTrack.scrollWidth - recommendationsTrack.clientWidth
+  );
+  const isRtl =
+    window.getComputedStyle(recommendationsTrack).direction.toLowerCase() === "rtl";
+  const currentScroll = recommendationsTrack.scrollLeft;
+  const tolerance = 2;
+  const isAtLeftEdge = isRtl
+    ? currentScroll <= -maxScroll + tolerance
+    : currentScroll <= tolerance;
+  const isAtRightEdge = isRtl
+    ? currentScroll >= -tolerance
+    : currentScroll >= maxScroll - tolerance;
+
+  recommendationsPrevButton.disabled = isAtLeftEdge;
+  recommendationsNextButton.disabled = isAtRightEdge;
+}
+
 function scrollRecommendationsBy(direction) {
   if (!recommendationsTrack) return;
 
@@ -719,23 +812,45 @@ function scrollRecommendationsBy(direction) {
     left: scrollLeft,
     behavior: getRecommendationScrollBehavior()
   });
+  updateRecommendationNavState();
 
   window.setTimeout(() => {
     const moved = Math.abs(recommendationsTrack.scrollLeft - startPosition) > 1;
-    if (moved) return;
+    if (moved) {
+      updateRecommendationNavState();
+      return;
+    }
 
     const closestIndex = getClosestRecommendationIndex(recommendationsTrack);
     scrollRecommendationIntoView(recommendationsTrack, closestIndex + direction);
+    window.setTimeout(updateRecommendationNavState, 180);
   }, 140);
 }
 
 if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButton) {
+  updateRecommendationNavState();
+  scrollRecommendationsToLeftEdge(recommendationsTrack);
+  window.addEventListener(
+    "load",
+    () => {
+      scrollRecommendationsToLeftEdge(recommendationsTrack);
+    },
+    { once: true }
+  );
+  document.fonts?.ready?.then(() => {
+    scrollRecommendationsToLeftEdge(recommendationsTrack);
+  });
+  recommendationsTrack.addEventListener("scroll", updateRecommendationNavState, {
+    passive: true
+  });
+  window.addEventListener("resize", updateRecommendationNavState);
+
   recommendationsPrevButton.addEventListener("click", () => {
-    scrollRecommendationsBy(-1);
+    scrollRecommendationsBy(1);
   });
 
   recommendationsNextButton.addEventListener("click", () => {
-    scrollRecommendationsBy(1);
+    scrollRecommendationsBy(-1);
   });
 
   recommendationsTrack.addEventListener("keydown", (event) => {
