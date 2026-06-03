@@ -22,7 +22,7 @@
 <header class="site-header">
 	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand" aria-label="<?php esc_attr_e( 'Back to blog home', 'vanshea-creative-blog' ); ?>">
 		<picture>
-			<source srcset="<?php echo esc_url( get_template_directory_uri() . '/assets/web_logomark_240_white.png' ); ?>" media="(prefers-color-scheme: dark)">
+			<source srcset="<?php echo esc_url( get_template_directory_uri() . '/assets/web_logomark_240_lite.png' ); ?>" media="(prefers-color-scheme: dark)">
 			<img class="brand-logo" src="<?php echo esc_url( get_template_directory_uri() . '/assets/web_logomark_240_dark.png' ); ?>" alt="<?php esc_attr_e( 'VSS logo', 'vanshea-creative-blog' ); ?>">
 		</picture>
 		<span class="brand-name"><?php esc_html_e( 'Van Shea Creative', 'vanshea-creative-blog' ); ?></span>

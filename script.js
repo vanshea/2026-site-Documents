@@ -56,6 +56,50 @@ const rootEl = document.documentElement;
 const themeButtons = document.querySelectorAll(".theme-link");
 const themeStorageKey = "vsc-site-theme-v2";
 const availableThemes = new Set(["theme1", "theme2", "theme3"]);
+const brandLogoLightImage = document.getElementById("brandLogoLightImage");
+const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
+
+if (brandLogoLightImage) {
+  brandLogoLightImage.dataset.logoLight =
+    brandLogoLightImage.getAttribute("src") || brandLogoLightImage.src;
+
+  if (brandLogoDarkSource?.getAttribute("srcset")) {
+    brandLogoLightImage.dataset.logoDark = brandLogoDarkSource.getAttribute("srcset");
+  }
+}
+
+function isDarkBackgroundTheme(theme) {
+  return theme === "theme3" || window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function updateBrandLogoForTheme(theme) {
+  if (!brandLogoLightImage) return;
+
+  const lightLogo = brandLogoLightImage.dataset.logoLight || brandLogoLightImage.src;
+  const darkLogo =
+    brandLogoLightImage.dataset.logoDark ||
+    brandLogoDarkSource?.getAttribute("srcset") ||
+    lightLogo;
+  brandLogoLightImage.src = isDarkBackgroundTheme(theme) ? darkLogo : lightLogo;
+}
+
+function setBrandLogoAssets(lightLogo, darkLogo) {
+  if (!brandLogoLightImage) return;
+
+  if (lightLogo) {
+    brandLogoLightImage.dataset.logoLight = lightLogo;
+  }
+
+  if (darkLogo) {
+    brandLogoLightImage.dataset.logoDark = darkLogo;
+
+    if (brandLogoDarkSource) {
+      brandLogoDarkSource.srcset = darkLogo;
+    }
+  }
+
+  updateBrandLogoForTheme(rootEl.dataset.theme);
+}
 
 function applyTheme(theme) {
   const resolvedTheme = availableThemes.has(theme) ? theme : "theme2";
@@ -66,6 +110,8 @@ function applyTheme(theme) {
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
+
+  updateBrandLogoForTheme(resolvedTheme);
 }
 
 let initialTheme = "theme1";
@@ -243,8 +289,6 @@ if (footerPatternHosts.length) {
   }
 }
 
-const brandLogoLightImage = document.getElementById("brandLogoLightImage");
-const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
 const experienceResumeSection = document.getElementById("experienceResumeSection");
 const copyExperienceTextButton = document.getElementById("copyExperienceText");
 const workGrid = document.querySelector("#work .grid");
@@ -465,13 +509,10 @@ async function loadSiteImageConfig() {
       return;
     }
 
-    if (config.logos?.light && brandLogoLightImage) {
-      brandLogoLightImage.src = toSitePath(config.logos.light);
-    }
-
-    if (config.logos?.dark && brandLogoDarkSource) {
-      brandLogoDarkSource.srcset = toSitePath(config.logos.dark);
-    }
+    setBrandLogoAssets(
+      config.logos?.light ? toSitePath(config.logos.light) : "",
+      config.logos?.dark ? toSitePath(config.logos.dark) : ""
+    );
 
     Object.entries(config.projects || {}).forEach(([projectId, projectConfig]) => {
       const link = document.querySelector(

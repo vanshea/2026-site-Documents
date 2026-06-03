@@ -31,6 +31,10 @@
   max-width: 66ch;
 }
 
+.case-study-index-copy > .eyebrow {
+  display: none;
+}
+
 .case-study-index-hero-has-image {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);

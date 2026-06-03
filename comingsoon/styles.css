@@ -5,6 +5,7 @@
   --header-height: calc(var(--header-logo-size) * 2);
   --space-42: 42px;
   --space-84: 84px;
+  --hero-after-space: calc(var(--space-84) * 0.6);
   --space-168: 168px;
   --space-card-grid: 24px;
   --type-scale: 1.05;
@@ -517,7 +518,7 @@ main {
 }
 
 .hero {
-  margin: 0 0 var(--space-84);
+  margin: 0 0 var(--hero-after-space);
 }
 
 .eyebrow {
@@ -581,6 +582,10 @@ h1 {
   align-items: flex-end;
   margin-bottom: var(--space-42);
   flex-wrap: wrap;
+}
+
+.work .section-head h2 {
+  display: none;
 }
 
 h2 {
@@ -1388,7 +1393,7 @@ textarea:focus {
   }
 
   .hero {
-    margin: 0 0 var(--space-84);
+    margin: 0 0 var(--hero-after-space);
   }
 }
 
