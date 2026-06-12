@@ -55,7 +55,7 @@ window.addEventListener("load", placeFooterAnimationMeta);
 const rootEl = document.documentElement;
 const themeButtons = document.querySelectorAll(".theme-link");
 const themeStorageKey = "vsc-site-theme-v2";
-const availableThemes = new Set(["theme1", "theme2", "theme3"]);
+const availableThemes = new Set(["theme1", "theme2", "theme3", "theme4"]);
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
 
@@ -69,6 +69,7 @@ if (brandLogoLightImage) {
 }
 
 function isDarkBackgroundTheme(theme) {
+  if (theme === "theme4") return false;
   return theme === "theme3" || window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
@@ -114,7 +115,7 @@ function applyTheme(theme) {
   updateBrandLogoForTheme(resolvedTheme);
 }
 
-let initialTheme = "theme1";
+let initialTheme = "theme4";
 try {
   const savedTheme = localStorage.getItem(themeStorageKey);
   if (savedTheme && availableThemes.has(savedTheme)) {
@@ -485,7 +486,7 @@ function refreshWorkCardState() {
 }
 
 async function readSiteImageConfig() {
-  const sources = ["/api/vscimage/config", "/assets/vscimage/config.json"];
+  const sources = ["/assets/vscimage/config.json"];
 
   for (const source of sources) {
     try {
@@ -1425,6 +1426,11 @@ if (lightbox && lightboxImage && lightboxCaption) {
 
         const card = fullscreenButton.closest(".card");
         const link = card ? card.querySelector(".work-link") : null;
+        const detailUrl = String(link?.dataset?.detailUrl || "").trim();
+        if (detailUrl) {
+          window.location.assign(detailUrl);
+          return;
+        }
         const workLinks = getWorkLinks();
         const index = workLinks.indexOf(link);
         if (index < 0) return;

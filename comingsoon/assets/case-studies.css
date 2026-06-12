@@ -260,6 +260,11 @@
   gap: 24px;
 }
 
+.case-study-section.reveal,
+.case-study-section.reveal.is-visible {
+  border: none !important;
+}
+
 .case-study-section-has-image {
   grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.85fr);
   align-items: start;

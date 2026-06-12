@@ -398,6 +398,7 @@ const thumbEditorHomepageVisible = document.getElementById("thumbEditorHomepageV
 const thumbEditorFeatured = document.getElementById("thumbEditorFeatured");
 const thumbEditorUseBg = document.getElementById("thumbEditorUseBg");
 const thumbEditorBgColor = document.getElementById("thumbEditorBgColor");
+const thumbEditorFit = document.getElementById("thumbEditorFit");
 const thumbEditorPreviewFrame = document.getElementById("thumbEditorPreviewFrame");
 const thumbEditorPreviewImage = document.getElementById("thumbEditorPreviewImage");
 const thumbEditorPreviewLabel = document.getElementById("thumbEditorPreviewLabel");
@@ -914,6 +915,7 @@ function normalizeGalleryEntries(entries) {
       const cardDescription = normalizeCardDescription(entry?.cardDescription || "");
       const linkText = normalizeLinkText(entry?.linkText || "");
       const linkUrl = normalizeLinkUrl(entry?.linkUrl || "");
+      const detailUrl = normalizeLinkUrl(entry?.detailUrl || "");
       const category = normalizeGalleryCategory(entry?.category);
       const homepageVisible = normalizeHomepageVisible(entry?.homepageVisible);
       const featured =
@@ -929,6 +931,9 @@ function normalizeGalleryEntries(entries) {
       const original = String(entry?.original || "").trim();
       const assetBaseName = sanitizeAssetName(entry?.assetBaseName || "");
       const backgroundColor = normalizeHexColor(entry?.backgroundColor);
+      const thumbFit = String(entry?.thumbFit || "").trim().toLowerCase() === "contain"
+        ? "contain"
+        : "cover";
       const archived = isGalleryEntryArchived(entry);
       const archivedAt = String(entry?.archivedAt || "").trim();
       const sourceHash = String(entry?.sourceHash || "").trim();
@@ -946,6 +951,7 @@ function normalizeGalleryEntries(entries) {
         cardDescription,
         linkText,
         linkUrl,
+        detailUrl,
         category,
         homepageVisible,
         featured,
@@ -957,6 +963,7 @@ function normalizeGalleryEntries(entries) {
         original,
         assetBaseName,
         backgroundColor,
+        thumbFit,
         archived,
         archivedAt,
         sourceHash,
@@ -2545,6 +2552,7 @@ function openGalleryEditor(entryId) {
     thumbEditorFeatured.checked = Boolean(entry.featured);
     thumbEditorUseBg.checked = Boolean(entry.backgroundColor);
     thumbEditorBgColor.value = entry.backgroundColor || "#ffffff";
+    if (thumbEditorFit) thumbEditorFit.value = entry.thumbFit || "cover";
     thumbEditorDelete.textContent = isGalleryEntryArchived(entry) ? "Delete Permanently" : "Archive";
     thumbEditorDelete.dataset.editorAction = isGalleryEntryArchived(entry) ? "purge" : "archive";
     updateThumbEditorPreview(entry);
@@ -2924,6 +2932,7 @@ async function saveGalleryEditor() {
   const nextBackgroundColor = thumbEditorUseBg?.checked
     ? normalizeHexColor(thumbEditorBgColor?.value || "#ffffff")
     : "";
+  const nextThumbFit = thumbEditorFit?.value === "contain" ? "contain" : "cover";
 
   if (!nextName) {
     setThumbEditorStatus("Asset name cannot be empty.", "error");
@@ -2954,6 +2963,7 @@ async function saveGalleryEditor() {
   formData.append("homepageVisible", thumbEditorHomepageVisible?.checked ? "true" : "false");
   formData.append("featured", thumbEditorFeatured?.checked ? "true" : "false");
   formData.append("backgroundColor", nextBackgroundColor);
+  formData.append("thumbFit", nextThumbFit);
 
   const replacementFile = thumbEditorImage?.files?.[0];
   if (replacementFile) {
@@ -2989,6 +2999,7 @@ async function saveGalleryEditor() {
       method: "POST",
       body: formData
     });
+    await refreshSiteCache();
     await reloadData();
     clearEditorDraft();
     closeGalleryEditor();
@@ -4078,6 +4089,10 @@ if (uploadForm) {
         }
 
         renderGeneratedOutputs(successfulEntries, failedEntries, skippedEntries);
+      }
+
+      if (successfulEntries.length && state.apiAvailable) {
+        await refreshSiteCache();
       }
 
       if (successfulEntries.length) {

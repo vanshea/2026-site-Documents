@@ -319,6 +319,10 @@ function resolveGalleryEntryAssetPath(entry, ...preferredCandidates) {
   return resolveExistingSiteAssetPath(entry?.original, ...fallbackCandidates);
 }
 
+function resolveGalleryClientLogoPath(entry) {
+  return resolveExistingSiteAssetPath(entry?.clientLogo);
+}
+
 function splitGalleryEntriesByFeatured(entries) {
   const featuredEntries = [];
   const standardEntries = [];
@@ -472,6 +476,8 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const escapedThumb = escapeHtml(previewThumb);
       const escapedLarge = escapeHtml(large);
       const escapedFullscreen = escapeHtml(fullscreen);
+      const clientLogo = resolveGalleryClientLogoPath(entry);
+      const escapedClientLogo = escapeHtml(clientLogo);
       const escapedCardDescription = escapeHtml(displayCardDescription);
       const escapedDescription = escapeHtml(displayDescription);
       const escapedLinkText = escapeHtml(normalizeLinkText(entry?.linkText || "", 80));
@@ -482,13 +488,17 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       return [
         `          <article class="${cardClasses.join(" ")}" data-category="${category}" data-generated="true"${featured ? ' data-featured="true"' : ""}>`,
         `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedHref}"${escapedDetailUrl ? ` data-detail-url="${escapedDetailUrl}"` : ""} data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}"${escapedLinkText ? ` data-lightbox-link-text="${escapedLinkText}"` : ""}${escapedLinkUrl ? ` data-lightbox-link-url="${escapedLinkUrl}"` : ""}>`,
-        `              <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
+        escapedClientLogo
+          ? `              <span class="card-image-shell">\n                <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />\n                <img class="card-client-logo" src="${escapedClientLogo}" alt="" loading="lazy" />\n              </span>`
+          : `              <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
         displayCardDescription ? `              <p>${escapedCardDescription}</p>` : "",
         "            </a>",
-        '            <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">',
-        '              <span aria-hidden="true">⤢</span>',
-        "            </button>",
+        escapedDetailUrl
+          ? ""
+          : '            <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">',
+        escapedDetailUrl ? "" : '              <span aria-hidden="true">⤢</span>',
+        escapedDetailUrl ? "" : "            </button>",
         "          </article>"
       ]
         .filter(Boolean)
@@ -750,6 +760,10 @@ function normalizeHexColor(value) {
   }
 
   return /^#[0-9a-f]{6}$/i.test(raw) ? raw.toLowerCase() : "";
+}
+
+function normalizeGalleryThumbFit(value) {
+  return String(value || "").trim().toLowerCase() === "contain" ? "contain" : "cover";
 }
 
 function toSharpColor(color) {
@@ -1219,6 +1233,7 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
   const generatedPaths = buildGeneratedAssetPaths(baseName);
   const generated = {};
   const backgroundColor = toSharpColor(options.backgroundColor);
+  const thumbFit = normalizeGalleryThumbFit(options.thumbFit);
   const fullscreenBackground = backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 };
   const pipeline = sharp(inputBuffer).rotate();
   const smartCropAnalysis = await analyzeSmartContentBounds(inputBuffer);
@@ -1239,9 +1254,14 @@ async function generateVscimageOutputsFromBuffer(inputBuffer, options = {}) {
     if (backgroundColor) {
       thumbPipeline = thumbPipeline.flatten({ background: backgroundColor });
     }
-    await applySmartCrop(thumbPipeline, smartCropAnalysis, 760, 570)
+    const resizedThumbPipeline =
+      thumbFit === "contain"
+        ? thumbPipeline
+        : applySmartCrop(thumbPipeline, smartCropAnalysis, 760, 570);
+    await resizedThumbPipeline
       .resize(760, 570, {
-        fit: "cover",
+        fit: thumbFit,
+        background: backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 },
         position: "attention"
       })
       .webp({ quality: 88 })
@@ -1321,6 +1341,7 @@ async function copyManagedGalleryAsset(sourceAssetPath, targetFilePath, label) {
 
 async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, options = {}) {
   const backgroundColor = toSharpColor(options.backgroundColor);
+  const thumbFit = normalizeGalleryThumbFit(options.thumbFit);
   const pipeline = sharp(inputBuffer).rotate();
   const smartCropAnalysis = await analyzeSmartContentBounds(inputBuffer);
 
@@ -1340,9 +1361,14 @@ async function writeManagedGalleryAsset(outputKey, inputBuffer, targetFilePath, 
     if (backgroundColor) {
       outputPipeline = outputPipeline.flatten({ background: backgroundColor });
     }
-    await applySmartCrop(outputPipeline, smartCropAnalysis, 760, 570)
+    const resizedThumbPipeline =
+      thumbFit === "contain"
+        ? outputPipeline
+        : applySmartCrop(outputPipeline, smartCropAnalysis, 760, 570);
+    await resizedThumbPipeline
       .resize(760, 570, {
-        fit: "cover",
+        fit: thumbFit,
+        background: backgroundColor || { r: 0, g: 0, b: 0, alpha: 1 },
         position: "attention"
       })
       .webp({ quality: 88 })
@@ -1532,6 +1558,10 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextBackgroundColor = Object.prototype.hasOwnProperty.call(options, "backgroundColor")
     ? normalizeHexColor(options.backgroundColor)
     : currentBackgroundColor;
+  const currentThumbFit = normalizeGalleryThumbFit(currentEntry.thumbFit);
+  const nextThumbFit = Object.prototype.hasOwnProperty.call(options, "thumbFit")
+    ? normalizeGalleryThumbFit(options.thumbFit)
+    : currentThumbFit;
   const currentArchived = isGalleryEntryArchived(currentEntry);
   const currentArchivedAt = normalizeTextField(currentEntry.archivedAt || "", 64);
   const nextArchived = Object.prototype.hasOwnProperty.call(options, "archived")
@@ -1566,6 +1596,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const hasReplacementImage = Buffer.isBuffer(options.imageBuffer) && options.imageBuffer.length > 0;
   const requiresFullRegeneration =
     hasReplacementImage ||
+    nextThumbFit !== currentThumbFit ||
     (nextBackgroundColor !== currentBackgroundColor && !replacesBackgroundSensitiveOutputs);
   const requiresPathRefresh = nextBaseName !== currentBaseName;
   const hasMaterialAssetChanges =
@@ -1647,6 +1678,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     const generated = await generateVscimageOutputsFromBuffer(sourceBuffer, {
       baseName: nextBaseName,
       backgroundColor: nextBackgroundColor,
+      thumbFit: nextThumbFit,
       outputs: outputsToGenerate
     });
 
@@ -1682,7 +1714,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
         "thumb",
         fileBuffer,
         resolveVscimageLocalPath(nextThumbPath),
-        { backgroundColor: nextBackgroundColor }
+        { backgroundColor: nextBackgroundColor, thumbFit: nextThumbFit }
       );
       continue;
     }
@@ -1807,6 +1839,7 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     original: nextOriginalPath,
     assetBaseName: nextBaseName,
     backgroundColor: nextBackgroundColor,
+    thumbFit: nextThumbFit,
     archived: nextArchived,
     archivedAt: nextArchivedAt,
     sourceHash: nextSourceHash,
@@ -3409,6 +3442,7 @@ if (upload) {
           featured: req.body?.featured,
           name: req.body?.name,
           backgroundColor: req.body?.backgroundColor,
+          thumbFit: req.body?.thumbFit,
           imageBuffer: sourceImage?.buffer,
           originalName: sourceImage?.originalname,
           thumbImageBuffer: thumbImage?.buffer,
@@ -3462,6 +3496,7 @@ if (upload) {
     const baseName = sanitizeName(req.body.name) || `image-${Date.now()}`;
     const duplicateMode = String(req.body.duplicateMode || "").trim().toLowerCase();
     const backgroundColor = normalizeHexColor(req.body.backgroundColor);
+    const thumbFit = normalizeGalleryThumbFit(req.body.thumbFit);
     const category = normalizeGalleryCategory(req.body.category);
     const homepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible")
       ? toBool(req.body.homepageVisible, true)
@@ -3541,6 +3576,7 @@ if (upload) {
           featured: false,
           name: duplicateReplacementBaseName,
           backgroundColor,
+          thumbFit,
           imageBuffer: req.file.buffer,
           originalName: req.file.originalname,
           archived: false
@@ -3568,6 +3604,7 @@ if (upload) {
       const generated = await generateVscimageOutputsFromBuffer(req.file.buffer, {
         baseName: resolvedBaseName,
         backgroundColor,
+        thumbFit,
         outputs
       });
 
@@ -3595,6 +3632,7 @@ if (upload) {
           original: toWebPath(originalPath),
           assetBaseName: resolvedBaseName,
           backgroundColor,
+          thumbFit,
           archived: false,
           archivedAt: "",
           sourceHash,
