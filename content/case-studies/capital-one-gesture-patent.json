@@ -2,32 +2,32 @@
   "slug": "capital-one-gesture-patent",
   "sortOrder": 1,
   "title": "Capital One: The Patent and Beyond",
-  "subtitle": "A self-directed prototype effort that turned information architecture friction into a patented gesture-based interaction model.",
-  "summary": "Capital One customers were struggling with too many screens during testing. Van assembled a small team, led prototype development, and helped turn the concept into a patented gesture-interface direction.",
+  "subtitle": "A self-directed prototype that turned navigation friction into a patented gesture-based interaction model.",
+  "summary": "Testing showed that customers struggled with too many screens. Van assembled a small team, led the prototype, and helped develop the concept into a patent.",
   "heroImage": {
     "src": "/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/capital-one-patent-figure-pdf-thumb-760x570.webp",
     "alt": "Capital One patent figure sheet showing gesture interface scenarios across devices.",
     "title": "Patent Figure Sheet",
-    "caption": "The updated PDF includes patent figure scenarios showing gesture interactions across devices and contexts."
+    "caption": "Patent figures showing gesture interactions across devices and contexts."
   },
   "featuredImages": [],
   "galleryImages": [],
   "sections": [
     {
       "id": "opportunity",
-      "heading": "The Conflict",
-      "bodyHtml": "<p>During testing, customers often mentioned that there were too many screens to find what they needed. That feedback pointed to a deeper information architecture and interaction problem: the experience required too much navigation, education, and effort for customers trying to move through financial information.</p><p>The opportunity was to create an interface that reduced that burden and made interaction feel more direct, memorable, and intuitive.</p>"
+      "heading": "The Story",
+      "bodyHtml": "<p>Testing showed that customers struggled to find information across too many screens. The team needed a more direct interaction model that reduced navigation and learning.</p>"
     },
     {
       "id": "approach",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van assembled a team to address information architecture problems identified during the redesign. As UX Design Lead, he led prototype development and technology revisions, earning second place at a hackathon.</p><p>He also created a concept video and presentation for the new technology, delivered to senior executives and the legal team. A follow-up conversation with the legal team helped develop the idea into a patent direction.</p>"
+      "bodyHtml": "<p>Van assembled a small team and led prototype development and technical revisions. The concept earned second place at a hackathon.</p><p>He then created a concept video and executive presentation. Collaboration with the legal team developed the idea into a patent.</p>"
     },
     {
       "id": "outcome",
       "heading": "Impact Beyond the Patent",
-      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The concept focused on an interface that required minimal education and effort, directly responding to customer feedback about screen overload.</li><li><strong>Technical Win:</strong> The gesture interface expanded how the team thought about interaction across devices and contexts.</li><li><strong>Organizational Win:</strong> The work showed how a small team could turn observed information architecture problems into a working prototype and executive-ready story.</li><li><strong>Innovation Win:</strong> The work earned hackathon recognition and continued through collaboration with the legal team to secure a patent.</li></ul>"
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The concept reduced the learning and effort required to navigate financial information.</li><li><strong>Technical Win:</strong> The gesture model explored interaction across devices and contexts.</li><li><strong>Organizational Win:</strong> A small team turned a usability problem into a working prototype and executive-ready story.</li><li><strong>Innovation Win:</strong> The concept earned hackathon recognition and became a patent.</li></ul>"
     },
     {
       "id": "published-patent",
@@ -37,7 +37,7 @@
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van helped turn usability friction into an innovation path. The patent was the visible artifact, but the larger contribution was recognizing a customer problem, organizing a small team around it, building a prototype, and translating the concept into a story that executives and legal partners could support.</p>"
+      "bodyHtml": "<p>Van turned a usability problem into a prototype, an executive story, and a patent supported by legal partners.</p>"
     }
   ],
   "metadata": {

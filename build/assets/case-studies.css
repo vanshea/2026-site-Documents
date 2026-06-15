@@ -27,6 +27,12 @@
   max-width: 66ch;
 }
 
+:root .case-study-index-hero .case-study-index-copy h1,
+:root .case-study-hero .case-study-hero-copy h1 {
+  max-width: 100%;
+  font-size: clamp(1.9rem, 3.2vw, 3rem);
+}
+
 .case-study-index-copy > .eyebrow {
   display: none;
 }
@@ -145,6 +151,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .case-study-pill {

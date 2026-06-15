@@ -2,13 +2,13 @@
   "slug": "vanguard-innovation-lab-integration",
   "sortOrder": 2,
   "title": "Vanguard Smart Home Voice & Security Strategy",
-  "subtitle": "A design research and strategy effort that helped Vanguard evaluate smart-home voice interfaces, security implications, and the operational readiness needed to support them.",
-  "summary": "Vanguard needed a market point of view on smart-home voice interfaces while protecting client trust. Van led the design research strategy, prototyped real solutions, and connected security concepts to business, analytics, and legacy systems.",
+  "subtitle": "Research and strategy for evaluating smart-home voice interfaces, security, and operational readiness.",
+  "summary": "Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems.",
   "heroImage": {
     "src": "/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp",
-    "alt": "vanguard3200x1800",
-    "title": "vanguard3200x1800",
+    "alt": "Vanguard smart-home voice and security strategy overview.",
+    "title": "Vanguard Smart-Home Voice Strategy",
     "caption": ""
   },
   "featuredImages": [],
@@ -16,13 +16,13 @@
   "sections": [
     {
       "id": "conflict",
-      "heading": "The Conflict",
-      "bodyHtml": "<p>Smart-home devices were becoming a serious consumer technology category, but financial services could not treat voice interfaces as a novelty. The PDF frames the core problem clearly: clients did not yet trust security and privacy on voice technology.</p><p>Vanguard needed to understand the level of effort and timeline for using smart-home devices in a consumer-facing strategy. The opportunity was large, but the strategy had to account for client trust, security messaging, current systems, usage data, and legacy technology constraints.</p>"
+      "heading": "The Story",
+      "bodyHtml": "<p>Smart-home devices were growing, but clients did not yet trust the security and privacy of voice technology. Vanguard needed to assess the effort, timing, and risks of a consumer voice strategy.</p><p>The strategy had to balance market opportunity with trust, security messaging, usage data, current systems, and legacy constraints.</p>"
     },
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van led the design research strategy and prototyped real solutions while staying aware of current systems and client usage data for smart-home devices. He also led design and research delivery for security enhancements, connecting strategy to business analytics, system analytics, and legacy technology.</p><p>The work combined research, product strategy, and art direction. Van created and art directed smart-home concepts that illustrated the learnings and possibilities, giving leadership a clearer way to evaluate the market, the client experience, and the internal readiness required to move forward.</p>",
+      "bodyHtml": "<p>Van led research, prototypes, and security experience design, grounding the work in client usage data, analytics, current systems, and legacy constraints.</p><p>He also directed smart-home concepts that helped leaders evaluate the market, client experience, and operational readiness.</p>",
       "image": {
         "src": "/assets/vscimage/generated/vanguard-md1-large-1900x1600.webp",
         "thumbSrc": "/assets/vscimage/generated/vanguard-md1-thumb-760x570.webp",
@@ -34,12 +34,12 @@
     {
       "id": "impact",
       "heading": "Impact Beyond the Roadmap",
-      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The work treated privacy and security as core experience requirements, not late-stage compliance considerations.</li><li><strong>Strategic Win:</strong> Vanguard gained a clearer market point of view on smart-home voice interfaces at a time when smart-home product sales and consumption were expected to exceed $500 billion by 2030.</li><li><strong>Organizational Win:</strong> The PDF notes that Vanguard digital leadership saw the need for enhanced and updated security and created teams to immediately support the technology.</li><li><strong>Execution Win:</strong> Adjacent authentication samples show how the strategy connected to concrete client security experiences, including credentials reset and profile-update flows.</li></ul>"
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> Privacy and security became core experience requirements.</li><li><strong>Strategic Win:</strong> Vanguard gained a clearer position on the smart-home voice market.</li><li><strong>Organizational Win:</strong> Digital leaders formed teams to support stronger security.</li><li><strong>Execution Win:</strong> The strategy informed credentials-reset and profile-update experiences.</li></ul>"
     },
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van helped Vanguard move from an abstract question about voice devices to a more practical strategy for consumer-facing smart-home experiences. The work connected market opportunity, client trust, security readiness, current systems, and prototype direction into a roadmap leadership could act on.</p>",
+      "bodyHtml": "<p>Van turned an abstract voice-device question into an actionable roadmap connecting market opportunity, client trust, security, systems, and prototypes.</p>",
       "image": {
         "src": "/assets/vscimage/generated/vanguard-md2-large-1900x1600.webp",
         "thumbSrc": "/assets/vscimage/generated/vanguard-md2-thumb-760x570.webp",

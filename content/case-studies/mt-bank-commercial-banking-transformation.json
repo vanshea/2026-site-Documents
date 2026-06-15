@@ -2,13 +2,13 @@
   "slug": "mt-bank-commercial-banking-transformation",
   "sortOrder": 3,
   "title": "M&T Bank Commercial Banking Transformation",
-  "subtitle": "A service design effort that mapped commercial lending complexity, reframed modernization around journeys, and translated future-state concepts into stakeholder-ready change narratives.",
-  "summary": "M&T Bank's commercial banking experience was shaped by fragmented processes, repeated handoffs, and operational waste. Van helped turn research and journey mapping into a clearer service blueprint for future commercial lending.",
+  "subtitle": "A service design program that mapped lending complexity and aligned stakeholders around a clearer future state.",
+  "summary": "Fragmented processes and repeated handoffs created friction and waste. Van turned research and journey maps into a service blueprint for commercial lending.",
   "heroImage": {
     "src": "/assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp",
-    "alt": "M&T Bank Case Study",
-    "title": "M&T Bank Case Study",
+    "alt": "M&T Bank commercial banking service design overview.",
+    "title": "M&T Bank Commercial Banking Transformation",
     "caption": ""
   },
   "featuredImages": [],
@@ -16,30 +16,30 @@
   "sections": [
     {
       "id": "conflict",
-      "heading": "The Conflict",
-      "bodyHtml": "<p>M&amp;T Bank’s commercial lending experience was spread across customer moments, employee roles, channels, documents, operational handoffs, and back-stage actions. The updated PDF shows this complexity in the current-state journey map, where friction appeared across planning, underwriting, approval, closing, ongoing requirements, and loan modification.</p><p>The deeper issue was not simply legacy technology. It was a fragmented service model that made it hard for customers and internal teams to see the full lending journey, understand dependencies, and prioritize the right process and digital improvements.</p>",
+      "heading": "The Story",
+      "bodyHtml": "<p>M&T Bank’s commercial lending experience spanned customers, employees, channels, documents, handoffs, and backstage operations. Friction affected planning, underwriting, approval, closing, ongoing requirements, and loan modification.</p><p>The core problem was a fragmented service model that obscured the full journey and made improvements difficult to prioritize.</p>",
       "image": {
         "src": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-fullscreen-3200x1800.webp",
         "thumbSrc": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp",
         "alt": "Current-state B2B lending journey map for M&T Bank commercial lending.",
         "title": "Current-State Journey Map",
-        "caption": "The updated PDF includes the full B2B lending current-state journey map, showing customer moments, role involvement, channels, friction, and backstage actions."
+        "caption": "Current-state B2B lending journey showing customer moments, roles, channels, friction, and backstage actions."
       }
     },
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van helped move the work from scattered feedback into a structured service design narrative. As Service Design Lead, he created a logical customer experience story from the feedback the team had received, guided service and UX designers as they refined ideas, and edited the story so it made sense to senior stakeholders.</p><p>The future-state blueprint used new products and enhancements to show the customer’s improved journey strategically. This gave the organization a clearer way to connect customer friction, employee workflow, operational waste, and future product direction.</p>"
+      "bodyHtml": "<p>Van organized scattered feedback into a clear service design narrative. He guided service and UX designers, refined concepts, and shaped the story for senior stakeholders.</p><p>The future-state blueprint connected customer friction, employee workflows, operational waste, and product direction.</p>"
     },
     {
       "id": "impact",
       "heading": "Impact Beyond the Journey Maps",
-      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The work clarified how customers could move through lending with less friction and better support across planning, underwriting, approval, closing, and ongoing requirements.</li><li><strong>Organizational Win:</strong> The future-state story helped stakeholders understand how to create change strategically over time rather than treating modernization as isolated feature work.</li><li><strong>Operational Win:</strong> The PDF notes an estimated $3MM in annual waste and a department that had experienced a 90% attrition rate in one year, making the service design work directly tied to operational urgency.</li><li><strong>Execution Win:</strong> The blueprint translated feedback into a narrative that product, design, service, and stakeholder teams could use to align around future-state concepts.</li></ul>"
+      "bodyHtml": "<ul><li><strong>Customer Win:</strong> The blueprint showed a less fragmented lending journey.</li><li><strong>Organizational Win:</strong> Stakeholders could plan modernization as a coordinated program rather than isolated features.</li><li><strong>Operational Win:</strong> The work addressed an estimated $3 million in annual waste and a department with 90% attrition in one year.</li><li><strong>Execution Win:</strong> Product, design, service, and business teams gained a shared future-state narrative.</li></ul>"
     },
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van helped M&amp;T see commercial lending as an interconnected service ecosystem. The value of the work was not only in the map or the blueprint. It was in making complexity visible, turning feedback into a usable future-state story, and helping stakeholders understand how customer and operational change could happen over time.</p>",
+      "bodyHtml": "<p>Van made the lending ecosystem visible and turned scattered feedback into a future-state story stakeholders could use.</p>",
       "image": {
         "src": "/assets/vscimage/generated/mt-bank-future-b2b-lending-board-fullscreen-3200x1800.webp",
         "thumbSrc": "/assets/vscimage/generated/mt-bank-future-b2b-lending-board-thumb-760x570.webp",

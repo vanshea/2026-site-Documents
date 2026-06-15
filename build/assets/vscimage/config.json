@@ -57,8 +57,8 @@
     {
       "id": "large-web-portfolio-pat760x570-1772332872992",
       "title": "Capital One Patent",
-      "description": "My job: Assemble a team based on information architecture problems we saw in the redesign Lead prototype creation and technology revisions, winning 2nd place at a hack-a-thon Create a concept video and presentation of new technology for presentation to senior executives and the legal team.",
-      "cardDescription": "Patent for gesture interfaces.",
+      "description": "Led a small team from usability findings through prototype development, hackathon recognition, executive review, and patent collaboration.",
+      "cardDescription": "Patented gesture-interface concept.",
       "linkText": "",
       "linkUrl": "http://www.vanshea.com/case-studies/capital-one-gesture-patent",
       "detailUrl": "/case-studies/capital-one-gesture-patent",
@@ -83,7 +83,7 @@
       "id": "politico-1776701606120",
       "title": "POLITICO",
       "description": "In 2008, I was asked to design a logo for a new news company.",
-      "cardDescription": "In 2008, I was asked to design a logo for a new news company...",
+      "cardDescription": "Logo design for a new political news company.",
       "linkText": "",
       "linkUrl": "",
       "category": "branding",
@@ -156,7 +156,7 @@
     {
       "id": "exchange-1440-v01-default-1776702887536",
       "title": "Candlestick Chart View for Crypto Project",
-      "description": "Candlestick Chart View for Crypto Project .",
+      "description": "Candlestick chart interface for a cryptocurrency product.",
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
@@ -179,9 +179,9 @@
     },
     {
       "id": "large-web-portfolio-greif3200x1800-1772332871783",
-      "title": "Grief Plus logo",
-      "description": "Branding for client portal.",
-      "cardDescription": "Branding for client portal.",
+      "title": "Greif Plus Logo",
+      "description": "Brand identity for a client portal.",
+      "cardDescription": "Brand identity for a client portal.",
       "linkText": "",
       "linkUrl": "",
       "category": "branding",
@@ -204,7 +204,7 @@
     {
       "id": "large-web-portfolio-gore3200x1800-1772332871171",
       "title": "3D Illustration for Wiring Product",
-      "description": "#D illustration composed in Blender.",
+      "description": "3D product illustration created in Blender.",
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
@@ -252,7 +252,7 @@
     {
       "id": "large-web-portfolio-airdolly23200x1800-1772332870266",
       "title": "Isometric Illustration",
-      "description": "Done for AirDolly.",
+      "description": "Isometric illustration created for AirDolly.",
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
@@ -276,7 +276,7 @@
     {
       "id": "nft-1776703281219",
       "title": "Sketches and NFTs",
-      "description": "NFT",
+      "description": "Original sketches and digital collectible artwork.",
       "cardDescription": "",
       "linkText": "for sale here",
       "linkUrl": "https://opensea.io/item/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/16558468591630651215346334032891504440586029420939591605290779045548959727617",
@@ -300,7 +300,7 @@
     {
       "id": "large-web-portfolio-linedraw-01-3200x1800-1772332872067",
       "title": "Schematic for Medical Device",
-      "description": "Illustration to depict a low-resolution image of medical equipment and its working parts.",
+      "description": "Technical schematic clarifying medical equipment and its components.",
       "cardDescription": "",
       "linkText": "",
       "linkUrl": "",
@@ -323,7 +323,7 @@
     },
     {
       "id": "case-studies-1777663297065",
-      "title": "case-studies",
+      "title": "Selected Case Studies",
       "description": "",
       "cardDescription": "",
       "linkText": "",
@@ -396,7 +396,7 @@
     {
       "id": "mt-bank-current-state-journey-pdf-1777494813529",
       "title": "M&T Bank Current-State Journey Map",
-      "description": "Updated PDF sample showing the B2B lending current-state journey map, friction points, channels, role involvement, and supporting backstage actions.",
+      "description": "B2B lending journey map showing friction, channels, roles, and backstage actions.",
       "cardDescription": "Current-state commercial lending journey map.",
       "linkText": "",
       "linkUrl": "",
@@ -420,7 +420,7 @@
     {
       "id": "mt-bank-future-blueprint-pdf-1777494813529",
       "title": "M&T Bank Future Blueprint Goals",
-      "description": "Updated PDF sample summarizing the future-state commercial lending blueprint goals, team, business need, and stakeholder outcome.",
+      "description": "Future-state commercial lending blueprint goals, team, business need, and stakeholder outcome.",
       "cardDescription": "Future-state commercial lending blueprint goals.",
       "linkText": "",
       "linkUrl": "",
@@ -444,7 +444,7 @@
     {
       "id": "mt-bank-service-design-role-pdf-1777563743257",
       "title": "M&T Bank Service Design Lead Role",
-      "description": "Updated PDF sample showing the Service Design Lead responsibilities: customer experience narrative creation, concept refinement guidance, and senior-stakeholder storytelling.",
+      "description": "Service Design Lead responsibilities across narrative development, concept refinement, and stakeholder communication.",
       "cardDescription": "Service Design Lead responsibilities for the future-state blueprint.",
       "linkText": "",
       "linkUrl": "",
@@ -468,7 +468,7 @@
     {
       "id": "mt-bank-future-b2b-lending-board-1777494813529",
       "title": "M&T Bank Future B2B Lending Concept Board",
-      "description": "Updated PDF sample showing the future B2B lending concept board and storyboard across customer, employee, and leadership experience.",
+      "description": "Future B2B lending concept board spanning customer, employee, and leadership experiences.",
       "cardDescription": "Future B2B lending storyboard and concept board.",
       "linkText": "",
       "linkUrl": "",
@@ -492,7 +492,7 @@
     {
       "id": "vanguard-smart-home-voice-strategy-pdf-1777494813529",
       "title": "Vanguard Smart Home Voice Strategy Goals",
-      "description": "Updated PDF sample summarizing the smart-home voice strategy goals, team, market need, and security outcome for Vanguard.",
+      "description": "Smart-home voice strategy goals, team, market need, and security outcome.",
       "cardDescription": "Smart-home voice strategy goals and outcome.",
       "linkText": "",
       "linkUrl": "",
@@ -516,7 +516,7 @@
     {
       "id": "vanguard-smart-home-voice-role-pdf-1777563743257",
       "title": "Vanguard UX Strategist Role",
-      "description": "Updated PDF sample showing the UX Strategist responsibilities: research strategy, prototyping, security enhancement delivery, analytics connection, and smart-home concept art direction.",
+      "description": "UX strategy responsibilities across research, prototypes, security, analytics, and concept direction.",
       "cardDescription": "UX Strategist responsibilities for smart-home voice and security strategy.",
       "linkText": "",
       "linkUrl": "",
@@ -540,7 +540,7 @@
     {
       "id": "vanguard-security-roadmap-pdf-1777563743257",
       "title": "Vanguard Privacy and Security Problem Roadmap",
-      "description": "Updated PDF sample showing the device enablement privacy and security problem roadmap for voice technology.",
+      "description": "Privacy and security roadmap for voice-device enablement.",
       "cardDescription": "Privacy and security roadmap for smart-home voice interfaces.",
       "linkText": "",
       "linkUrl": "",
@@ -564,7 +564,7 @@
     {
       "id": "vanguard-credentials-reset-pdf-1777494813529",
       "title": "Vanguard Credentials Reset Experience",
-      "description": "Updated PDF sample showing Vanguard credentials reset screens and the authentication redesign direction.",
+      "description": "Credentials-reset screens and authentication redesign direction.",
       "cardDescription": "Credentials reset authentication redesign sample.",
       "linkText": "",
       "linkUrl": "",
@@ -588,7 +588,7 @@
     {
       "id": "vanguard-security-quick-solutions-pdf-1777563743257",
       "title": "Vanguard Security Experience Improvements",
-      "description": "Updated PDF sample showing a problematic security experience and the improved prompt to update a security profile.",
+      "description": "Before-and-after security prompts for updating a client profile.",
       "cardDescription": "Old-to-new security experience improvement sample.",
       "linkText": "",
       "linkUrl": "",
@@ -612,7 +612,7 @@
     {
       "id": "capital-one-gesture-patent-pdf-1777494813529",
       "title": "Capital One Gesture Patent Goals",
-      "description": "Updated PDF sample summarizing the Capital One gesture-interface patent goals, team, customer need, and legal collaboration outcome.",
+      "description": "Gesture-interface patent goals, team, customer need, and legal collaboration outcome.",
       "cardDescription": "Gesture-interface patent goals and outcome.",
       "linkText": "",
       "linkUrl": "",
@@ -636,7 +636,7 @@
     {
       "id": "capital-one-gesture-patent-role-pdf-1777563743257",
       "title": "Capital One UX Design Lead Role",
-      "description": "Updated PDF sample showing UX Design Lead responsibilities: team assembly, prototype development, executive storytelling, and legal collaboration.",
+      "description": "UX Design Lead responsibilities across team building, prototypes, executive storytelling, and legal collaboration.",
       "cardDescription": "UX Design Lead responsibilities for the gesture-interface patent.",
       "linkText": "",
       "linkUrl": "",
@@ -660,7 +660,7 @@
     {
       "id": "capital-one-patent-figure-pdf-1777563743257",
       "title": "Capital One Patent Figure Sheet",
-      "description": "Updated PDF sample showing patent figure scenarios for gesture interfaces across mobile, television, and vehicle contexts.",
+      "description": "Patent figures for gesture interfaces across mobile, television, and vehicle contexts.",
       "cardDescription": "Patent figure sheet showing gesture interface scenarios.",
       "linkText": "",
       "linkUrl": "",
@@ -707,7 +707,7 @@
     },
     {
       "id": "large-web-portfolio-airdolly-1772332869960",
-      "title": "large-web-portfolio-airdolly",
+      "title": "AirDolly Illustration",
       "description": "",
       "cardDescription": "",
       "linkText": "",
