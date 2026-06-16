@@ -4,7 +4,13 @@
   "title": "Capital One: The Patent and Beyond",
   "subtitle": "A self-directed prototype that turned navigation friction into a patented gesture-based interaction model.",
   "summary": "Testing showed that customers struggled with too many screens. Van assembled a small team, led the prototype, and helped develop the concept into a patent.",
-  "heroImage": {
+  "heroVideo": {
+    "src": "/assets/videos/capital-one-samples.mp4",
+    "type": "video/mp4",
+    "poster": "/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp",
+    "title": "Capital One: The Patent and Beyond"
+  },
+  "cardImage": {
     "src": "/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/capital-one-patent-figure-pdf-thumb-760x570.webp",
     "alt": "Capital One patent figure sheet showing gesture interface scenarios across devices.",

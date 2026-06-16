@@ -13,7 +13,7 @@
   rel="stylesheet"
 />
 <link rel="stylesheet" href="/styles.css?v=20260612-case-hero-spacing-1" />
-<link rel="stylesheet" href="/assets/case-studies.css?v=20260614-case-h1-1" />
+<link rel="stylesheet" href="/assets/case-studies.css?v=20260615-local-video-1" />
 
 
 
@@ -93,18 +93,18 @@
   </div>
 
   
-    <button
-      class="case-study-hero-media"
-      type="button"
-      data-lightbox-trigger
-      data-lightbox-index="0"
-      aria-label="Open hero image for M&amp;T Bank Commercial Banking Transformation"
-    >
-      <img
-        src="/assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp"
-        alt="M&amp;T Bank commercial banking service design overview."
-      />
-    </button>
+    <div class="case-study-hero-media case-study-hero-video">
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        poster="/assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp"
+        aria-label="M&amp;T Bank Commercial Banking Transformation"
+      >
+        <source src="/assets/videos/mt_movie.mp4" type="video/mp4" />
+        Your browser does not support HTML video.
+      </video>
+    </div>
   
 </section>
 
@@ -160,7 +160,7 @@
 
       <section class="case-study-sections">
         
-          <article class="case-study-section reveal case-study-section-has-image">
+          <article class="case-study-section reveal ">
   <div class="case-study-section-copy">
     <h2>The Story</h2>
 
@@ -171,23 +171,6 @@
     
   </div>
 
-  
-    <button
-      class="case-study-section-media"
-      type="button"
-      data-lightbox-trigger
-      data-lightbox-index="1"
-      aria-label="Open image for The Story"
-    >
-      <img
-        src="/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp"
-        alt="Current-state B2B lending journey map for M&amp;T Bank commercial lending."
-        loading="lazy"
-      />
-      
-        <span class="case-study-media-caption">Current-state B2B lending journey showing customer moments, roles, channels, friction, and backstage actions.</span>
-      
-    </button>
   
 </article>
 
@@ -222,7 +205,7 @@
 </article>
 
         
-          <article class="case-study-section reveal case-study-section-has-image">
+          <article class="case-study-section reveal ">
   <div class="case-study-section-copy">
     <h2>Strategic Takeaway</h2>
 
@@ -233,23 +216,6 @@
     
   </div>
 
-  
-    <button
-      class="case-study-section-media"
-      type="button"
-      data-lightbox-trigger
-      data-lightbox-index="2"
-      aria-label="Open image for Strategic Takeaway"
-    >
-      <img
-        src="/assets/vscimage/generated/mt-bank-future-b2b-lending-board-thumb-760x570.webp"
-        alt="Future B2B lending concept board and storyboard for M&amp;T Bank."
-        loading="lazy"
-      />
-      
-        <span class="case-study-media-caption">The concept board connected customer, employee, and leadership experiences into a future commercial lending story.</span>
-      
-    </button>
   
 </article>
 
@@ -368,40 +334,6 @@
   </div>
 </aside>
 
-    <div class="lightbox case-study-lightbox" id="caseStudyLightbox" aria-hidden="true">
-  <button class="lightbox-close" id="caseStudyLightboxClose" type="button" aria-label="Close lightbox">
-    &times;
-  </button>
-  <button
-    class="lightbox-nav lightbox-prev"
-    id="caseStudyLightboxPrev"
-    type="button"
-    aria-label="Previous image"
-  >
-    &larr;
-  </button>
-  <button
-    class="lightbox-nav lightbox-next"
-    id="caseStudyLightboxNext"
-    type="button"
-    aria-label="Next image"
-  >
-    &rarr;
-  </button>
-
-  <figure class="lightbox-figure">
-    <img id="caseStudyLightboxImage" src="" alt="" />
-    <figcaption>
-      <strong id="caseStudyLightboxTitle"></strong>
-      <span id="caseStudyLightboxCaption"></span>
-      <span class="case-study-lightbox-counter" id="caseStudyLightboxCounter"></span>
-    </figcaption>
-  </figure>
-</div>
-
-<script id="caseStudyLightboxData" type="application/json">
-  [{"src":"/assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp","alt":"M&T Bank commercial banking service design overview.","title":"M&T Bank Commercial Banking Transformation","caption":""},{"src":"/assets/vscimage/generated/mt-bank-current-state-journey-pdf-fullscreen-3200x1800.webp","alt":"Current-state B2B lending journey map for M&T Bank commercial lending.","title":"Current-State Journey Map","caption":"Current-state B2B lending journey showing customer moments, roles, channels, friction, and backstage actions."},{"src":"/assets/vscimage/generated/mt-bank-future-b2b-lending-board-fullscreen-3200x1800.webp","alt":"Future B2B lending concept board and storyboard for M&T Bank.","title":"Future B2B Lending Concept Board","caption":"The concept board connected customer, employee, and leadership experiences into a future commercial lending story."}]
-</script>
 
 
     <script src="/analytics.js"></script>

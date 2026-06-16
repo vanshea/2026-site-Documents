@@ -13,7 +13,7 @@
   rel="stylesheet"
 />
 <link rel="stylesheet" href="/build/styles.css?v=20260612-case-hero-spacing-1" />
-<link rel="stylesheet" href="/build/assets/case-studies.css?v=20260614-case-h1-1" />
+<link rel="stylesheet" href="/build/assets/case-studies.css?v=20260615-local-video-1" />
 
 
 
@@ -93,18 +93,18 @@
   </div>
 
   
-    <button
-      class="case-study-hero-media"
-      type="button"
-      data-lightbox-trigger
-      data-lightbox-index="0"
-      aria-label="Open hero image for Capital One: The Patent and Beyond"
-    >
-      <img
-        src="/build/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp"
-        alt="Capital One patent figure sheet showing gesture interface scenarios across devices."
-      />
-    </button>
+    <div class="case-study-hero-media case-study-hero-video">
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        poster="/build/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp"
+        aria-label="Capital One: The Patent and Beyond"
+      >
+        <source src="/build/assets/videos/capital-one-samples.mp4" type="video/mp4" />
+        Your browser does not support HTML video.
+      </video>
+    </div>
   
 </section>
 
@@ -349,40 +349,6 @@
   </div>
 </aside>
 
-    <div class="lightbox case-study-lightbox" id="caseStudyLightbox" aria-hidden="true">
-  <button class="lightbox-close" id="caseStudyLightboxClose" type="button" aria-label="Close lightbox">
-    &times;
-  </button>
-  <button
-    class="lightbox-nav lightbox-prev"
-    id="caseStudyLightboxPrev"
-    type="button"
-    aria-label="Previous image"
-  >
-    &larr;
-  </button>
-  <button
-    class="lightbox-nav lightbox-next"
-    id="caseStudyLightboxNext"
-    type="button"
-    aria-label="Next image"
-  >
-    &rarr;
-  </button>
-
-  <figure class="lightbox-figure">
-    <img id="caseStudyLightboxImage" src="" alt="" />
-    <figcaption>
-      <strong id="caseStudyLightboxTitle"></strong>
-      <span id="caseStudyLightboxCaption"></span>
-      <span class="case-study-lightbox-counter" id="caseStudyLightboxCounter"></span>
-    </figcaption>
-  </figure>
-</div>
-
-<script id="caseStudyLightboxData" type="application/json">
-  [{"src":"/build/assets/vscimage/generated/capital-one-patent-figure-pdf-fullscreen-3200x1800.webp","alt":"Capital One patent figure sheet showing gesture interface scenarios across devices.","title":"Patent Figure Sheet","caption":"Patent figures showing gesture interactions across devices and contexts."}]
-</script>
 
 
     <script src="/build/analytics.js"></script>

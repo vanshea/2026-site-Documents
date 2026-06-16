@@ -4,7 +4,11 @@
   "title": "NYU Curriculum Alignment",
   "subtitle": "A curriculum redesign that connected information architecture to modern UX research and practice.",
   "summary": "Van expanded NYU’s information architecture curriculum beyond classification methods into a broader human-centered UX process.",
-  "heroImage": {
+  "heroPresentation": {
+    "src": "https://docs.google.com/presentation/d/1LCo8Gz5eX0xqk9f4S3nCqH1J3FQxTeKUCGQ76zYxQ8k/embed?start=false&loop=false&delayms=3000",
+    "title": "NYU Curriculum Alignment presentation"
+  },
+  "cardImage": {
     "src": "/assets/vscimage/generated/nyu-2000-1-2000x1000-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp",
     "alt": "NYU information architecture curriculum and teaching work.",

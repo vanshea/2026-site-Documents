@@ -24,7 +24,30 @@
     </div>
   </div>
 
-  <% if (caseStudy.heroImage) { %>
+  <% if (caseStudy.heroPresentation) { %>
+    <div class="case-study-hero-media case-study-hero-presentation">
+      <iframe
+        src="<%= caseStudy.heroPresentation.src %>"
+        title="<%= caseStudy.heroPresentation.title %>"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen
+      ></iframe>
+    </div>
+  <% } else if (caseStudy.heroVideo) { %>
+    <div class="case-study-hero-media case-study-hero-video">
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        <% if (caseStudy.heroVideo.poster) { %>poster="<%= caseStudy.heroVideo.poster %>"<% } %>
+        aria-label="<%= caseStudy.heroVideo.title %>"
+      >
+        <source src="<%= caseStudy.heroVideo.src %>" type="<%= caseStudy.heroVideo.type %>" />
+        Your browser does not support HTML video.
+      </video>
+    </div>
+  <% } else if (caseStudy.heroImage) { %>
     <button
       class="case-study-hero-media"
       type="button"

@@ -38,9 +38,11 @@
 
     <%- include("../partials/public_footer") %>
     <%- include("../partials/consent_banner") %>
-    <%- include("../partials/case-studies/lightbox", {
-      lightboxImages: caseStudy.lightboxImages
-    }) %>
+<% if (caseStudy.lightboxImages.length > 0) { %>
+<%- include("../partials/case-studies/lightbox", {
+  lightboxImages: caseStudy.lightboxImages
+}) %>
+<% } %>
 
     <script src="/analytics.js"></script>
     <script src="/script.js?v=20260612-case-hero-spacing-1"></script>

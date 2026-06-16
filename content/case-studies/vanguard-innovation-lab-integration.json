@@ -4,7 +4,13 @@
   "title": "Vanguard Smart Home Voice & Security Strategy",
   "subtitle": "Research and strategy for evaluating smart-home voice interfaces, security, and operational readiness.",
   "summary": "Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems.",
-  "heroImage": {
+  "heroVideo": {
+    "src": "/assets/videos/vanguard-samples.mp4",
+    "type": "video/mp4",
+    "poster": "/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp",
+    "title": "Vanguard Smart Home Voice & Security Strategy"
+  },
+  "cardImage": {
     "src": "/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp",
     "alt": "Vanguard smart-home voice and security strategy overview.",
@@ -22,14 +28,7 @@
     {
       "id": "strategic-action",
       "heading": "The Strategic Action",
-      "bodyHtml": "<p>Van led research, prototypes, and security experience design, grounding the work in client usage data, analytics, current systems, and legacy constraints.</p><p>He also directed smart-home concepts that helped leaders evaluate the market, client experience, and operational readiness.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/vanguard-md1-large-1900x1600.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-md1-thumb-760x570.webp",
-        "alt": "Vanguard Research Metrics",
-        "title": "Vanguard Research Metrics",
-        "caption": "Research summary slide showing video snippets, survey responses, and interviews for the Vanguard smart-home voice and security strategy."
-      }
+      "bodyHtml": "<p>Van led research, prototypes, and security experience design, grounding the work in client usage data, analytics, current systems, and legacy constraints.</p><p>He also directed smart-home concepts that helped leaders evaluate the market, client experience, and operational readiness.</p>"
     },
     {
       "id": "impact",
@@ -39,14 +38,7 @@
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van turned an abstract voice-device question into an actionable roadmap connecting market opportunity, client trust, security, systems, and prototypes.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/vanguard-md2-large-1900x1600.webp",
-        "thumbSrc": "/assets/vscimage/generated/vanguard-md2-thumb-760x570.webp",
-        "alt": "Vanguard Concept Exploration",
-        "title": "Vanguard Concept Exploration",
-        "caption": "Concept summary slide showing 154 design concepts for the Vanguard smart-home voice and security strategy."
-      }
+      "bodyHtml": "<p>Van turned an abstract voice-device question into an actionable roadmap connecting market opportunity, client trust, security, systems, and prototypes.</p>"
     }
   ],
   "metadata": {

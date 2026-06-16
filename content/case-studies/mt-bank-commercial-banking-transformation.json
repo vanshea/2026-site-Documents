@@ -4,7 +4,13 @@
   "title": "M&T Bank Commercial Banking Transformation",
   "subtitle": "A service design program that mapped lending complexity and aligned stakeholders around a clearer future state.",
   "summary": "Fragmented processes and repeated handoffs created friction and waste. Van turned research and journey maps into a service blueprint for commercial lending.",
-  "heroImage": {
+  "heroVideo": {
+    "src": "/assets/videos/mt_movie.mp4",
+    "type": "video/mp4",
+    "poster": "/assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp",
+    "title": "M&T Bank Commercial Banking Transformation"
+  },
+  "cardImage": {
     "src": "/assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp",
     "thumbSrc": "/assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp",
     "alt": "M&T Bank commercial banking service design overview.",
@@ -17,14 +23,7 @@
     {
       "id": "conflict",
       "heading": "The Story",
-      "bodyHtml": "<p>M&T Bank’s commercial lending experience spanned customers, employees, channels, documents, handoffs, and backstage operations. Friction affected planning, underwriting, approval, closing, ongoing requirements, and loan modification.</p><p>The core problem was a fragmented service model that obscured the full journey and made improvements difficult to prioritize.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/mt-bank-current-state-journey-pdf-thumb-760x570.webp",
-        "alt": "Current-state B2B lending journey map for M&T Bank commercial lending.",
-        "title": "Current-State Journey Map",
-        "caption": "Current-state B2B lending journey showing customer moments, roles, channels, friction, and backstage actions."
-      }
+      "bodyHtml": "<p>M&T Bank’s commercial lending experience spanned customers, employees, channels, documents, handoffs, and backstage operations. Friction affected planning, underwriting, approval, closing, ongoing requirements, and loan modification.</p><p>The core problem was a fragmented service model that obscured the full journey and made improvements difficult to prioritize.</p>"
     },
     {
       "id": "strategic-action",
@@ -39,14 +38,7 @@
     {
       "id": "takeaway",
       "heading": "Strategic Takeaway",
-      "bodyHtml": "<p>Van made the lending ecosystem visible and turned scattered feedback into a future-state story stakeholders could use.</p>",
-      "image": {
-        "src": "/assets/vscimage/generated/mt-bank-future-b2b-lending-board-fullscreen-3200x1800.webp",
-        "thumbSrc": "/assets/vscimage/generated/mt-bank-future-b2b-lending-board-thumb-760x570.webp",
-        "alt": "Future B2B lending concept board and storyboard for M&T Bank.",
-        "title": "Future B2B Lending Concept Board",
-        "caption": "The concept board connected customer, employee, and leadership experiences into a future commercial lending story."
-      }
+      "bodyHtml": "<p>Van made the lending ecosystem visible and turned scattered feedback into a future-state story stakeholders could use.</p>"
     }
   ],
   "metadata": {
