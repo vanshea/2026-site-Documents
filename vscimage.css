@@ -1229,8 +1229,25 @@ th {
 .editor-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.editor-carousel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+.editor-position {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-width: 6ch;
+  text-align: center;
 }
 
 .editor-mode-note {
@@ -1294,6 +1311,26 @@ th {
 
   .editor-header {
     flex-direction: column;
+  }
+
+  .editor-actions,
+  .editor-carousel-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .editor-carousel-actions {
+    margin-right: 0;
+  }
+
+  .editor-actions .btn,
+  .editor-carousel-actions .btn {
+    width: 100%;
+  }
+
+  .editor-position {
+    min-width: 0;
   }
 
   .case-study-image-preview,

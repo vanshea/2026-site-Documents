@@ -49,11 +49,12 @@
         </div>
       </header>
 
-      <nav class="workspace-tabs" aria-label="VSCimage workspace">
+      <nav class="workspace-tabs" role="tablist" aria-label="VSCimage workspace">
         <button
           class="workspace-tab is-active"
           id="imageLibraryTab"
           type="button"
+          role="tab"
           data-workspace-tab="image-library"
           aria-controls="imageLibraryWorkspace"
           aria-selected="true"
@@ -64,6 +65,7 @@
           class="workspace-tab"
           id="caseStudiesTab"
           type="button"
+          role="tab"
           data-workspace-tab="case-studies"
           aria-controls="caseStudiesWorkspace"
           aria-selected="false"
@@ -146,8 +148,15 @@
                 <option value="illustration">Illustration</option>
               </select>
               <span class="field-note">
-                Applied to each image in a batch so homepage filters can place the generated cards correctly.
+                Applied to each image as category metadata for future organization.
               </span>
+            </label>
+            <label>
+              Work Type
+              <select id="uploadWorkType" name="workType">
+                <option value="corporate">Corporate</option>
+                <option value="independent">Independent</option>
+              </select>
             </label>
             <div class="editor-toggle-block">
               <label class="editor-inline-toggle">
@@ -155,7 +164,7 @@
                 Show on homepage after upload
               </label>
               <p class="field-note">
-                Turn this off to store the image in Hidden Assetts only until you are ready to publish it.
+                Turn this off to store the image in Hidden Assets only until you are ready to publish it.
               </p>
             </div>
             <fieldset class="output-set">
@@ -175,7 +184,7 @@
           <h2>Processed Thumbnails</h2>
           <p class="subhead">
             Homepage Gallery contains the cards currently published to the portfolio. Hidden
-            Assetts stay collapsed until you open them, and Archived Assets keep removed images in
+            Assets stay collapsed until you open them, and Archived Assets keep removed images in
             storage until you decide to restore or permanently delete them.
           </p>
           <div class="thumb-controls" aria-label="Gallery controls">
@@ -192,7 +201,7 @@
               <select id="galleryStatusFilter">
                 <option value="all">All</option>
                 <option value="homepage">Homepage</option>
-                <option value="hidden">Hidden Assetts</option>
+                <option value="hidden">Hidden Assets</option>
                 <option value="archived">Archived Assets</option>
               </select>
             </label>
@@ -559,8 +568,16 @@
                 <option value="illustration">Illustration</option>
               </select>
               <span class="field-note">
-                Controls which homepage filter tab this generated card appears in.
+                Stores category metadata for future organization.
               </span>
+            </label>
+
+            <label>
+              Work Type
+              <select id="thumbEditorWorkType" name="workType">
+                <option value="corporate">Corporate</option>
+                <option value="independent">Independent</option>
+              </select>
             </label>
 
             <label>
@@ -637,7 +654,7 @@
                 Show on homepage
               </label>
               <p class="field-note">
-                Turn this off to keep the image stored in Hidden Assetts only.
+                Turn this off to keep the image stored in Hidden Assets only.
               </p>
               <label class="editor-inline-toggle">
                 <input id="thumbEditorFeatured" name="featured" type="checkbox" />
@@ -678,6 +695,25 @@
         <p id="thumbEditorMsg" class="status" role="status" aria-live="polite"></p>
 
         <div class="editor-actions">
+          <div class="editor-carousel-actions" data-editor-single-only>
+            <button
+              id="thumbEditorPrev"
+              class="btn btn-secondary"
+              type="button"
+              aria-label="Save this image and edit the previous image"
+            >
+              Save &amp; Previous
+            </button>
+            <span id="thumbEditorPosition" class="editor-position" aria-live="polite"></span>
+            <button
+              id="thumbEditorNext"
+              class="btn btn-secondary"
+              type="button"
+              aria-label="Save this image and edit the next image"
+            >
+              Save &amp; Next
+            </button>
+          </div>
           <button id="thumbEditorSave" class="btn" type="submit">Save Changes</button>
           <button id="thumbEditorDelete" class="btn btn-danger" type="button">Archive</button>
         </div>

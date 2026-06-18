@@ -292,7 +292,9 @@ if (footerPatternHosts.length) {
 
 const experienceResumeSection = document.getElementById("experienceResumeSection");
 const copyExperienceTextButton = document.getElementById("copyExperienceText");
-const workGrid = document.querySelector("#work .grid");
+const workFilterScope = document.querySelector("[data-filter-scope]");
+const workGrid =
+  workFilterScope?.querySelector("[data-filter-grid]") || document.querySelector("#work .grid");
 const siteHeader = document.querySelector(".site-header");
 const navToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector(".nav");
@@ -501,6 +503,32 @@ async function readSiteImageConfig() {
   return null;
 }
 
+function applyGalleryMetadataFromConfig(galleryEntries) {
+  const rows = Array.isArray(galleryEntries) ? galleryEntries : [];
+
+  rows.forEach((entry) => {
+    const idToken = String(entry?.id || "")
+      .trim()
+      .replace(/"/g, '\\"');
+    if (!idToken) return;
+
+    const link = document.querySelector(
+      `.work-link[data-project-id="generated_${idToken}"]`
+    );
+    const card = link?.closest?.(".card");
+    if (!card) return;
+
+    const category = normalizeWorkCategory(entry?.category);
+    const workType = normalizeWorkType(entry?.workType);
+    if (category) {
+      card.dataset.category = category;
+    }
+    if (workType) {
+      card.dataset.workType = workType;
+    }
+  });
+}
+
 async function loadSiteImageConfig() {
   try {
     const config = await readSiteImageConfig();
@@ -514,6 +542,8 @@ async function loadSiteImageConfig() {
       config.logos?.light ? toSitePath(config.logos.light) : "",
       config.logos?.dark ? toSitePath(config.logos.dark) : ""
     );
+
+    applyGalleryMetadataFromConfig(config.gallery);
 
     Object.entries(config.projects || {}).forEach(([projectId, projectConfig]) => {
       const link = document.querySelector(
@@ -924,8 +954,15 @@ if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButt
   });
 }
 
-const filterGroup = document.querySelector("#work .filters");
-const filterButtons = document.querySelectorAll(".filter-btn");
+const filterGroup = workFilterScope?.querySelector(".filters");
+const filterButtons = workFilterScope
+  ? workFilterScope.querySelectorAll(".filter-btn")
+  : document.querySelectorAll(".filter-btn");
+const workTypeGroup = workFilterScope?.querySelector(".work-type-tabs");
+const workTypeButtons = workFilterScope
+  ? workFilterScope.querySelectorAll(".work-type-tab")
+  : document.querySelectorAll(".work-type-tab");
+const workFilterEmptyState = workFilterScope?.querySelector("[data-filter-empty]");
 const workLoadMoreButton = document.getElementById("workLoadMore");
 const WORK_ROWS_PER_PAGE = 2;
 let visibleWorkCards = 0;
@@ -952,16 +989,48 @@ function normalizeWorkCategory(value) {
   return normalized === "web" ? "ux-design" : normalized;
 }
 
-function getAvailableWorkFilters() {
+function normalizeWorkType(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  return ["corporate", "independent"].includes(normalized) ? normalized : "";
+}
+
+function getActiveWorkType() {
+  const activeButton = workTypeGroup?.querySelector(".work-type-tab.active");
+  return normalizeWorkType(activeButton?.dataset?.workType) || "all";
+}
+
+function syncWorkTypeTabs() {
+  if (!workTypeButtons.length) return;
+
+  workTypeButtons.forEach((button) => {
+    const isActive = button.classList.contains("active");
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function activateWorkTypeTab(button) {
+  if (!button) return;
+
+  workTypeButtons.forEach((btn) => btn.classList.remove("active"));
+  button.classList.add("active");
+  syncWorkTypeTabs();
+  syncProjectFilters();
+  visibleWorkCards = getWorkCardsPerPage();
+  applyActiveFilter();
+}
+
+function getAvailableWorkFilters(targetWorkType = getActiveWorkType()) {
   const categories = new Set();
   const cards = getWorkCardElements();
-  const displayCards = cards.some((card) => !card.classList.contains("is-placeholder"))
-    ? cards.filter((card) => !card.classList.contains("is-placeholder"))
-    : cards;
 
-  displayCards.forEach((card) => {
+  cards.forEach((card) => {
     const category = normalizeWorkCategory(card.dataset.category);
+    const workType = normalizeWorkType(card.dataset.workType);
     if (!category || category === "all") return;
+    if (targetWorkType !== "all" && workType !== targetWorkType) return;
     categories.add(category);
   });
 
@@ -971,6 +1040,7 @@ function getAvailableWorkFilters() {
 function syncProjectFilters() {
   if (!filterGroup || !filterButtons.length) return;
 
+  // Discipline buttons only appear when matching work exists in the active context.
   const availableFilters = getAvailableWorkFilters();
   const shouldShowFilters = availableFilters.size > 0;
 
@@ -986,6 +1056,11 @@ function syncProjectFilters() {
     if (!showButton) {
       button.classList.remove("active");
     }
+
+    button.setAttribute(
+      "aria-pressed",
+      !button.hidden && button.classList.contains("active") ? "true" : "false"
+    );
   });
 
   filterGroup.hidden = !shouldShowFilters;
@@ -1007,21 +1082,24 @@ function syncProjectFilters() {
 
   filterButtons.forEach((button) => {
     button.classList.toggle("active", button === fallbackButton);
+    button.setAttribute("aria-pressed", button === fallbackButton ? "true" : "false");
   });
 }
 
 function getFilteredCards() {
-  const activeButton = document.querySelector(".filter-btn.active");
+  const activeButton = filterGroup?.querySelector(".filter-btn.active");
   const target = activeButton?.dataset?.filter || "all";
+  const targetWorkType = getActiveWorkType();
   const cards = getWorkCardElements();
-  const displayCards = cards.some((card) => !card.classList.contains("is-placeholder"))
-    ? cards.filter((card) => !card.classList.contains("is-placeholder"))
-    : cards;
+  const normalizedTarget = normalizeWorkCategory(target);
 
-  return displayCards.filter((card) => {
+  // Work-type and discipline filters combine against simple card metadata.
+  return cards.filter((card) => {
     const category = normalizeWorkCategory(card.dataset.category);
-    const normalizedTarget = normalizeWorkCategory(target);
-    return normalizedTarget === "all" || category === normalizedTarget;
+    const workType = normalizeWorkType(card.dataset.workType);
+    const categoryMatches = normalizedTarget === "all" || category === normalizedTarget;
+    const workTypeMatches = targetWorkType === "all" || workType === targetWorkType;
+    return categoryMatches && workTypeMatches;
   });
 }
 
@@ -1093,15 +1171,50 @@ function applyActiveFilter() {
     workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
   }
 
+  if (workFilterEmptyState) {
+    const hasMatches = filteredCards.length > 0;
+    workFilterEmptyState.hidden = hasMatches;
+    workFilterEmptyState.setAttribute("aria-hidden", hasMatches ? "true" : "false");
+  }
+
   scheduleFeaturedCardHeightUpdate();
 }
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    filterButtons.forEach((btn) => btn.classList.remove("active"));
+    filterButtons.forEach((btn) => {
+      btn.classList.remove("active");
+      btn.setAttribute("aria-pressed", "false");
+    });
     button.classList.add("active");
+    button.setAttribute("aria-pressed", "true");
     visibleWorkCards = getWorkCardsPerPage();
     applyActiveFilter();
+  });
+});
+
+workTypeButtons.forEach((button, index) => {
+  button.addEventListener("click", () => {
+    activateWorkTypeTab(button);
+  });
+
+  button.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      activateWorkTypeTab(button);
+      return;
+    }
+
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+
+    event.preventDefault();
+    const lastIndex = workTypeButtons.length - 1;
+    let nextIndex = index;
+    if (event.key === "ArrowLeft") nextIndex = index === 0 ? lastIndex : index - 1;
+    if (event.key === "ArrowRight") nextIndex = index === lastIndex ? 0 : index + 1;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = lastIndex;
+    workTypeButtons[nextIndex]?.focus();
   });
 });
 
@@ -1553,6 +1666,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
 
 ensureCardImageShells();
 refreshWorkCardState();
+syncWorkTypeTabs();
 visibleWorkCards = getWorkCardsPerPage();
 applyActiveFilter();
 loadSiteImageConfig();

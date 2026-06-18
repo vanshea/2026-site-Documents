@@ -87,51 +87,51 @@ const acceptedImageExt = new Set([
 
 const defaultVscimageConfig = {
   logos: {
-    light: "assets/web_logomark_240_dark.png",
-    dark: "assets/web_logomark_240_lite.png"
+    light: "assets/sm_logo_hor_3x.png",
+    dark: "assets/sm_logo_hor_3x.png"
   },
   gallery: [],
   projects: {
     northline: {
       title: "Northline Coffee",
-      thumb: "assets/fpo-thumb-760x570.svg",
-      large: "assets/fpo-large-northline-1900x1600.svg",
-      fullscreen: "assets/fpo-large-northline-1900x1600.svg",
+      thumb: "",
+      large: "",
+      fullscreen: "",
       description: ""
     },
     atlas: {
       title: "Atlas Wellness",
-      thumb: "assets/fpo-thumb-760x570.svg",
-      large: "assets/fpo-large-atlas-1900x1600.svg",
-      fullscreen: "assets/fpo-large-atlas-1900x1600.svg",
+      thumb: "",
+      large: "",
+      fullscreen: "",
       description: ""
     },
     city_transit: {
       title: "City Transit Posters",
-      thumb: "assets/fpo-thumb-760x570.svg",
-      large: "assets/fpo-large-city-transit-1900x1600.svg",
-      fullscreen: "assets/fpo-large-city-transit-1900x1600.svg",
+      thumb: "",
+      large: "",
+      fullscreen: "",
       description: ""
     },
     wren: {
       title: "Wren Studio",
-      thumb: "assets/fpo-thumb-760x570.svg",
-      large: "assets/fpo-large-wren-1900x1600.svg",
-      fullscreen: "assets/fpo-large-wren-1900x1600.svg",
+      thumb: "",
+      large: "",
+      fullscreen: "",
       description: ""
     },
     hollow_creek: {
       title: "Hollow Creek Cider",
-      thumb: "assets/fpo-thumb-760x570.svg",
-      large: "assets/fpo-large-hollow-creek-1900x1600.svg",
-      fullscreen: "assets/fpo-large-hollow-creek-1900x1600.svg",
+      thumb: "",
+      large: "",
+      fullscreen: "",
       description: ""
     },
     field_notes: {
       title: "Field Notes Covers",
-      thumb: "assets/fpo-thumb-760x570.svg",
-      large: "assets/fpo-large-field-notes-1900x1600.svg",
-      fullscreen: "assets/fpo-large-field-notes-1900x1600.svg",
+      thumb: "",
+      large: "",
+      fullscreen: "",
       description: ""
     }
   }
@@ -454,6 +454,7 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const fullscreen =
         resolveGalleryEntryAssetPath(entry, entry?.fullscreen, large, thumb) || large;
       const category = normalizeGalleryCategory(entry?.category);
+      const designation = normalizeGalleryWorkType(entry?.designation ?? entry?.workType);
       const featured = isGalleryEntryHomepageFeatured(entry);
       const featuredThumb = resolveGalleryEntryAssetPath(entry, entry?.featuredThumb, thumb) || thumb;
       const previewThumb = featured ? featuredThumb : thumb;
@@ -486,7 +487,7 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const escapedHref = escapedDetailUrl || escapedLarge;
 
       return [
-        `          <article class="${cardClasses.join(" ")}" data-category="${category}" data-generated="true"${featured ? ' data-featured="true"' : ""}>`,
+        `          <article class="${cardClasses.join(" ")}" data-category="${category}" data-work-type="${designation}" data-designation="${designation}" data-generated="true"${featured ? ' data-featured="true"' : ""}>`,
         `            <a class="work-link" data-project-id="generated_${idToken}" href="${escapedHref}"${escapedDetailUrl ? ` data-detail-url="${escapedDetailUrl}"` : ""} data-lightbox-src="${escapedLarge}" data-fullscreen-src="${escapedFullscreen}" data-lightbox-title="${escapedTitle}" data-lightbox-description="${escapedDescription}"${escapedLinkText ? ` data-lightbox-link-text="${escapedLinkText}"` : ""}${escapedLinkUrl ? ` data-lightbox-link-url="${escapedLinkUrl}"` : ""}>`,
         escapedClientLogo
           ? `              <span class="card-image-shell">\n                <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />\n                <img class="card-client-logo" src="${escapedClientLogo}" alt="" loading="lazy" />\n              </span>`
@@ -744,6 +745,13 @@ function normalizeGalleryCategory(value) {
   return ["branding", "ux-design", "service-design", "education", "illustration", "all"].includes(normalized)
     ? normalized
     : "all";
+}
+
+function normalizeGalleryWorkType(value) {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  return ["corporate", "independent"].includes(normalized) ? normalized : "corporate";
 }
 
 function normalizeHexColor(value) {
@@ -1542,6 +1550,9 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
   const nextLinkText = normalizeLinkText(options.linkText ?? currentEntry.linkText ?? "", 80);
   const nextLinkUrl = normalizeLinkUrl(options.linkUrl ?? currentEntry.linkUrl ?? "", 320);
   const nextCategory = normalizeGalleryCategory(options.category ?? currentEntry.category);
+  const nextWorkType = normalizeGalleryWorkType(
+    options.designation ?? options.workType ?? currentEntry.designation ?? currentEntry.workType
+  );
   const nextDescription = normalizeGalleryDescription(
     options.description ?? currentEntry.description ?? "",
     320
@@ -1828,6 +1839,8 @@ async function editVscimageGalleryEntry(entryId, options = {}) {
     linkText: nextLinkText,
     linkUrl: nextLinkUrl,
     category: nextCategory,
+    designation: nextWorkType,
+    workType: nextWorkType,
     description: nextDescription,
     homepageVisible: nextArchived ? false : nextHomepageVisible,
     featured: nextFeatured,
@@ -1879,6 +1892,11 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextCategoryInput = Object.prototype.hasOwnProperty.call(updates || {}, "category")
     ? updates.category
     : currentEntry.category;
+  const nextWorkTypeInput = Object.prototype.hasOwnProperty.call(updates || {}, "designation")
+    ? updates.designation
+    : Object.prototype.hasOwnProperty.call(updates || {}, "workType")
+      ? updates.workType
+      : currentEntry.designation ?? currentEntry.workType;
   const nextTitle =
     normalizeTextField(nextTitleInput || entryId, 120) || entryId;
   const nextCardDescription = normalizeCardDescription(nextCardDescriptionInput || "", 120);
@@ -1891,6 +1909,7 @@ async function updateVscimageGalleryEntry(entryId, updates) {
   const nextLinkText = normalizeLinkText(nextLinkTextInput || "", 80);
   const nextLinkUrl = normalizeLinkUrl(nextLinkUrlInput || "", 320);
   const nextCategory = normalizeGalleryCategory(nextCategoryInput);
+  const nextWorkType = normalizeGalleryWorkType(nextWorkTypeInput);
   const nextDescription = normalizeGalleryDescription(nextDescriptionInput || "", 320);
   const nextHomepageVisibleInput = Object.prototype.hasOwnProperty.call(
     updates || {},
@@ -1921,6 +1940,8 @@ async function updateVscimageGalleryEntry(entryId, updates) {
     linkText: nextLinkText,
     linkUrl: nextLinkUrl,
     category: nextCategory,
+    designation: nextWorkType,
+    workType: nextWorkType,
     description: nextDescription,
     homepageVisible: nextArchived ? false : nextHomepageVisible,
     featured: toBool(currentEntry.featured, Boolean(currentEntry.featuredThumb)),
@@ -1977,7 +1998,7 @@ async function reorderVscimageGalleryEntry(entryId, direction) {
 
     if (hiddenIndex !== -1) {
       const hiddenEntryError = new Error(
-        "Images in Hidden Assetts do not appear on the homepage. Show the image on the homepage before reordering it."
+        "Images in Hidden Assets do not appear on the homepage. Show the image on the homepage before reordering it."
       );
       hiddenEntryError.code = "VSCIMAGE_REORDER_HIDDEN";
       throw hiddenEntryError;
@@ -3288,6 +3309,8 @@ app.post("/api/vscimage/gallery/:entryId/update", requireAnalyticsAdminApi, asyn
   const linkUrl = normalizeLinkUrl(req.body?.linkUrl, 320);
   const category = normalizeGalleryCategory(req.body?.category);
   const description = normalizeTextField(req.body?.description, 320);
+  const hasDesignation = Object.prototype.hasOwnProperty.call(req.body || {}, "designation");
+  const hasWorkType = Object.prototype.hasOwnProperty.call(req.body || {}, "workType");
   const hasHomepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible");
   const hasArchived = Object.prototype.hasOwnProperty.call(req.body || {}, "archived");
 
@@ -3307,6 +3330,11 @@ app.post("/api/vscimage/gallery/:entryId/update", requireAnalyticsAdminApi, asyn
       linkUrl,
       category,
       description,
+      ...(hasDesignation
+        ? { designation: req.body.designation }
+        : hasWorkType
+          ? { workType: req.body.workType }
+          : {}),
       ...(hasHomepageVisible ? { homepageVisible: req.body.homepageVisible } : {}),
       ...(hasArchived ? { archived: req.body.archived } : {})
     });
@@ -3437,6 +3465,8 @@ if (upload) {
           linkText: req.body?.linkText,
           linkUrl: req.body?.linkUrl,
           category: req.body?.category,
+          designation: req.body?.designation,
+          workType: req.body?.workType,
           description: req.body?.description,
           homepageVisible: req.body?.homepageVisible,
           featured: req.body?.featured,
@@ -3498,6 +3528,7 @@ if (upload) {
     const backgroundColor = normalizeHexColor(req.body.backgroundColor);
     const thumbFit = normalizeGalleryThumbFit(req.body.thumbFit);
     const category = normalizeGalleryCategory(req.body.category);
+    const workType = normalizeGalleryWorkType(req.body.designation ?? req.body.workType);
     const homepageVisible = Object.prototype.hasOwnProperty.call(req.body || {}, "homepageVisible")
       ? toBool(req.body.homepageVisible, true)
       : true;
@@ -3571,6 +3602,8 @@ if (upload) {
           linkText: normalizeLinkText(req.body.linkText || "", 80),
           linkUrl: normalizeLinkUrl(req.body.linkUrl || "", 320),
           category,
+          designation: workType,
+          workType,
           description: normalizeGalleryDescription(req.body.description || "", 320),
           homepageVisible,
           featured: false,
@@ -3621,6 +3654,8 @@ if (upload) {
           linkText: normalizeLinkText(req.body.linkText || "", 80),
           linkUrl: normalizeLinkUrl(req.body.linkUrl || "", 320),
           category,
+          designation: workType,
+          workType,
           description: normalizeGalleryDescription(req.body.description || "", 320),
           homepageVisible,
           featured: false,
