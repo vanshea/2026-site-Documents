@@ -53,7 +53,9 @@ syncFooterAnimationMeta();
 window.addEventListener("load", placeFooterAnimationMeta);
 
 const rootEl = document.documentElement;
-const themeButtons = document.querySelectorAll(".theme-link");
+const themeButtons = Array.from(document.querySelectorAll(".theme-link[data-theme]"));
+const themeSwitchers = Array.from(document.querySelectorAll(".theme-switcher"));
+const themeSliders = [];
 const themeStorageKey = "vsc-site-theme-v2";
 const availableThemes = new Set(["theme1", "theme2", "theme3", "theme4"]);
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
@@ -69,8 +71,7 @@ if (brandLogoLightImage) {
 }
 
 function isDarkBackgroundTheme(theme) {
-  if (theme === "theme4") return false;
-  return theme === "theme3" || window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return theme === "theme3";
 }
 
 function updateBrandLogoForTheme(theme) {
@@ -102,6 +103,24 @@ function setBrandLogoAssets(lightLogo, darkLogo) {
   updateBrandLogoForTheme(rootEl.dataset.theme);
 }
 
+function getThemeLabel(button) {
+  return button?.getAttribute("aria-label") || button?.textContent?.trim() || "Theme";
+}
+
+function syncThemeSliders(theme) {
+  themeSliders.forEach(({ buttons, input }) => {
+    const activeIndex = buttons.findIndex((button) => button.dataset.theme === theme);
+    if (activeIndex < 0) return;
+
+    input.value = String(activeIndex);
+    input.setAttribute("aria-valuetext", getThemeLabel(buttons[activeIndex]));
+    input.style.setProperty("--theme-slider-index", String(activeIndex));
+    input.style.setProperty("--theme-slider-steps", String(Math.max(1, buttons.length - 1)));
+    input.parentElement?.style.setProperty("--theme-slider-index", String(activeIndex));
+    input.parentElement?.style.setProperty("--theme-slider-steps", String(Math.max(1, buttons.length - 1)));
+  });
+}
+
 function applyTheme(theme) {
   const resolvedTheme = availableThemes.has(theme) ? theme : "theme2";
   rootEl.dataset.theme = resolvedTheme;
@@ -113,6 +132,89 @@ function applyTheme(theme) {
   });
 
   updateBrandLogoForTheme(resolvedTheme);
+  syncThemeSliders(resolvedTheme);
+}
+
+function saveTheme(theme) {
+  try {
+    localStorage.setItem(themeStorageKey, theme);
+  } catch (error) {
+    // Ignore storage write errors in restricted browsing contexts.
+  }
+}
+
+function preserveThemeAnchor(anchor, changeTheme) {
+  const anchorTop = anchor?.getBoundingClientRect().top;
+  const shouldPreserve =
+    typeof anchorTop === "number" && anchorTop >= 0 && anchorTop <= window.innerHeight;
+
+  changeTheme();
+
+  if (!shouldPreserve) return;
+
+  let frameCount = 0;
+  const keepAnchorStable = () => {
+    const nextTop = anchor.getBoundingClientRect().top;
+    const delta = nextTop - anchorTop;
+    if (Math.abs(delta) > 0.5) {
+      window.scrollBy(0, delta);
+    }
+
+    frameCount += 1;
+    if (frameCount < 5) {
+      window.requestAnimationFrame(keepAnchorStable);
+    }
+  };
+
+  window.requestAnimationFrame(keepAnchorStable);
+}
+
+function selectTheme(theme, anchor) {
+  if (!availableThemes.has(theme)) return;
+
+  preserveThemeAnchor(anchor, () => {
+    applyTheme(theme);
+    saveTheme(theme);
+  });
+}
+
+function enhanceThemeSwitchers() {
+  themeSwitchers.forEach((switcher, switcherIndex) => {
+    const buttons = Array.from(switcher.querySelectorAll(".theme-link[data-theme]")).filter((button) =>
+      availableThemes.has(button.dataset.theme)
+    );
+    if (buttons.length < 2) return;
+
+    const sliderShell = document.createElement("div");
+    const slider = document.createElement("input");
+    const labels = document.createElement("div");
+    const controlId = `themeSlider${switcherIndex + 1}`;
+
+    switcher.classList.add("has-theme-slider");
+    sliderShell.className = "theme-slider-shell";
+    sliderShell.style.setProperty("--theme-slider-count", String(buttons.length));
+    labels.className = "theme-slider-labels";
+
+    slider.id = controlId;
+    slider.className = "theme-slider-control";
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = String(buttons.length - 1);
+    slider.step = "1";
+    slider.value = "0";
+    slider.setAttribute("aria-label", switcher.getAttribute("aria-label") || "Choose site theme");
+
+    slider.addEventListener("input", () => {
+      const nextButton = buttons[Number(slider.value)];
+      selectTheme(nextButton?.dataset.theme, switcher);
+    });
+
+    sliderShell.appendChild(slider);
+    buttons[0].before(sliderShell);
+    buttons.forEach((button) => labels.appendChild(button));
+    sliderShell.appendChild(labels);
+    themeSliders.push({ buttons, input: slider });
+  });
 }
 
 let initialTheme = "theme4";
@@ -125,20 +227,12 @@ try {
   // Ignore storage access errors and fall back to default theme.
 }
 
+enhanceThemeSwitchers();
 applyTheme(initialTheme);
 
 themeButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const selectedTheme = button.dataset.theme;
-    if (!availableThemes.has(selectedTheme)) return;
-
-    applyTheme(selectedTheme);
-
-    try {
-      localStorage.setItem(themeStorageKey, selectedTheme);
-    } catch (error) {
-      // Ignore storage write errors in restricted browsing contexts.
-    }
+    selectTheme(button.dataset.theme, button.closest(".theme-switcher"));
   });
 });
 

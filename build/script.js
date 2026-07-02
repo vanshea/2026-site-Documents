@@ -53,7 +53,9 @@ syncFooterAnimationMeta();
 window.addEventListener("load", placeFooterAnimationMeta);
 
 const rootEl = document.documentElement;
-const themeButtons = document.querySelectorAll(".theme-link");
+const themeButtons = Array.from(document.querySelectorAll(".theme-link[data-theme]"));
+const themeSwitchers = Array.from(document.querySelectorAll(".theme-switcher"));
+const themeSliders = [];
 const themeStorageKey = "vsc-site-theme-v2";
 const availableThemes = new Set(["theme1", "theme2", "theme3", "theme4"]);
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
@@ -69,8 +71,7 @@ if (brandLogoLightImage) {
 }
 
 function isDarkBackgroundTheme(theme) {
-  if (theme === "theme4") return false;
-  return theme === "theme3" || window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return theme === "theme3";
 }
 
 function updateBrandLogoForTheme(theme) {
@@ -102,6 +103,24 @@ function setBrandLogoAssets(lightLogo, darkLogo) {
   updateBrandLogoForTheme(rootEl.dataset.theme);
 }
 
+function getThemeLabel(button) {
+  return button?.getAttribute("aria-label") || button?.textContent?.trim() || "Theme";
+}
+
+function syncThemeSliders(theme) {
+  themeSliders.forEach(({ buttons, input }) => {
+    const activeIndex = buttons.findIndex((button) => button.dataset.theme === theme);
+    if (activeIndex < 0) return;
+
+    input.value = String(activeIndex);
+    input.setAttribute("aria-valuetext", getThemeLabel(buttons[activeIndex]));
+    input.style.setProperty("--theme-slider-index", String(activeIndex));
+    input.style.setProperty("--theme-slider-steps", String(Math.max(1, buttons.length - 1)));
+    input.parentElement?.style.setProperty("--theme-slider-index", String(activeIndex));
+    input.parentElement?.style.setProperty("--theme-slider-steps", String(Math.max(1, buttons.length - 1)));
+  });
+}
+
 function applyTheme(theme) {
   const resolvedTheme = availableThemes.has(theme) ? theme : "theme2";
   rootEl.dataset.theme = resolvedTheme;
@@ -113,6 +132,89 @@ function applyTheme(theme) {
   });
 
   updateBrandLogoForTheme(resolvedTheme);
+  syncThemeSliders(resolvedTheme);
+}
+
+function saveTheme(theme) {
+  try {
+    localStorage.setItem(themeStorageKey, theme);
+  } catch (error) {
+    // Ignore storage write errors in restricted browsing contexts.
+  }
+}
+
+function preserveThemeAnchor(anchor, changeTheme) {
+  const anchorTop = anchor?.getBoundingClientRect().top;
+  const shouldPreserve =
+    typeof anchorTop === "number" && anchorTop >= 0 && anchorTop <= window.innerHeight;
+
+  changeTheme();
+
+  if (!shouldPreserve) return;
+
+  let frameCount = 0;
+  const keepAnchorStable = () => {
+    const nextTop = anchor.getBoundingClientRect().top;
+    const delta = nextTop - anchorTop;
+    if (Math.abs(delta) > 0.5) {
+      window.scrollBy(0, delta);
+    }
+
+    frameCount += 1;
+    if (frameCount < 5) {
+      window.requestAnimationFrame(keepAnchorStable);
+    }
+  };
+
+  window.requestAnimationFrame(keepAnchorStable);
+}
+
+function selectTheme(theme, anchor) {
+  if (!availableThemes.has(theme)) return;
+
+  preserveThemeAnchor(anchor, () => {
+    applyTheme(theme);
+    saveTheme(theme);
+  });
+}
+
+function enhanceThemeSwitchers() {
+  themeSwitchers.forEach((switcher, switcherIndex) => {
+    const buttons = Array.from(switcher.querySelectorAll(".theme-link[data-theme]")).filter((button) =>
+      availableThemes.has(button.dataset.theme)
+    );
+    if (buttons.length < 2) return;
+
+    const sliderShell = document.createElement("div");
+    const slider = document.createElement("input");
+    const labels = document.createElement("div");
+    const controlId = `themeSlider${switcherIndex + 1}`;
+
+    switcher.classList.add("has-theme-slider");
+    sliderShell.className = "theme-slider-shell";
+    sliderShell.style.setProperty("--theme-slider-count", String(buttons.length));
+    labels.className = "theme-slider-labels";
+
+    slider.id = controlId;
+    slider.className = "theme-slider-control";
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = String(buttons.length - 1);
+    slider.step = "1";
+    slider.value = "0";
+    slider.setAttribute("aria-label", switcher.getAttribute("aria-label") || "Choose site theme");
+
+    slider.addEventListener("input", () => {
+      const nextButton = buttons[Number(slider.value)];
+      selectTheme(nextButton?.dataset.theme, switcher);
+    });
+
+    sliderShell.appendChild(slider);
+    buttons[0].before(sliderShell);
+    buttons.forEach((button) => labels.appendChild(button));
+    sliderShell.appendChild(labels);
+    themeSliders.push({ buttons, input: slider });
+  });
 }
 
 let initialTheme = "theme4";
@@ -125,20 +227,12 @@ try {
   // Ignore storage access errors and fall back to default theme.
 }
 
+enhanceThemeSwitchers();
 applyTheme(initialTheme);
 
 themeButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const selectedTheme = button.dataset.theme;
-    if (!availableThemes.has(selectedTheme)) return;
-
-    applyTheme(selectedTheme);
-
-    try {
-      localStorage.setItem(themeStorageKey, selectedTheme);
-    } catch (error) {
-      // Ignore storage write errors in restricted browsing contexts.
-    }
+    selectTheme(button.dataset.theme, button.closest(".theme-switcher"));
   });
 });
 
@@ -519,12 +613,13 @@ function applyGalleryMetadataFromConfig(galleryEntries) {
     if (!card) return;
 
     const category = normalizeWorkCategory(entry?.category);
-    const workType = normalizeWorkType(entry?.workType);
+    const designation = normalizeWorkDesignation(entry?.designation ?? entry?.workType);
     if (category) {
       card.dataset.category = category;
     }
-    if (workType) {
-      card.dataset.workType = workType;
+    if (designation) {
+      card.dataset.designation = designation;
+      card.dataset.workType = designation;
     }
   });
 }
@@ -954,17 +1049,13 @@ if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButt
   });
 }
 
-const filterGroup = workFilterScope?.querySelector(".filters");
-const filterButtons = workFilterScope
-  ? workFilterScope.querySelectorAll(".filter-btn")
-  : document.querySelectorAll(".filter-btn");
 const workTypeGroup = workFilterScope?.querySelector(".work-type-tabs");
 const workTypeButtons = workFilterScope
   ? workFilterScope.querySelectorAll(".work-type-tab")
   : document.querySelectorAll(".work-type-tab");
 const workFilterEmptyState = workFilterScope?.querySelector("[data-filter-empty]");
 const workLoadMoreButton = document.getElementById("workLoadMore");
-const WORK_ROWS_PER_PAGE = 2;
+const WORK_CARDS_PER_PAGE = 15;
 let visibleWorkCards = 0;
 let featuredCardHeightFrame = 0;
 const REGULAR_CARD_IMAGE_ASPECT_RATIO = 4 / 3;
@@ -979,7 +1070,7 @@ function getWorkGridColumnCount() {
 }
 
 function getWorkCardsPerPage() {
-  return getWorkGridColumnCount() * WORK_ROWS_PER_PAGE;
+  return WORK_CARDS_PER_PAGE;
 }
 
 function normalizeWorkCategory(value) {
@@ -989,16 +1080,20 @@ function normalizeWorkCategory(value) {
   return normalized === "web" ? "ux-design" : normalized;
 }
 
-function normalizeWorkType(value) {
+function normalizeWorkDesignation(value) {
   const normalized = String(value || "")
     .trim()
     .toLowerCase();
   return ["corporate", "independent"].includes(normalized) ? normalized : "";
 }
 
+function normalizeWorkType(value) {
+  return normalizeWorkDesignation(value);
+}
+
 function getActiveWorkType() {
   const activeButton = workTypeGroup?.querySelector(".work-type-tab.active");
-  return normalizeWorkType(activeButton?.dataset?.workType) || "all";
+  return normalizeWorkDesignation(activeButton?.dataset?.workType) || "all";
 }
 
 function syncWorkTypeTabs() {
@@ -1022,84 +1117,19 @@ function activateWorkTypeTab(button) {
   applyActiveFilter();
 }
 
-function getAvailableWorkFilters(targetWorkType = getActiveWorkType()) {
-  const categories = new Set();
-  const cards = getWorkCardElements();
-
-  cards.forEach((card) => {
-    const category = normalizeWorkCategory(card.dataset.category);
-    const workType = normalizeWorkType(card.dataset.workType);
-    if (!category || category === "all") return;
-    if (targetWorkType !== "all" && workType !== targetWorkType) return;
-    categories.add(category);
-  });
-
-  return categories;
-}
-
 function syncProjectFilters() {
-  if (!filterGroup || !filterButtons.length) return;
-
-  // Discipline buttons only appear when matching work exists in the active context.
-  const availableFilters = getAvailableWorkFilters();
-  const shouldShowFilters = availableFilters.size > 0;
-
-  filterButtons.forEach((button) => {
-    const filterValue = normalizeWorkCategory(button.dataset.filter);
-    const showButton =
-      shouldShowFilters &&
-      (filterValue === "all" || availableFilters.has(filterValue));
-
-    button.hidden = !showButton;
-    button.setAttribute("aria-hidden", showButton ? "false" : "true");
-
-    if (!showButton) {
-      button.classList.remove("active");
-    }
-
-    button.setAttribute(
-      "aria-pressed",
-      !button.hidden && button.classList.contains("active") ? "true" : "false"
-    );
-  });
-
-  filterGroup.hidden = !shouldShowFilters;
-  filterGroup.setAttribute("aria-hidden", shouldShowFilters ? "false" : "true");
-
-  if (!shouldShowFilters) return;
-
-  const activeVisibleButton = Array.from(filterButtons).find(
-    (button) => !button.hidden && button.classList.contains("active")
-  );
-  if (activeVisibleButton) return;
-
-  const allButton = Array.from(filterButtons).find(
-    (button) => !button.hidden && normalizeWorkCategory(button.dataset.filter) === "all"
-  );
-  const fallbackButton = allButton || Array.from(filterButtons).find((button) => !button.hidden);
-
-  if (!fallbackButton) return;
-
-  filterButtons.forEach((button) => {
-    button.classList.toggle("active", button === fallbackButton);
-    button.setAttribute("aria-pressed", button === fallbackButton ? "true" : "false");
-  });
+  // Category metadata is kept on cards, but category filter UI is intentionally retired.
 }
 
 function getFilteredCards() {
-  const activeButton = filterGroup?.querySelector(".filter-btn.active");
-  const target = activeButton?.dataset?.filter || "all";
   const targetWorkType = getActiveWorkType();
   const cards = getWorkCardElements();
-  const normalizedTarget = normalizeWorkCategory(target);
 
-  // Work-type and discipline filters combine against simple card metadata.
   return cards.filter((card) => {
-    const category = normalizeWorkCategory(card.dataset.category);
-    const workType = normalizeWorkType(card.dataset.workType);
-    const categoryMatches = normalizedTarget === "all" || category === normalizedTarget;
-    const workTypeMatches = targetWorkType === "all" || workType === targetWorkType;
-    return categoryMatches && workTypeMatches;
+    const designation = normalizeWorkDesignation(
+      card.dataset.designation || card.dataset.workType
+    );
+    return targetWorkType === "all" || designation === targetWorkType;
   });
 }
 
@@ -1166,7 +1196,7 @@ function applyActiveFilter() {
   });
 
   if (workLoadMoreButton) {
-    const hasMore = filteredCards.length > maxVisible;
+    const hasMore = filteredCards.length > getWorkCardsPerPage() && filteredCards.length > maxVisible;
     workLoadMoreButton.hidden = !hasMore;
     workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
   }
@@ -1179,19 +1209,6 @@ function applyActiveFilter() {
 
   scheduleFeaturedCardHeightUpdate();
 }
-
-filterButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    filterButtons.forEach((btn) => {
-      btn.classList.remove("active");
-      btn.setAttribute("aria-pressed", "false");
-    });
-    button.classList.add("active");
-    button.setAttribute("aria-pressed", "true");
-    visibleWorkCards = getWorkCardsPerPage();
-    applyActiveFilter();
-  });
-});
 
 workTypeButtons.forEach((button, index) => {
   button.addEventListener("click", () => {

@@ -29,16 +29,17 @@ add_action( 'after_setup_theme', 'vanshea_creative_blog_setup' );
 
 function vanshea_creative_blog_theme_choices() {
 	return array(
-		'theme1' => __( 'Theme 1', 'vanshea-creative-blog' ),
-		'theme2' => __( 'Theme 2', 'vanshea-creative-blog' ),
+		'theme1' => __( 'Clear', 'vanshea-creative-blog' ),
+		'theme2' => __( 'Tinted', 'vanshea-creative-blog' ),
 		'theme3' => __( 'High Contrast', 'vanshea-creative-blog' ),
+		'theme4' => __( 'Wild', 'vanshea-creative-blog' ),
 	);
 }
 
 function vanshea_creative_blog_sanitize_theme_choice( $value ) {
 	$choices = vanshea_creative_blog_theme_choices();
 
-	return array_key_exists( $value, $choices ) ? $value : 'theme2';
+	return array_key_exists( $value, $choices ) ? $value : 'theme4';
 }
 
 function vanshea_creative_blog_sanitize_checkbox( $checked ) {
@@ -46,7 +47,7 @@ function vanshea_creative_blog_sanitize_checkbox( $checked ) {
 }
 
 function vanshea_creative_blog_get_default_theme() {
-	return vanshea_creative_blog_sanitize_theme_choice( get_theme_mod( 'vsc_default_theme', 'theme2' ) );
+	return vanshea_creative_blog_sanitize_theme_choice( get_theme_mod( 'vsc_default_theme', 'theme4' ) );
 }
 
 function vanshea_creative_blog_customizer( $wp_customize ) {
@@ -62,7 +63,7 @@ function vanshea_creative_blog_customizer( $wp_customize ) {
 	$wp_customize->add_setting(
 		'vsc_default_theme',
 		array(
-			'default'           => 'theme2',
+			'default'           => 'theme4',
 			'sanitize_callback' => 'vanshea_creative_blog_sanitize_theme_choice',
 			'transport'         => 'refresh',
 		)

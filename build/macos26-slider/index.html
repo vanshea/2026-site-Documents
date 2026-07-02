@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="clear">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Liquid Theme Slider</title>
+    <meta
+      name="description"
+      content="A macOS 26-inspired liquid glass theme slider with four visual themes."
+    />
+    <link rel="stylesheet" href="styles.css?v=20260630-footer-signal-1" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="theme-stage" aria-label="Theme preview">
+        <div class="wallpaper" aria-hidden="true"></div>
+        <div class="ambient ambient-one" aria-hidden="true"></div>
+        <div class="ambient ambient-two" aria-hidden="true"></div>
+
+        <div class="top-bar glass-panel">
+          <div class="traffic" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p class="eyebrow">Appearance</p>
+          <time datetime="2026-06-29">Mon 29</time>
+        </div>
+
+        <div class="preview-window glass-panel">
+          <div class="preview-sidebar">
+            <button class="sidebar-dot active" type="button" aria-label="Active item"></button>
+            <button class="sidebar-dot" type="button" aria-label="Secondary item"></button>
+            <button class="sidebar-dot" type="button" aria-label="Tertiary item"></button>
+          </div>
+          <div class="preview-content">
+            <div class="preview-header">
+              <span class="theme-badge" id="themeBadge">Clear Glass</span>
+              <span class="signal" aria-hidden="true"></span>
+            </div>
+            <h1 id="themeTitle">Clear Glass</h1>
+            <p id="themeCopy">
+              Bright iOS-style translucency, soft refractions, and a cool floating surface.
+            </p>
+            <div class="preview-grid" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dock glass-panel" aria-label="Theme chooser">
+          <div class="dock-icons" aria-hidden="true">
+            <span class="dock-icon"></span>
+            <span class="dock-icon"></span>
+            <span class="dock-icon"></span>
+          </div>
+
+          <div class="slider-wrap">
+            <input
+              id="themeSlider"
+              class="theme-slider"
+              type="range"
+              min="0"
+              max="3"
+              step="1"
+              value="0"
+              aria-label="Theme"
+            />
+            <div class="theme-options" role="tablist" aria-label="Themes">
+              <button class="theme-option active" type="button" role="tab" aria-selected="true" data-theme-index="0">
+                Clear Glass
+              </button>
+              <button class="theme-option" type="button" role="tab" aria-selected="false" data-theme-index="1">
+                Tinted Glass
+              </button>
+              <button class="theme-option" type="button" role="tab" aria-selected="false" data-theme-index="2">
+                Aurora
+              </button>
+              <button class="theme-option" type="button" role="tab" aria-selected="false" data-theme-index="3">
+                Ember
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js?v=20260630-footer-signal-1"></script>
+  </body>
+</html>

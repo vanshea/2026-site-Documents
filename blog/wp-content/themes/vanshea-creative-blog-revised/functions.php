@@ -29,10 +29,10 @@ add_action( 'after_setup_theme', 'vanshea_creative_blog_setup' );
 
 function vanshea_creative_blog_theme_choices() {
 	return array(
-		'theme1' => __( 'Basic Theme', 'vanshea-creative-blog' ),
-		'theme2' => __( 'Pro Theme', 'vanshea-creative-blog' ),
+		'theme1' => __( 'Clear', 'vanshea-creative-blog' ),
+		'theme2' => __( 'Tinted', 'vanshea-creative-blog' ),
 		'theme3' => __( 'High Contrast', 'vanshea-creative-blog' ),
-		'theme4' => __( 'Wild Theme', 'vanshea-creative-blog' ),
+		'theme4' => __( 'Wild', 'vanshea-creative-blog' ),
 	);
 }
 
