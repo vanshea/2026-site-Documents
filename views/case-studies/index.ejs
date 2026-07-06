@@ -13,41 +13,20 @@
         heroEyebrow: "Selected Work",
         heroTitle: "Case studies built from structured content, not duplicated templates.",
         heroLead: "Each entry below is powered by a reusable slug route and a JSON content file, so future case studies can be added in VS Code without rebuilding layout components.",
-        topImage: null,
-        galleryEyebrow: "Gallery",
-        galleryTitle: "Case Study Index"
+        topImage: null
       };
     %>
 
     <main id="top">
-      <section class="hero case-study-index-hero <%= indexContent.topImage ? "case-study-index-hero-has-image" : "" %> reveal">
+      <section class="hero case-study-index-hero reveal">
         <div class="case-study-index-copy">
           <p class="eyebrow"><%= indexContent.heroEyebrow %></p>
-          <h1><%= indexContent.heroTitle %></h1>
+          <h1 id="caseStudiesIndexHeading"><%= indexContent.heroTitle %></h1>
           <p class="lead"><%= indexContent.heroLead %></p>
         </div>
-
-        <% if (indexContent.topImage) { %>
-          <figure class="case-study-index-media">
-            <img
-              src="<%= indexContent.topImage.src %>"
-              alt="<%= indexContent.topImage.alt || indexContent.topImage.title || indexContent.heroTitle %>"
-            />
-            <% if (indexContent.topImage.caption) { %>
-              <figcaption><%= indexContent.topImage.caption %></figcaption>
-            <% } %>
-          </figure>
-        <% } %>
       </section>
 
       <section class="case-study-block reveal" aria-labelledby="caseStudiesIndexHeading">
-        <div class="section-head case-study-block-head">
-          <div>
-            <p class="eyebrow"><%= indexContent.galleryEyebrow %></p>
-            <h2 id="caseStudiesIndexHeading"><%= indexContent.galleryTitle %></h2>
-          </div>
-        </div>
-
         <div class="grid case-study-card-grid">
           <% caseStudies.forEach((caseStudy) => { %>
             <%- include("../partials/case-studies/case-study-card", { caseStudy }) %>
@@ -60,6 +39,6 @@
     <%- include("../partials/consent_banner") %>
 
     <script src="/analytics.js"></script>
-    <script src="/script.js?v=20260612-case-hero-spacing-1"></script>
+    <script src="/script.js?v=20260706-clear-logo-1"></script>
   </body>
 </html>

@@ -4,6 +4,32 @@
     <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
 <title>M&amp;T Bank Commercial Banking Transformation | Case Study | Van Shea Creative</title>
 <meta name="description" content="Fragmented processes and repeated handoffs created friction and waste. Van turned research and journey maps into a service blueprint for commercial lending." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,7 +38,7 @@
   href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
   rel="stylesheet"
 />
-<link rel="stylesheet" href="/styles.css?v=20260630-footer-signal-1" />
+<link rel="stylesheet" href="/styles.css?v=20260706-capital-one-logo-1" />
 <link rel="stylesheet" href="/assets/case-studies.css?v=20260615-local-video-1" />
 
 
@@ -27,7 +53,7 @@
     <picture>
       <source
         id="brandLogoDarkSource"
-        srcset="/assets/web_logomark_240_lite.png"
+        srcset="/assets/web_logomark_240_white.png"
         media="(prefers-color-scheme: dark)"
       />
       <img
@@ -343,7 +369,7 @@
 
 
     <script src="/analytics.js"></script>
-    <script src="/script.js?v=20260630-footer-signal-1"></script>
+    <script src="/script.js?v=20260706-clear-logo-1"></script>
     <script src="/assets/case-studies.js"></script>
   </body>
 </html>

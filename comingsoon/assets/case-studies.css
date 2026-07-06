@@ -66,6 +66,22 @@
   aspect-ratio: 4 / 3;
 }
 
+.case-study-logo-card-shell {
+  display: grid;
+  place-items: center;
+  padding: clamp(28px, 8vw, 58px);
+  background: #fff;
+}
+
+.case-study-logo-card-image {
+  display: block;
+  width: min(78%, 360px);
+  height: auto;
+  max-height: 58%;
+  object-fit: contain;
+  filter: none;
+}
+
 .case-study-card-topline {
   display: flex;
   gap: 10px;

@@ -1,6 +1,16 @@
 <article class="card case-study-card reveal">
   <a class="case-study-card-link" href="<%= caseStudy.routePath %>">
-    <% if (caseStudy.cardImage) { %>
+    <% const useCapitalOneLogoCard = caseStudy.metadata.client === "Capital One" || caseStudy.routePath === "/case-studies/capital-one-gesture-patent"; %>
+    <% if (useCapitalOneLogoCard) { %>
+      <span class="card-image-shell case-study-card-image-shell case-study-logo-card-shell">
+        <img
+          class="case-study-logo-card-image"
+          src="/assets/capital-one-logo.svg"
+          alt="Capital One logo"
+          loading="lazy"
+        />
+      </span>
+    <% } else if (caseStudy.cardImage) { %>
       <span class="card-image-shell case-study-card-image-shell">
         <img
           class="card-image case-study-card-image"

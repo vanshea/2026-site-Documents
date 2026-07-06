@@ -4,6 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
+    <script>
+      (() => {
+        const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+        const root = document.documentElement;
+        let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+        try {
+          const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+            .map((key) => window.localStorage.getItem(key))
+            .find((value) => themes.has(value));
+
+          if (savedTheme) {
+            theme = savedTheme;
+            window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+          }
+        } catch (error) {
+          // Keep the markup default when storage is unavailable.
+        }
+
+        root.dataset.theme = theme;
+        root.style.colorScheme =
+          theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ? "dark"
+            : "light";
+      })();
+    </script>
     <title>Van Shea Sedita | Design Portfolio</title>
     <meta
       name="description"
@@ -40,7 +66,7 @@
       rel="stylesheet"
     />
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260701-wild-anchor-2" />
+    <link rel="stylesheet" href="styles.css?v=20260706-work-tabs-contrast-1" />
   </head>
   <body>
     <div class="bg-shape bg-shape-a"></div>
@@ -137,14 +163,12 @@
             <a class="work-link" data-project-id="generated_large-web-portfolio-pat760x570-1772332872992" href="/case-studies/capital-one-gesture-patent" data-detail-url="/case-studies/capital-one-gesture-patent" data-lightbox-src="assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp" data-lightbox-title="Capital One Patent" data-lightbox-description="Led a small team from usability findings through prototype development, hackathon recognition, executive review, and patent collaboration." data-lightbox-link-url="http://www.vanshea.com/case-studies/capital-one-gesture-patent">
               <img class="card-image" src="assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp" alt="Preview image for Capital One Patent" loading="lazy" />
               <h3>Capital One Patent</h3>
-              <p>Patented gesture-interface concept.</p>
             </a>
           </article>
           <article class="card reveal generated-card" data-category="branding" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_politico-1776701606120" href="assets/vscimage/generated/politico-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/politico-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/politico-fullscreen-3200x1800.webp" data-lightbox-title="POLITICO" data-lightbox-description="In 2008, I was asked to design a logo for a new news company.">
               <img class="card-image" src="assets/vscimage/generated/politico-thumb-760x570.webp" alt="Preview image for POLITICO" loading="lazy" />
               <h3>POLITICO</h3>
-              <p>Logo design for a new political news company.</p>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
               <span aria-hidden="true">⤢</span>
@@ -178,7 +202,6 @@
             <a class="work-link" data-project-id="generated_large-web-portfolio-greif3200x1800-1772332871783" href="assets/vscimage/generated/large-web-portfolio-greif3200x1800-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Greif Plus Logo" data-lightbox-description="Brand identity for a client portal.">
               <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-thumb-760x570.webp" alt="Preview image for Greif Plus Logo" loading="lazy" />
               <h3>Greif Plus Logo</h3>
-              <p>Brand identity for a client portal.</p>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
               <span aria-hidden="true">⤢</span>
@@ -434,7 +457,7 @@
         </div>
       </section>
 
-      <section id="contact" class="contact reveal">
+      <section id="contact" class="contact reveal" data-analytics-location="contact">
         <div class="contact-shell">
           <p class="contact-kicker">Let&apos;s Build Something Useful</p>
           <h2>Project Inquiry</h2>
@@ -597,7 +620,29 @@
         </p>
       </div>
     </footer>
-<div class="lightbox" id="lightbox" aria-hidden="true">
+
+    <aside
+      class="consent-banner"
+      id="consentBanner"
+      role="dialog"
+      aria-live="polite"
+      aria-label="Analytics consent"
+      hidden
+    >
+      <p class="consent-text">
+        Privacy-first analytics only. No personal tracking.
+      </p>
+      <div class="consent-actions">
+        <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+          Deny
+        </button>
+        <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+          Allow Analytics
+        </button>
+      </div>
+    </aside>
+
+    <div class="lightbox" id="lightbox" aria-hidden="true">
       <button class="lightbox-close" id="lightboxClose" aria-label="Close image">
         x
       </button>
@@ -636,6 +681,8 @@
         <figcaption id="lightboxCaption"></figcaption>
       </figure>
     </div>
-<script src="script.js?v=20260701-wild-anchor-2"></script>
+
+    <script src="analytics.js"></script>
+    <script src="script.js?v=20260706-clear-logo-1"></script>
   </body>
 </html>

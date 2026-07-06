@@ -9,6 +9,18 @@ const themeSwitchers = Array.from(document.querySelectorAll(".theme-switcher"));
 const themeSliders = [];
 const themeStorageKey = "vsc-site-theme-v2";
 const availableThemes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+const darkBrowserMedia =
+  typeof window.matchMedia === "function"
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
+
+function isClearThemeOnDarkBrowser(theme) {
+  return theme === "theme1" && Boolean(darkBrowserMedia?.matches);
+}
+
+function isDarkBackgroundTheme(theme) {
+  return theme === "theme3" || isClearThemeOnDarkBrowser(theme);
+}
 
 function getThemeLabel(button) {
   return button?.getAttribute("aria-label") || button?.textContent?.trim() || "Theme";
@@ -28,10 +40,25 @@ function syncThemeSliders(theme) {
   });
 }
 
+function setResolvedColorScheme(theme) {
+  rootEl.style.colorScheme = isDarkBackgroundTheme(theme) ? "dark" : "light";
+}
+
+function runWithoutThemeTransitions(changeTheme) {
+  rootEl.classList.add("is-theme-changing");
+  changeTheme();
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      rootEl.classList.remove("is-theme-changing");
+    });
+  });
+}
+
 function applyTheme(theme) {
   const resolvedTheme = availableThemes.has(theme) ? theme : "theme4";
   rootEl.dataset.theme = resolvedTheme;
-  rootEl.style.colorScheme = resolvedTheme === "theme3" ? "dark" : "";
+  setResolvedColorScheme(resolvedTheme);
 
   themeButtons.forEach((button) => {
     const isActive = button.dataset.theme === resolvedTheme;
@@ -80,7 +107,7 @@ function selectTheme(theme, anchor) {
   if (!availableThemes.has(theme)) return;
 
   preserveThemeAnchor(anchor, () => {
-    applyTheme(theme);
+    runWithoutThemeTransitions(() => applyTheme(theme));
     saveTheme(theme);
   });
 }
@@ -118,7 +145,11 @@ function enhanceThemeSwitchers() {
 
     sliderShell.appendChild(slider);
     buttons[0].before(sliderShell);
-    buttons.forEach((button) => labels.appendChild(button));
+    buttons.forEach((button) => {
+      button.setAttribute("aria-hidden", "true");
+      button.tabIndex = -1;
+      labels.appendChild(button);
+    });
     sliderShell.appendChild(labels);
     themeSliders.push({ buttons, input: slider });
   });
@@ -126,9 +157,15 @@ function enhanceThemeSwitchers() {
 
 let initialTheme = availableThemes.has(rootEl.dataset.theme) ? rootEl.dataset.theme : "theme4";
 try {
-  const savedTheme = localStorage.getItem(themeStorageKey);
-  if (savedTheme && availableThemes.has(savedTheme)) {
+  const savedThemes = [
+    localStorage.getItem(themeStorageKey),
+    localStorage.getItem("vsc-site-theme")
+  ];
+  const savedTheme = savedThemes.find((theme) => availableThemes.has(theme));
+
+  if (savedTheme) {
     initialTheme = savedTheme;
+    localStorage.setItem(themeStorageKey, savedTheme);
   }
 } catch (error) {
   // Storage may be unavailable in restricted contexts.
@@ -136,6 +173,16 @@ try {
 
 enhanceThemeSwitchers();
 applyTheme(initialTheme);
+
+if (darkBrowserMedia) {
+  const updateForBrowserColorScheme = () => applyTheme(rootEl.dataset.theme);
+
+  if (darkBrowserMedia.addEventListener) {
+    darkBrowserMedia.addEventListener("change", updateForBrowserColorScheme);
+  } else if (darkBrowserMedia.addListener) {
+    darkBrowserMedia.addListener(updateForBrowserColorScheme);
+  }
+}
 
 themeButtons.forEach((button) => {
   button.addEventListener("click", () => {

@@ -4,6 +4,32 @@
     <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
 <title>Case Studies | Van Shea Creative</title>
 <meta name="description" content="UX, service design, strategy, and product case studies from Van Shea Creative." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,8 +38,8 @@
   href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
   rel="stylesheet"
 />
-<link rel="stylesheet" href="/styles.css?v=20260630-footer-signal-1" />
-<link rel="stylesheet" href="/assets/case-studies.css?v=20260614-case-h1-1" />
+<link rel="stylesheet" href="/styles.css?v=20260706-capital-one-logo-1" />
+<link rel="stylesheet" href="/assets/case-studies.css?v=20260706-capital-one-logo-1" />
 
 
 
@@ -27,7 +53,7 @@
     <picture>
       <source
         id="brandLogoDarkSource"
-        srcset="/assets/web_logomark_240_lite.png"
+        srcset="/assets/web_logomark_240_white.png"
         media="(prefers-color-scheme: dark)"
       />
       <img
@@ -39,12 +65,6 @@
     </picture>
     <span class="brand-name">Van Shea Creative</span>
   </a>
-  <div class="theme-switcher theme-switcher-mini" role="group" aria-label="Choose site theme">
-    <button class="theme-link" type="button" data-theme="theme1" aria-label="Clear Glass" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme2" aria-label="Tinted Glass" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme3" aria-label="High Contrast" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme4" aria-label="Wild Theme" aria-pressed="false"></button>
-  </div>
   <button
     class="nav-toggle"
     type="button"
@@ -73,42 +93,25 @@
     
 
     <main id="top">
-      <section class="hero case-study-index-hero case-study-index-hero-has-image reveal">
+      <section class="hero case-study-index-hero reveal">
         <div class="case-study-index-copy">
           <p class="eyebrow">Selected Work</p>
-          <h1>Selected case studies.</h1>
+          <h1 id="caseStudiesIndexHeading">Selected case studies.</h1>
           <p class="lead">A closer look at work created with talented teams and collaborators.</p>
         </div>
-
-        
-          <figure class="case-study-index-media">
-            <img
-              src="/assets/vscimage/generated/case-studies-fullscreen-3200x1800.webp"
-              alt="A selection of Van Shea Creative case-study work."
-            />
-            
-          </figure>
-        
       </section>
 
       <section class="case-study-block reveal" aria-labelledby="caseStudiesIndexHeading">
-        <div class="section-head case-study-block-head">
-          <div>
-            <p class="eyebrow">Gallery</p>
-            <h2 id="caseStudiesIndexHeading">Case Study Index</h2>
-          </div>
-        </div>
-
         <div class="grid case-study-card-grid">
           
             <article class="card case-study-card reveal">
   <a class="case-study-card-link" href="/case-studies/capital-one-gesture-patent">
     
-      <span class="card-image-shell case-study-card-image-shell">
+      <span class="card-image-shell case-study-card-image-shell case-study-logo-card-shell">
         <img
-          class="card-image case-study-card-image"
-          src="/assets/vscimage/generated/capital-one-patent-figure-pdf-thumb-760x570.webp"
-          alt="Capital One patent figure sheet showing gesture interface scenarios across devices."
+          class="case-study-logo-card-image"
+          src="/assets/capital-one-logo.svg"
+          alt="Capital One logo"
           loading="lazy"
         />
       </span>
@@ -404,6 +407,6 @@
 
 
     <script src="/analytics.js"></script>
-    <script src="/script.js?v=20260630-footer-signal-1"></script>
+    <script src="/script.js?v=20260706-clear-logo-1"></script>
   </body>
 </html>

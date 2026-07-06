@@ -4,6 +4,32 @@
     <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
 <title>M&amp;T Bank Commercial Banking Transformation | Case Study | Van Shea Creative</title>
 <meta name="description" content="Fragmented processes and repeated handoffs created friction and waste. Van turned research and journey maps into a service blueprint for commercial lending." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,7 +38,7 @@
   href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
   rel="stylesheet"
 />
-<link rel="stylesheet" href="/styles.css?v=20260630-footer-signal-1" />
+<link rel="stylesheet" href="/styles.css?v=20260706-capital-one-logo-1" />
 <link rel="stylesheet" href="/assets/case-studies.css?v=20260615-local-video-1" />
 
 
@@ -27,18 +53,17 @@
     <picture>
       <source
         id="brandLogoDarkSource"
-        srcset="/assets/sm_logo_hor_3x.png"
+        srcset="/assets/web_logomark_240_white.png"
         media="(prefers-color-scheme: dark)"
       />
       <img
         id="brandLogoLightImage"
         class="brand-logo"
-        src="/assets/sm_logo_hor_3x.png"
-        alt="Van Shea Creative"
-        width="889"
-        height="192"
+        src="/assets/web_logomark_240_dark.png"
+        alt="VSS logo"
       />
     </picture>
+    <span class="brand-name">Van Shea Creative</span>
   </a>
   <div class="theme-switcher theme-switcher-mini" role="group" aria-label="Choose site theme">
     <button class="theme-link" type="button" data-theme="theme1" aria-label="Clear Glass" aria-pressed="false"></button>
@@ -319,7 +344,32 @@
     </p>
   </div>
 </footer>
-<script src="/script.js?v=20260630-footer-signal-1"></script>
+
+    <aside
+  class="consent-banner"
+  id="consentBanner"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Analytics consent"
+  hidden
+>
+  <p class="consent-text">
+    We use privacy-first analytics to measure meaningful actions, not personal identity.
+  </p>
+  <div class="consent-actions">
+    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+      Deny
+    </button>
+    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+      Allow Analytics
+    </button>
+  </div>
+</aside>
+
+
+
+    <script src="/analytics.js"></script>
+    <script src="/script.js?v=20260706-clear-logo-1"></script>
     <script src="/assets/case-studies.js"></script>
   </body>
 </html>

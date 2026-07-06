@@ -60,6 +60,10 @@ const themeStorageKey = "vsc-site-theme-v2";
 const availableThemes = new Set(["theme1", "theme2", "theme3", "theme4"]);
 const brandLogoLightImage = document.getElementById("brandLogoLightImage");
 const brandLogoDarkSource = document.getElementById("brandLogoDarkSource");
+const darkBrowserMedia =
+  typeof window.matchMedia === "function"
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
 
 if (brandLogoLightImage) {
   brandLogoLightImage.dataset.logoLight =
@@ -70,8 +74,20 @@ if (brandLogoLightImage) {
   }
 }
 
+function isClearThemeOnDarkBrowser(theme) {
+  return theme === "theme1" && Boolean(darkBrowserMedia?.matches);
+}
+
 function isDarkBackgroundTheme(theme) {
-  return theme === "theme3";
+  return theme === "theme3" || isClearThemeOnDarkBrowser(theme);
+}
+
+function normalizeLogoPath(path) {
+  try {
+    return new URL(path, window.location.href).href;
+  } catch (error) {
+    return path;
+  }
 }
 
 function updateBrandLogoForTheme(theme) {
@@ -82,7 +98,14 @@ function updateBrandLogoForTheme(theme) {
     brandLogoLightImage.dataset.logoDark ||
     brandLogoDarkSource?.getAttribute("srcset") ||
     lightLogo;
-  brandLogoLightImage.src = isDarkBackgroundTheme(theme) ? darkLogo : lightLogo;
+  const shouldUseDarkBackgroundLogo = isDarkBackgroundTheme(theme);
+  const hasAlternateDarkLogo = normalizeLogoPath(darkLogo) !== normalizeLogoPath(lightLogo);
+
+  brandLogoLightImage.src = shouldUseDarkBackgroundLogo ? darkLogo : lightLogo;
+  brandLogoLightImage.classList.toggle(
+    "uses-dark-browser-logo",
+    isClearThemeOnDarkBrowser(theme) && hasAlternateDarkLogo
+  );
 }
 
 function setBrandLogoAssets(lightLogo, darkLogo) {
@@ -121,9 +144,25 @@ function syncThemeSliders(theme) {
   });
 }
 
+function setResolvedColorScheme(theme) {
+  rootEl.style.colorScheme = isDarkBackgroundTheme(theme) ? "dark" : "light";
+}
+
+function runWithoutThemeTransitions(changeTheme) {
+  rootEl.classList.add("is-theme-changing");
+  changeTheme();
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      rootEl.classList.remove("is-theme-changing");
+    });
+  });
+}
+
 function applyTheme(theme) {
   const resolvedTheme = availableThemes.has(theme) ? theme : "theme2";
   rootEl.dataset.theme = resolvedTheme;
+  setResolvedColorScheme(resolvedTheme);
 
   themeButtons.forEach((button) => {
     const isActive = button.dataset.theme === resolvedTheme;
@@ -173,7 +212,7 @@ function selectTheme(theme, anchor) {
   if (!availableThemes.has(theme)) return;
 
   preserveThemeAnchor(anchor, () => {
-    applyTheme(theme);
+    runWithoutThemeTransitions(() => applyTheme(theme));
     saveTheme(theme);
   });
 }
@@ -211,7 +250,11 @@ function enhanceThemeSwitchers() {
 
     sliderShell.appendChild(slider);
     buttons[0].before(sliderShell);
-    buttons.forEach((button) => labels.appendChild(button));
+    buttons.forEach((button) => {
+      button.setAttribute("aria-hidden", "true");
+      button.tabIndex = -1;
+      labels.appendChild(button);
+    });
     sliderShell.appendChild(labels);
     themeSliders.push({ buttons, input: slider });
   });
@@ -219,9 +262,15 @@ function enhanceThemeSwitchers() {
 
 let initialTheme = "theme4";
 try {
-  const savedTheme = localStorage.getItem(themeStorageKey);
-  if (savedTheme && availableThemes.has(savedTheme)) {
+  const savedThemes = [
+    localStorage.getItem(themeStorageKey),
+    localStorage.getItem("vsc-site-theme")
+  ];
+  const savedTheme = savedThemes.find((theme) => availableThemes.has(theme));
+
+  if (savedTheme) {
     initialTheme = savedTheme;
+    localStorage.setItem(themeStorageKey, savedTheme);
   }
 } catch (error) {
   // Ignore storage access errors and fall back to default theme.
@@ -229,6 +278,16 @@ try {
 
 enhanceThemeSwitchers();
 applyTheme(initialTheme);
+
+if (darkBrowserMedia) {
+  const updateForBrowserColorScheme = () => applyTheme(rootEl.dataset.theme);
+
+  if (darkBrowserMedia.addEventListener) {
+    darkBrowserMedia.addEventListener("change", updateForBrowserColorScheme);
+  } else if (darkBrowserMedia.addListener) {
+    darkBrowserMedia.addListener(updateForBrowserColorScheme);
+  }
+}
 
 themeButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -633,10 +692,16 @@ async function loadSiteImageConfig() {
       return;
     }
 
-    setBrandLogoAssets(
-      config.logos?.light ? toSitePath(config.logos.light) : "",
-      config.logos?.dark ? toSitePath(config.logos.dark) : ""
-    );
+    const configuredLightLogo = config.logos?.light ? toSitePath(config.logos.light) : "";
+    const configuredDarkLogo = config.logos?.dark ? toSitePath(config.logos.dark) : "";
+    const currentLightLogo = brandLogoLightImage?.dataset.logoLight || "";
+    const headerUsesConfiguredLogo =
+      configuredLightLogo &&
+      normalizeLogoPath(currentLightLogo) === normalizeLogoPath(configuredLightLogo);
+
+    if (headerUsesConfiguredLogo) {
+      setBrandLogoAssets(configuredLightLogo, configuredDarkLogo);
+    }
 
     applyGalleryMetadataFromConfig(config.gallery);
 

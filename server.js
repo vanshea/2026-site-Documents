@@ -462,7 +462,6 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
         .trim()
         .replace(/\s+/g, " ")
         .slice(0, 120);
-      const displayCardDescription = normalizeCardDescription(entry?.cardDescription || "", 120);
       const displayDescription = normalizeGalleryDescription(entry?.description || "", 320);
       const idToken = sanitizeName(entry?.id || displayTitle || `generated-${index + 1}`);
       const cardClasses = ["card", "reveal", "generated-card"];
@@ -479,7 +478,6 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
       const escapedFullscreen = escapeHtml(fullscreen);
       const clientLogo = resolveGalleryClientLogoPath(entry);
       const escapedClientLogo = escapeHtml(clientLogo);
-      const escapedCardDescription = escapeHtml(displayCardDescription);
       const escapedDescription = escapeHtml(displayDescription);
       const escapedLinkText = escapeHtml(normalizeLinkText(entry?.linkText || "", 80));
       const escapedLinkUrl = escapeHtml(normalizeLinkUrl(entry?.linkUrl || "", 320));
@@ -493,7 +491,6 @@ function buildGeneratedGalleryMarkup(galleryEntries) {
           ? `              <span class="card-image-shell">\n                <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />\n                <img class="card-client-logo" src="${escapedClientLogo}" alt="" loading="lazy" />\n              </span>`
           : `              <img class="${imageClasses.join(" ")}" src="${escapedThumb}" alt="Preview image for ${escapedTitle}" loading="lazy" />`,
         `              <h3>${escapedTitle}</h3>`,
-        displayCardDescription ? `              <p>${escapedCardDescription}</p>` : "",
         "            </a>",
         escapedDetailUrl
           ? ""

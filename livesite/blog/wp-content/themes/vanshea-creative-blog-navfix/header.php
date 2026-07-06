@@ -10,6 +10,32 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="color-scheme" content="light dark">
+	<script>
+		(() => {
+			const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+			const root = document.documentElement;
+			let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+			try {
+				const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+					.map((key) => window.localStorage.getItem(key))
+					.find((value) => themes.has(value));
+
+				if (savedTheme) {
+					theme = savedTheme;
+					window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+				}
+			} catch (error) {
+				// Keep the WordPress default when storage is unavailable.
+			}
+
+			root.dataset.theme = theme;
+			root.style.colorScheme =
+				theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+					? "dark"
+					: "light";
+		})();
+	</script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<?php wp_head(); ?>

@@ -3,7 +3,7 @@ Theme Name: Van Shea Creative Blog Nav Fix
 Theme URI: https://www.vanshea.com/blog
 Author: Van Shea Creative
 Description: A custom blog theme matching the vanshea.com portfolio design.
-Version: 1.2.8
+Version: 1.2.10
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -254,6 +254,13 @@ html {
   overflow-anchor: none;
 }
 
+html.is-theme-changing,
+html.is-theme-changing *,
+html.is-theme-changing *::before,
+html.is-theme-changing *::after {
+  transition: none !important;
+}
+
 @font-face {
   font-family: "Pinot Grigio Modern";
   src: local("Pinot Grigio Modern"), local("PinotGrigioModern");
@@ -414,6 +421,13 @@ img {
 
 :root[data-theme="theme3"] .brand-logo {
   filter: brightness(0) invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="theme1"] .brand-logo {
+    content: url("assets/web_logomark_240_white.png");
+    filter: none;
+  }
 }
 
 .brand-name {

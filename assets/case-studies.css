@@ -124,6 +124,22 @@
   max-width: 100%;
 }
 
+.case-study-logo-card-shell {
+  display: grid;
+  place-items: center;
+  padding: clamp(28px, 8vw, 58px);
+  background: #fff;
+}
+
+.case-study-logo-card-image {
+  display: block;
+  width: min(78%, 360px);
+  height: auto;
+  max-height: 58%;
+  object-fit: contain;
+  filter: none;
+}
+
 .case-study-card:hover .case-study-card-image-shell,
 .case-study-card.is-hover-active .case-study-card-image-shell,
 .case-study-card:focus-within .case-study-card-image-shell {
