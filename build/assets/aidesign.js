@@ -1,4 +1,60 @@
 (() => {
+  const openers = Array.from(document.querySelectorAll("[data-aide-prototype-open]"));
+  const overlay = document.querySelector("[data-aide-prototype-overlay]");
+  const frame = document.querySelector("[data-aide-prototype-frame]");
+  const closeButton = document.querySelector("[data-aide-prototype-close]");
+  if (!openers.length || !overlay || !frame || !closeButton) return;
+
+  let activeOpener = null;
+  let previousOverflow = "";
+
+  function openPrototype(opener) {
+    const src = opener.getAttribute("data-prototype-src");
+    const title = opener.getAttribute("data-prototype-title");
+    if (!src) return;
+
+    activeOpener = opener;
+    previousOverflow = document.body.style.overflow;
+    frame.src = src;
+    if (title) {
+      frame.title = title;
+    }
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+    closeButton.focus();
+  }
+
+  function closePrototype() {
+    if (overlay.hidden) return;
+
+    overlay.hidden = true;
+    frame.removeAttribute("src");
+    document.body.style.overflow = previousOverflow;
+    if (activeOpener) {
+      activeOpener.focus();
+      activeOpener = null;
+    }
+  }
+
+  openers.forEach((opener) => {
+    opener.addEventListener("click", () => openPrototype(opener));
+  });
+
+  closeButton.addEventListener("click", closePrototype);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      closePrototype();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !overlay.hidden) {
+      closePrototype();
+    }
+  });
+})();
+
+(() => {
   const prototype = document.querySelector("[data-stock-prototype]");
   if (!prototype) return;
 

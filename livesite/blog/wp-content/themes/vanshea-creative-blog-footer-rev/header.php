@@ -53,6 +53,7 @@
 			?>
 			<a href="https://www.vanshea.com/#work"><?php esc_html_e( 'Work', 'vanshea-creative-blog' ); ?></a>
 			<a href="https://www.vanshea.com/case-studies"><?php esc_html_e( 'Case Studies', 'vanshea-creative-blog' ); ?></a>
+			<a href="https://www.vanshea.com/aidesign"><?php esc_html_e( 'AIdesign', 'vanshea-creative-blog' ); ?></a>
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-current="page"><?php esc_html_e( 'Blog', 'vanshea-creative-blog' ); ?></a>
 			<?php
 		}

@@ -77,12 +77,100 @@
 }
 
 .aide-sample-frame {
+  display: block;
   width: min(100%, 640px);
   aspect-ratio: 520 / 980;
   min-height: 980px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #faf9f5;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.aide-sample-preview {
+  display: none !important;
+  justify-self: start;
+  width: min(100%, 360px);
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  box-shadow: 0 18px 42px rgba(47, 36, 39, 0.14);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.aide-sample-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.aide-sample-preview:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 52px rgba(47, 36, 39, 0.18);
+}
+
+.aide-sample-preview:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.aide-prototype-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 28px);
+  background: rgba(6, 6, 14, 0.9);
+}
+
+.aide-prototype-overlay[hidden] {
+  display: none;
+}
+
+.aide-prototype-frame {
+  width: min(100%, 520px);
+  height: min(100%, 980px);
+  border: 0;
+  border-radius: 24px;
+  background: #faf9f5;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.aide-prototype-close {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  z-index: 1001;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+}
+
+.aide-prototype-close:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+@media (min-width: 721px) {
+  .aide-sample-preview {
+    display: none !important;
+  }
 }
 
 .aide-hero {
@@ -943,8 +1031,27 @@
     gap: 46px;
   }
 
+  .aide-sample-main {
+    width: min(100% - 32px, 1180px);
+  }
+
   .aide-sample-frame {
-    min-height: min(980px, 160vw);
+    display: none !important;
+  }
+
+  .aide-sample-preview {
+    display: block !important;
+    width: min(70vw, 280px);
+  }
+
+  .aide-prototype-overlay {
+    padding: 0;
+  }
+
+  .aide-prototype-frame {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
   }
 
   .aide-main h1 {

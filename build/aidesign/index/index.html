@@ -49,7 +49,7 @@
 <link rel="stylesheet" href="/build/assets/case-studies.css?v=20260706-capital-one-logo-1" />
 
 
-<link rel="stylesheet" href="/build/assets/aidesign.css" />
+<link rel="stylesheet" href="/build/assets/aidesign.css?v=20260709-self-care-responsive-1" />
 
 
   </head>
@@ -115,7 +115,45 @@
         title="Self Care (Beta) V1.0"
         loading="eager"
       ></iframe>
+      <button
+        class="aide-sample-preview"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="selfCarePrototypeOverlay"
+        data-aide-prototype-open
+        data-prototype-src="/build/aidesign/self_care.html"
+        data-prototype-title="Self Care (Beta) V1.0"
+      >
+        <img
+          src="/build/assets/aidesign/self-care-thumbnail.svg"
+          alt=""
+          width="360"
+          height="678"
+          loading="eager"
+        />
+        <span class="sr-only">Open Self Care (Beta) V1.0</span>
+      </button>
     </main>
+
+    <div
+      class="aide-prototype-overlay"
+      id="selfCarePrototypeOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Self Care (Beta) V1.0"
+      hidden
+      data-aide-prototype-overlay
+    >
+      <button class="aide-prototype-close" type="button" aria-label="Close prototype" data-aide-prototype-close>
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <iframe
+        class="aide-prototype-frame"
+        title="Self Care (Beta) V1.0"
+        loading="lazy"
+        data-aide-prototype-frame
+      ></iframe>
+    </div>
 
     <footer class="site-footer" id="siteFooter" data-footer-pattern>
   <div class="footer-pattern-layer" aria-hidden="true"></div>
@@ -229,5 +267,6 @@
 
     <script src="/build/analytics.js"></script>
     <script src="/build/script.js"></script>
+    <script src="/build/assets/aidesign.js"></script>
   </body>
 </html>
