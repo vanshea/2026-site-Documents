@@ -2919,6 +2919,10 @@ function renderAiDesignLanding(req, res) {
 
 app.get(["/aidesign", "/aidesign/", "/aidesign/index", "/aidesign/index/"], renderAiDesignLanding);
 
+app.get("/aidesign/self_care.html", (req, res) => {
+  res.sendFile(path.join(rootDir, "content", "aidesign", "self_care.html"));
+});
+
 app.get(["/aidesign/experiments", "/aidesign/experiments/"], (req, res) => {
   const landing = getAiDesignLandingContent();
   const experiments = listAiDesignExperiments();

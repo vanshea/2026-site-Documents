@@ -4,6 +4,39 @@
     <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
+<link rel="icon" href="/build/assets/icons/favicon.ico" sizes="any" />
+<link rel="icon" href="/build/assets/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/build/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/build/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16" />
+<link rel="apple-touch-icon" href="/build/assets/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/build/assets/icons/site.webmanifest" />
+<meta name="theme-color" content="#020319" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
 <title>AI Design Lab | Van Shea Creative</title>
 <meta name="description" content="Practical experiments comparing how AI coding platforms approach design, product thinking, data, and responsible UX." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,8 +45,8 @@
   href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
   rel="stylesheet"
 />
-<link rel="stylesheet" href="/build/styles.css?v=20260630-footer-signal-1" />
-<link rel="stylesheet" href="/build/assets/case-studies.css?v=20260615-local-video-1" />
+<link rel="stylesheet" href="/build/styles.css?v=20260706-capital-one-logo-1" />
+<link rel="stylesheet" href="/build/assets/case-studies.css?v=20260706-capital-one-logo-1" />
 
 
 <link rel="stylesheet" href="/build/assets/aidesign.css" />
@@ -29,24 +62,19 @@
     <picture>
       <source
         id="brandLogoDarkSource"
-        srcset="/build/assets/web_logomark_240_lite.png"
+        srcset="/build/assets/sm_logo_hor_3x.png"
         media="(prefers-color-scheme: dark)"
       />
       <img
         id="brandLogoLightImage"
         class="brand-logo"
-        src="/build/assets/web_logomark_240_dark.png"
-        alt="VSS logo"
+        src="/build/assets/sm_logo_hor_3x.png"
+        alt="Van Shea Creative"
+        width="889"
+        height="192"
       />
     </picture>
-    <span class="brand-name">Van Shea Creative</span>
   </a>
-  <div class="theme-switcher theme-switcher-mini" role="group" aria-label="Choose site theme">
-    <button class="theme-link" type="button" data-theme="theme1" aria-label="Clear Glass" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme2" aria-label="Tinted Glass" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme3" aria-label="High Contrast" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme4" aria-label="Wild Theme" aria-pressed="false"></button>
-  </div>
   <button
     class="nav-toggle"
     type="button"
@@ -66,6 +94,9 @@
     <a href="/build/case-studies">
       Case Studies
     </a>
+    <a href="/build/aidesign" aria-current="page">
+      AIdesign
+    </a>
     <a href="/blog/">
       Blog
     </a>
@@ -73,146 +104,17 @@
 </header>
 
 
-    <main id="top" class="aide-main">
-      <section class="aide-hero reveal">
-        <div class="aide-hero-copy">
-          <p class="eyebrow">AI Application Experiments</p>
-          <h1>AI Design Lab</h1>
-          <p class="lead">Small application experiments compare how AI platforms interpret the same prompt, structure solutions, make interface decisions, and handle ambiguity.</p>
-          <p>The goal is to understand how these tools shape design, development, product decisions, and human judgment, not to declare one tool the best.</p>
-          <div class="aide-hero-actions">
-            <a class="btn" href="/build/aidesign/experiments">Browse Experiments</a>
-            <a class="aide-text-link" href="#current-experiments">View current test</a>
-          </div>
-        </div>
-        <div class="aide-hero-visual" aria-label="AI Design Lab experiment map">
-          <div class="aide-visual-row">
-            <span>Prompt</span>
-            <i></i>
-            <span>Prototype</span>
-          </div>
-          <div class="aide-visual-row">
-            <span>Ambiguity</span>
-            <i></i>
-            <span>Judgment</span>
-          </div>
-          <div class="aide-visual-row">
-            <span>Code</span>
-            <i></i>
-            <span>Critique</span>
-          </div>
-          <div class="aide-visual-note">
-            Same challenge, different tool, visible tradeoffs.
-          </div>
-        </div>
-      </section>
-
-      <section class="aide-section aide-two-column reveal" aria-labelledby="whyThisExists">
-        <div>
-          <p class="eyebrow">01</p>
-          <h2 id="whyThisExists">Why This Exists</h2>
-        </div>
-        <div class="aide-section-copy">
-          <p>Working code is not enough. A functional prototype can still make poor assumptions, hide uncertainty, ignore accessibility, or miss the human context.</p>
-          <ul class="aide-chip-list" aria-label="Evaluation criteria">
-            
-              <li>quality of UX thinking</li>
-            
-              <li>clarity of interface</li>
-            
-              <li>usefulness of the product concept</li>
-            
-              <li>handling of data and uncertainty</li>
-            
-              <li>accessibility</li>
-            
-              <li>visual polish</li>
-            
-              <li>code maintainability</li>
-            
-              <li>honesty around limitations</li>
-            
-              <li>ability to support human decision-making</li>
-            
-          </ul>
-        </div>
-      </section>
-
-      <section class="aide-section aide-two-column reveal" aria-labelledby="experimentFormat">
-        <div>
-          <p class="eyebrow">02</p>
-          <h2 id="experimentFormat">Experiment Format</h2>
-        </div>
-        <div class="aide-section-copy">
-          <p>Each experiment provides enough context, implementation detail, and critique to decide what to trust, revise, or rebuild.</p>
-          <ol class="aide-step-list">
-            
-              <li>the original prompt</li>
-            
-              <li>the AI platform used</li>
-            
-              <li>generated concept summary</li>
-            
-              <li>working prototype</li>
-            
-              <li>screenshots or embedded app</li>
-            
-              <li>what worked well</li>
-            
-              <li>what failed or felt weak</li>
-            
-              <li>design critique</li>
-            
-              <li>code critique</li>
-            
-              <li>final human reflection</li>
-            
-          </ol>
-        </div>
-      </section>
-
-      <section
-        id="current-experiments"
-        class="aide-section reveal"
-        aria-labelledby="currentExperiments"
-      >
-        <div class="section-head aide-section-head">
-          <div>
-            <p class="eyebrow">03</p>
-            <h2 id="currentExperiments">Current Experiments</h2>
-          </div>
-          <a class="aide-text-link" href="/build/aidesign/experiments">All experiments</a>
-        </div>
-
-        <div class="aide-card-grid">
-          
-            <article class="aide-experiment-card">
-  <a class="aide-experiment-card-link" href="/build/aidesign/experiments/stock-performance-test">
-    <span class="aide-card-visual" aria-hidden="true">
-      <svg viewBox="0 0 280 132" focusable="false">
-        <path class="aide-card-gridline" d="M0 34H280M0 72H280M0 110H280" />
-        <path
-          class="aide-card-line aide-card-line-muted"
-          d="M2 95 C32 80 48 92 70 70 S112 44 136 54 180 88 206 62 244 30 278 38"
-        />
-        <path
-          class="aide-card-line"
-          d="M2 100 C30 86 52 90 76 72 S118 42 142 50 174 84 204 66 246 34 278 42"
-        />
-        <circle cx="204" cy="66" r="4" />
-        <path class="aide-card-projection" d="M204 66 C226 58 248 48 278 42" />
-      </svg>
-    </span>
-    <span class="aide-card-meta">Financial visualization prototype · Demo prototype</span>
-    <h3>Stock Performance Projection Test</h3>
-    <p>A financial visualization prototype that compares how AI platforms handle market data, charts, projections, uncertainty, and responsible UX language.</p>
-    <span class="aide-card-action">View Experiment</span>
-  </a>
-</article>
-
-          
-        </div>
-      </section>
+    <main id="top" class="aide-sample-main">
+      <h1>AI Design Lab:</h1>
+      <h3>Application experiments compare to test how AI structures solutions, makes interface decisions, and handles delivery.</h3>
+      <h2>Self Care (Beta) V1.0</h2>
+      <p class="aide-sample-description">A lock-screen self-care snack bar for quick mood check-ins. Name how you feel, note the small daily factors around you, and log a tiny check-in without opening a full app.</p>
+      <iframe
+        class="aide-sample-frame"
+        src="/build/aidesign/self_care.html"
+        title="Self Care (Beta) V1.0"
+        loading="eager"
+      ></iframe>
     </main>
 
     <footer class="site-footer" id="siteFooter" data-footer-pattern>
@@ -265,7 +167,7 @@
           data-theme="theme1"
           aria-pressed="false"
         >
-          Clear Glass
+          Basic Theme
         </button>
         <button
           class="theme-link"
@@ -273,7 +175,7 @@
           data-theme="theme2"
           aria-pressed="false"
         >
-          Tinted Glass
+          Pro Theme
         </button>
         <button
           class="theme-link"
@@ -326,6 +228,6 @@
 
 
     <script src="/build/analytics.js"></script>
-    <script src="/build/script.js?v=20260630-footer-signal-1"></script>
+    <script src="/build/script.js"></script>
   </body>
 </html>

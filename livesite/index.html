@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/assets/icons/favicon.ico" sizes="any" />
+    <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/assets/icons/site.webmanifest" />
+    <meta name="theme-color" content="#020319" />
     <script>
       (() => {
         const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
@@ -115,6 +122,7 @@
       <nav id="siteNav" class="nav">
         <a href="#work" aria-current="page">Work</a>
         <a href="/case-studies">Case Studies</a>
+        <a href="/build/aidesign">AIdesign</a>
         <a href="/blog/">Blog</a>
       </nav>
     </header>
@@ -457,7 +465,7 @@
         </div>
       </section>
 
-      <section id="contact" class="contact reveal" data-analytics-location="contact">
+      <section id="contact" class="contact reveal">
         <div class="contact-shell">
           <p class="contact-kicker">Let&apos;s Build Something Useful</p>
           <h2>Project Inquiry</h2>
@@ -620,29 +628,7 @@
         </p>
       </div>
     </footer>
-
-    <aside
-      class="consent-banner"
-      id="consentBanner"
-      role="dialog"
-      aria-live="polite"
-      aria-label="Analytics consent"
-      hidden
-    >
-      <p class="consent-text">
-        Privacy-first analytics only. No personal tracking.
-      </p>
-      <div class="consent-actions">
-        <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
-          Deny
-        </button>
-        <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
-          Allow Analytics
-        </button>
-      </div>
-    </aside>
-
-    <div class="lightbox" id="lightbox" aria-hidden="true">
+<div class="lightbox" id="lightbox" aria-hidden="true">
       <button class="lightbox-close" id="lightboxClose" aria-label="Close image">
         x
       </button>
@@ -681,8 +667,6 @@
         <figcaption id="lightboxCaption"></figcaption>
       </figure>
     </div>
-
-    <script src="analytics.js"></script>
-    <script src="script.js?v=20260706-clear-logo-1"></script>
+<script src="script.js?v=20260706-clear-logo-1"></script>
   </body>
 </html>

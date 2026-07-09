@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
+<link rel="icon" href="/assets/icons/favicon.ico" sizes="any" />
+<link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/assets/icons/site.webmanifest" />
+<meta name="theme-color" content="#020319" />
 <script>
   (() => {
     const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
@@ -53,17 +60,18 @@
     <picture>
       <source
         id="brandLogoDarkSource"
-        srcset="/assets/web_logomark_240_white.png"
+        srcset="/assets/sm_logo_hor_3x.png"
         media="(prefers-color-scheme: dark)"
       />
       <img
         id="brandLogoLightImage"
         class="brand-logo"
-        src="/assets/web_logomark_240_dark.png"
-        alt="VSS logo"
+        src="/assets/sm_logo_hor_3x.png"
+        alt="Van Shea Creative"
+        width="889"
+        height="192"
       />
     </picture>
-    <span class="brand-name">Van Shea Creative</span>
   </a>
   <button
     class="nav-toggle"
@@ -83,6 +91,9 @@
     <a href="/#work" >Work</a>
     <a href="/case-studies" aria-current="page">
       Case Studies
+    </a>
+    <a href="/aidesign">
+      AIdesign
     </a>
     <a href="/blog/">
       Blog
@@ -106,6 +117,7 @@
           
             <article class="card case-study-card reveal">
   <a class="case-study-card-link" href="/case-studies/capital-one-gesture-patent">
+    
     
       <span class="card-image-shell case-study-card-image-shell case-study-logo-card-shell">
         <img
@@ -154,6 +166,7 @@
             <article class="card case-study-card reveal">
   <a class="case-study-card-link" href="/case-studies/vanguard-innovation-lab-integration">
     
+    
       <span class="card-image-shell case-study-card-image-shell">
         <img
           class="card-image case-study-card-image"
@@ -201,6 +214,7 @@
             <article class="card case-study-card reveal">
   <a class="case-study-card-link" href="/case-studies/mt-bank-commercial-banking-transformation">
     
+    
       <span class="card-image-shell case-study-card-image-shell">
         <img
           class="card-image case-study-card-image"
@@ -247,6 +261,7 @@
           
             <article class="card case-study-card reveal">
   <a class="case-study-card-link" href="/case-studies/nyu-curriculum-alignment">
+    
     
       <span class="card-image-shell case-study-card-image-shell">
         <img
@@ -346,7 +361,7 @@
           data-theme="theme1"
           aria-pressed="false"
         >
-          Clear Glass
+          Basic Theme
         </button>
         <button
           class="theme-link"
@@ -354,7 +369,7 @@
           data-theme="theme2"
           aria-pressed="false"
         >
-          Tinted Glass
+          Pro Theme
         </button>
         <button
           class="theme-link"
@@ -383,30 +398,6 @@
     </p>
   </div>
 </footer>
-
-    <aside
-  class="consent-banner"
-  id="consentBanner"
-  role="dialog"
-  aria-live="polite"
-  aria-label="Analytics consent"
-  hidden
->
-  <p class="consent-text">
-    We use privacy-first analytics to measure meaningful actions, not personal identity.
-  </p>
-  <div class="consent-actions">
-    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
-      Deny
-    </button>
-    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
-      Allow Analytics
-    </button>
-  </div>
-</aside>
-
-
-    <script src="/analytics.js"></script>
-    <script src="/script.js?v=20260706-clear-logo-1"></script>
+<script src="/script.js?v=20260706-clear-logo-1"></script>
   </body>
 </html>

@@ -13,89 +13,17 @@
 
     <%- include("../partials/public_header", { currentPath }) %>
 
-    <main id="top" class="aide-main">
-      <section class="aide-hero reveal">
-        <div class="aide-hero-copy">
-          <p class="eyebrow"><%= landing.eyebrow %></p>
-          <h1><%= landing.title %></h1>
-          <p class="lead"><%= landing.intro %></p>
-          <p><%= landing.secondaryIntro %></p>
-          <div class="aide-hero-actions">
-            <a class="btn" href="/aidesign/experiments">Browse Experiments</a>
-            <a class="aide-text-link" href="#current-experiments">View current test</a>
-          </div>
-        </div>
-        <div class="aide-hero-visual" aria-label="AI Design Lab experiment map">
-          <div class="aide-visual-row">
-            <span>Prompt</span>
-            <i></i>
-            <span>Prototype</span>
-          </div>
-          <div class="aide-visual-row">
-            <span>Ambiguity</span>
-            <i></i>
-            <span>Judgment</span>
-          </div>
-          <div class="aide-visual-row">
-            <span>Code</span>
-            <i></i>
-            <span>Critique</span>
-          </div>
-          <div class="aide-visual-note">
-            Same challenge, different tool, visible tradeoffs.
-          </div>
-        </div>
-      </section>
-
-      <section class="aide-section aide-two-column reveal" aria-labelledby="whyThisExists">
-        <div>
-          <p class="eyebrow">01</p>
-          <h2 id="whyThisExists"><%= landing.whyTitle %></h2>
-        </div>
-        <div class="aide-section-copy">
-          <p><%= landing.whyBody %></p>
-          <ul class="aide-chip-list" aria-label="Evaluation criteria">
-            <% landing.evaluationCriteria.forEach((item) => { %>
-              <li><%= item %></li>
-            <% }) %>
-          </ul>
-        </div>
-      </section>
-
-      <section class="aide-section aide-two-column reveal" aria-labelledby="experimentFormat">
-        <div>
-          <p class="eyebrow">02</p>
-          <h2 id="experimentFormat"><%= landing.formatTitle %></h2>
-        </div>
-        <div class="aide-section-copy">
-          <p><%= landing.formatBody %></p>
-          <ol class="aide-step-list">
-            <% landing.experimentFormat.forEach((item) => { %>
-              <li><%= item %></li>
-            <% }) %>
-          </ol>
-        </div>
-      </section>
-
-      <section
-        id="current-experiments"
-        class="aide-section reveal"
-        aria-labelledby="currentExperiments"
-      >
-        <div class="section-head aide-section-head">
-          <div>
-            <p class="eyebrow">03</p>
-            <h2 id="currentExperiments"><%= landing.currentTitle %></h2>
-          </div>
-          <a class="aide-text-link" href="/aidesign/experiments">All experiments</a>
-        </div>
-
-        <div class="aide-card-grid">
-          <% landing.experiments.forEach((experiment) => { %>
-            <%- include("../partials/aidesign/experiment-card", { experiment }) %>
-          <% }) %>
-        </div>
-      </section>
+    <main id="top" class="aide-sample-main">
+      <h1><%= landing.intro %></h1>
+      <h3><%= landing.introDetail %></h3>
+      <h2><%= landing.standaloneIdea.title %></h2>
+      <p class="aide-sample-description"><%= landing.standaloneIdea.description %></p>
+      <iframe
+        class="aide-sample-frame"
+        src="<%= landing.standaloneIdea.href %>"
+        title="<%= landing.standaloneIdea.title %>"
+        loading="eager"
+      ></iframe>
     </main>
 
     <%- include("../partials/public_footer") %>

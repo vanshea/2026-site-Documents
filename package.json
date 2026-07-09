@@ -15,6 +15,7 @@
     "livesite:bundle": "node scripts/create-public-static-bundle.mjs livesite",
     "comingsoon:bundle": "node scripts/create-public-static-bundle.mjs comingsoon",
     "client:scaffold": "node scripts/create-client-scaffold.mjs",
+    "icons:generate": "node scripts/generate-site-icons.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init_analytics",
     "prisma:deploy": "prisma migrate deploy",

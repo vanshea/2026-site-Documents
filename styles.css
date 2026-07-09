@@ -2428,6 +2428,18 @@ textarea:focus {
   text-shadow: none;
 }
 
+:root[data-theme="theme4"] .aide-sample-main h1 {
+  color: #0b0710;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 7vw, 6.7rem);
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: var(--type-heading-letter-spacing);
+  line-height: 0.98;
+  text-transform: none;
+  text-shadow: none;
+}
+
 :root[data-theme="theme4"] .hero .lead {
   max-width: 46ch;
   margin: 0 0 clamp(30px, 3.5vw, 48px);

@@ -4,6 +4,39 @@
     <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="light dark" />
+<link rel="icon" href="/build/assets/icons/favicon.ico" sizes="any" />
+<link rel="icon" href="/build/assets/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/build/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/build/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16" />
+<link rel="apple-touch-icon" href="/build/assets/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/build/assets/icons/site.webmanifest" />
+<meta name="theme-color" content="#020319" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
 <title>AI Design Lab Experiments | Van Shea Creative</title>
 <meta name="description" content="A running index of AI application experiments comparing platform output, UX judgment, code quality, and responsible product thinking." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,8 +45,8 @@
   href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
   rel="stylesheet"
 />
-<link rel="stylesheet" href="/build/styles.css?v=20260630-footer-signal-1" />
-<link rel="stylesheet" href="/build/assets/case-studies.css?v=20260615-local-video-1" />
+<link rel="stylesheet" href="/build/styles.css?v=20260706-capital-one-logo-1" />
+<link rel="stylesheet" href="/build/assets/case-studies.css?v=20260706-capital-one-logo-1" />
 
 
 <link rel="stylesheet" href="/build/assets/aidesign.css" />
@@ -29,24 +62,19 @@
     <picture>
       <source
         id="brandLogoDarkSource"
-        srcset="/build/assets/web_logomark_240_lite.png"
+        srcset="/build/assets/sm_logo_hor_3x.png"
         media="(prefers-color-scheme: dark)"
       />
       <img
         id="brandLogoLightImage"
         class="brand-logo"
-        src="/build/assets/web_logomark_240_dark.png"
-        alt="VSS logo"
+        src="/build/assets/sm_logo_hor_3x.png"
+        alt="Van Shea Creative"
+        width="889"
+        height="192"
       />
     </picture>
-    <span class="brand-name">Van Shea Creative</span>
   </a>
-  <div class="theme-switcher theme-switcher-mini" role="group" aria-label="Choose site theme">
-    <button class="theme-link" type="button" data-theme="theme1" aria-label="Clear Glass" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme2" aria-label="Tinted Glass" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme3" aria-label="High Contrast" aria-pressed="false"></button>
-    <button class="theme-link" type="button" data-theme="theme4" aria-label="Wild Theme" aria-pressed="false"></button>
-  </div>
   <button
     class="nav-toggle"
     type="button"
@@ -65,6 +93,9 @@
     <a href="/build/#work" >Work</a>
     <a href="/build/case-studies">
       Case Studies
+    </a>
+    <a href="/build/aidesign" aria-current="page">
+      AIdesign
     </a>
     <a href="/blog/">
       Blog
@@ -100,6 +131,26 @@
         </div>
 
         <div class="aide-card-grid">
+          <article class="aide-experiment-card">
+  <a class="aide-experiment-card-link" href="/build/aidesign/self_care.html">
+    <span class="aide-card-visual aide-self-care-card-visual" aria-hidden="true">
+      <span class="aide-self-care-card-phone">
+        <span class="aide-self-care-card-pill"></span>
+        <span class="aide-self-care-card-widget">
+          <span>SC</span>
+          <i></i>
+        </span>
+        <span class="aide-self-care-card-row"></span>
+        <span class="aide-self-care-card-row aide-self-care-card-row-short"></span>
+      </span>
+    </span>
+    <span class="aide-card-meta">Claude standalone HTML · Self Care prototype</span>
+    <h3>Self Care (Beta) V1.0</h3>
+    <p>A bundled mobile self-care concept with mood check-ins, daily factor tracking, theme controls, and lock-screen style interactions.</p>
+    <span class="aide-card-action">Launch Standalone Prototype</span>
+  </a>
+</article>
+
           
             <article class="aide-experiment-card">
   <a class="aide-experiment-card-link" href="/build/aidesign/experiments/stock-performance-test">
@@ -198,7 +249,7 @@
           data-theme="theme1"
           aria-pressed="false"
         >
-          Clear Glass
+          Basic Theme
         </button>
         <button
           class="theme-link"
@@ -206,7 +257,7 @@
           data-theme="theme2"
           aria-pressed="false"
         >
-          Tinted Glass
+          Pro Theme
         </button>
         <button
           class="theme-link"
@@ -259,6 +310,6 @@
 
 
     <script src="/build/analytics.js"></script>
-    <script src="/build/script.js?v=20260630-footer-signal-1"></script>
+    <script src="/build/script.js"></script>
   </body>
 </html>

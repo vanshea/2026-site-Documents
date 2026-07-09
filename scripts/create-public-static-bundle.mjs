@@ -188,7 +188,18 @@ async function pruneUnreferencedImages() {
   const files = await collectUploadFiles();
   const refs = new Set();
   const imageExtensions = new Set([".gif", ".ico", ".jpeg", ".jpg", ".png", ".svg", ".webp"]);
-  const keepImages = new Set(["fav.ico", "fav32px.png"]);
+  const keepImages = new Set([
+    "android-chrome-192x192.png",
+    "android-chrome-512x512.png",
+    "apple-touch-icon.png",
+    "fav.ico",
+    "fav32px.png",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon-48x48.png",
+    "favicon.ico",
+    "favicon.svg"
+  ]);
 
   for (const relativePath of files) {
     const extension = path.extname(relativePath).toLowerCase();
