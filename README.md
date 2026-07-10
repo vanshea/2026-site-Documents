@@ -35,7 +35,7 @@ npm run dev
 ```
 
 Open:
-- Portfolio hub: [http://localhost:3000](http://localhost:3000)
+- Default local preview (redirects to Build): [http://localhost:3000](http://localhost:3000)
 - Live site: [http://localhost:3000/livesite/](http://localhost:3000/livesite/)
 - Coming soon: [http://localhost:3000/comingsoon/](http://localhost:3000/comingsoon/)
 - Build sandbox: [http://localhost:3000/build/](http://localhost:3000/build/)
@@ -45,9 +45,13 @@ Open:
 - Client admin: [http://localhost:3000/analytics/home](http://localhost:3000/analytics/home)
 
 Static variant folders:
-- Live site: [`/Library/WebServer/Documents/livesite`](/Library/WebServer/Documents/livesite)
+- Build — all new public work and review: [`/Library/WebServer/Documents/build`](/Library/WebServer/Documents/build)
+- Live site — manually maintained, approved publication files only: [`/Library/WebServer/Documents/livesite`](/Library/WebServer/Documents/livesite)
 - Coming-soon site: [`/Library/WebServer/Documents/comingsoon`](/Library/WebServer/Documents/comingsoon)
-- Build variant: [`/Library/WebServer/Documents/build`](/Library/WebServer/Documents/build)
+
+The web-root files in `/Library/WebServer/Documents` are application source and
+server support files. They are not a fourth publication target. In development,
+opening `/` redirects to `/build/`; in production it redirects to `/livesite/`.
 
 Each variant folder now contains a complete static copy of:
 - `index.html`
@@ -175,11 +179,14 @@ Ensure `ANALYTICS_UI_ORIGIN` points to the deployed Next.js analytics UI service
 
 ## Static FTP Exports
 
-Refresh the complete static variant folders after source-content changes:
+Refresh Build after source-content changes:
 
 ```bash
-npm run variants:sync
+npm run build:sync
 ```
+
+`npm run variants:sync` is retained as an alias for Build only. It never updates
+Livesite. Review Build, then copy approved files to `livesite/` manually.
 
 Create a root-ready static export for the live site:
 

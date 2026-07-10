@@ -4,7 +4,7 @@
     <%- include("../partials/public_head", {
       pageTitle,
       metaDescription,
-      extraStyles: ["/assets/aidesign.css?v=20260709-self-care-responsive-1"]
+      extraStyles: ["/assets/aidesign.css?v=20260710-idea-sidebar-1"]
     }) %>
   </head>
   <body>
@@ -40,25 +40,33 @@
         </div>
 
         <div class="aide-card-grid">
-          <article class="aide-experiment-card">
-  <a class="aide-experiment-card-link" href="<%= landing.standaloneIdea.href %>">
-    <span class="aide-card-visual aide-self-care-card-visual" aria-hidden="true">
-      <span class="aide-self-care-card-phone">
-        <span class="aide-self-care-card-pill"></span>
-        <span class="aide-self-care-card-widget">
-          <span>SC</span>
-          <i></i>
-        </span>
-        <span class="aide-self-care-card-row"></span>
-        <span class="aide-self-care-card-row aide-self-care-card-row-short"></span>
-      </span>
-    </span>
-    <span class="aide-card-meta"><%= landing.standaloneIdea.meta %></span>
-    <h3><%= landing.standaloneIdea.title %></h3>
-    <p><%= landing.standaloneIdea.shortDescription %></p>
-    <span class="aide-card-action">Launch Standalone Prototype</span>
-  </a>
-</article>
+          <% landing.standaloneIdeas.forEach((idea) => { %>
+            <article class="aide-experiment-card">
+              <a class="aide-experiment-card-link" href="<%= idea.href %>">
+                <% if (idea.wideThumbnail) { %>
+                  <span class="aide-card-visual aide-image-card-visual" aria-hidden="true">
+                    <img src="<%= idea.wideThumbnail %>" alt="" width="924" height="540" loading="lazy" />
+                  </span>
+                <% } else { %>
+                  <span class="aide-card-visual aide-self-care-card-visual" aria-hidden="true">
+                    <span class="aide-self-care-card-phone">
+                      <span class="aide-self-care-card-pill"></span>
+                      <span class="aide-self-care-card-widget">
+                        <span>SC</span>
+                        <i></i>
+                      </span>
+                      <span class="aide-self-care-card-row"></span>
+                      <span class="aide-self-care-card-row aide-self-care-card-row-short"></span>
+                    </span>
+                  </span>
+                <% } %>
+                <span class="aide-card-meta"><%= idea.meta %></span>
+                <h3><%= idea.title %></h3>
+                <p><%= idea.shortDescription %></p>
+                <span class="aide-card-action">Launch Standalone Prototype</span>
+              </a>
+            </article>
+          <% }) %>
 
           <% experiments.forEach((experiment) => { %>
             <%- include("../partials/aidesign/experiment-card", { experiment }) %>

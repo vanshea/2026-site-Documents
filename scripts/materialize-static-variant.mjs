@@ -8,7 +8,9 @@ const { getCaseStudyIndexContent, listCaseStudies } = require("../lib/case-studi
 const { getAiDesignLandingContent, listAiDesignExperiments } = require("../lib/aidesign.js");
 
 const projectRoot = process.cwd();
-const requestedVariant = String(process.argv[2] || "all").trim().toLowerCase();
+const requestedVariant = String(process.argv[2] || "build").trim().toLowerCase();
+const livesitePromotionApproved = process.argv.includes("--approve-livesite");
+const aiDesignOnly = process.argv.includes("--aidesign-only");
 const supportedVariants = ["livesite", "build", "comingsoon"];
 const variants =
   requestedVariant === "all" ? supportedVariants : supportedVariants.includes(requestedVariant)
@@ -17,6 +19,18 @@ const variants =
 
 if (variants.length === 0) {
   console.error(`Unsupported static variant: ${requestedVariant}`);
+  process.exit(1);
+}
+
+if (["all", "livesite"].includes(requestedVariant) && !livesitePromotionApproved) {
+  console.error(
+    "Livesite is manually maintained. Re-run with --approve-livesite only after review and approval."
+  );
+  process.exit(1);
+}
+
+if (aiDesignOnly && requestedVariant !== "livesite") {
+  console.error("--aidesign-only is supported only for an approved Livesite promotion.");
   process.exit(1);
 }
 
@@ -36,7 +50,11 @@ const aiDesignStockTemplatePath = path.join(
   "aidesign",
   "stock-performance-test.ejs"
 );
-const aiDesignStandaloneFiles = ["self_care.html"];
+const aiDesignStandaloneFiles = [
+  "self_care.html",
+  "meeting_coach.html",
+  "meeting_coach_demo.html"
+];
 const aiDesignStandaloneSourceRoot = path.join(projectRoot, "content", "aidesign");
 const snapshotVariants = new Set(["livesite", "build"]);
 const staticUploadVariants = new Set(["livesite"]);
@@ -238,14 +256,20 @@ function stripStaticOnlyFeatures(html) {
   return String(html || "")
     .replace(/\s*<script src="\/?(?:livesite|comingsoon|build)\/analytics\.js"><\/script>\s*/g, "\n")
     .replace(/\s*<script src="\/?analytics\.js"><\/script>\s*/g, "\n")
-    .replace(/\s*<aside[\s\S]*?id="consentBanner"[\s\S]*?<\/aside>\s*/g, "\n")
+    .replace(
+      /\s*<aside\b(?=[^>]*\bid="consentBanner")[^>]*>[\s\S]*?<\/aside>\s*/g,
+      "\n"
+    )
     .replace(/\s*<button class="theme-link consent-manage-btn"[\s\S]*?<\/button>\s*/g, "\n")
     .replace(/\sdata-analytics(?:-location)?="[^"]*"/g, "");
 }
 
 function rewriteHtmlForVariant(html, variant) {
   const rewritten = rewriteVariantPreviewLinks(html, variant);
-  return staticUploadVariants.has(variant) ? stripStaticOnlyFeatures(rewritten) : rewritten;
+  const output = staticUploadVariants.has(variant)
+    ? stripStaticOnlyFeatures(rewritten)
+    : rewritten;
+  return output.replace(/^[\t ]+$/gm, "");
 }
 
 function rewriteScriptForStaticUpload(script) {
@@ -569,6 +593,21 @@ async function cleanStaticUploadVariant(variantRoot) {
 async function materializeVariant(variant) {
   const variantRoot = path.join(projectRoot, variant);
   await mkdir(variantRoot, { recursive: true });
+
+  if (variant === "livesite" && aiDesignOnly) {
+    await mkdir(path.join(variantRoot, "assets"), { recursive: true });
+    await cp(
+      path.join(projectRoot, "assets", "aidesign.css"),
+      path.join(variantRoot, "assets", "aidesign.css")
+    );
+    await cp(
+      path.join(projectRoot, "assets", "aidesign.js"),
+      path.join(variantRoot, "assets", "aidesign.js")
+    );
+    await copyDirectory("assets/aidesign", path.join(variantRoot, "assets", "aidesign"));
+    await writeAiDesign(variant);
+    return;
+  }
 
   if (snapshotVariants.has(variant)) {
     await copyTopLevelPublicFiles(variant);

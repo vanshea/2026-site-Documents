@@ -49,7 +49,7 @@
 <link rel="stylesheet" href="/assets/case-studies.css?v=20260706-capital-one-logo-1" />
 
 
-<link rel="stylesheet" href="/assets/aidesign.css?v=20260709-self-care-responsive-1" />
+<link rel="stylesheet" href="/assets/aidesign.css?v=20260710-idea-sidebar-1" />
 
 
   </head>
@@ -105,42 +105,135 @@
 
 
     <main id="top" class="aide-sample-main">
-      <h1>AI Design Lab:</h1>
-      <h3>Application experiments compare to test how AI structures solutions, makes interface decisions, and handles delivery.</h3>
-      <h2>Self Care (Beta) V1.0</h2>
-      <p class="aide-sample-description">A lock-screen self-care snack bar for quick mood check-ins. Name how you feel, note the small daily factors around you, and log a tiny check-in without opening a full app.</p>
-      <iframe
-        class="aide-sample-frame"
-        src="/aidesign/self_care.html"
-        title="Self Care (Beta) V1.0"
-        loading="eager"
-      ></iframe>
-      <button
-        class="aide-sample-preview"
-        type="button"
-        aria-haspopup="dialog"
-        aria-controls="selfCarePrototypeOverlay"
-        data-aide-prototype-open
-        data-prototype-src="/aidesign/self_care.html"
-        data-prototype-title="Self Care (Beta) V1.0"
-      >
-        <img
-          src="/assets/aidesign/self-care-thumbnail.svg"
-          alt=""
-          width="360"
-          height="678"
-          loading="eager"
-        />
-        <span class="sr-only">Open Self Care (Beta) V1.0</span>
-      </button>
+      <header class="aide-sample-intro">
+        <h1>AI Design Lab:</h1>
+        <h3>Prototypes to test ideas I&#39;ve been brewing on for years.</h3>
+      </header>
+
+      <div class="aide-idea-browser" data-aide-idea-browser>
+        <aside class="aide-idea-sidebar" aria-label="AI Design Lab ideas">
+          <p class="aide-idea-sidebar-label">Ideas</p>
+          <div class="aide-idea-list" role="tablist" aria-label="Choose an idea">
+
+              <button
+                class="aide-idea-tab is-active"
+                id="idea-tab-self-care"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                aria-controls="idea-panel-self-care"
+                tabindex="0"
+                data-aide-idea-tab="self-care"
+              >
+                <span class="aide-idea-index">01</span>
+                <span class="aide-idea-name">Self Care (Beta) V1.0</span>
+                <span class="aide-idea-arrow" aria-hidden="true">→</span>
+              </button>
+
+              <button
+                class="aide-idea-tab"
+                id="idea-tab-meeting-coach"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-controls="idea-panel-meeting-coach"
+                tabindex="-1"
+                data-aide-idea-tab="meeting-coach"
+              >
+                <span class="aide-idea-index">02</span>
+                <span class="aide-idea-name">Meeting Coach</span>
+                <span class="aide-idea-arrow" aria-hidden="true">→</span>
+              </button>
+
+          </div>
+        </aside>
+
+        <div class="aide-idea-workbench">
+
+            <section
+              class="aide-sample-project"
+              id="idea-panel-self-care"
+              role="tabpanel"
+              aria-labelledby="idea-tab-self-care"
+              data-aide-idea-panel="self-care"
+
+            >
+              <p class="aide-idea-meta">Claude standalone HTML · Self Care prototype</p>
+              <h2>Self Care (Beta) V1.0</h2>
+              <p class="aide-sample-description">A lock-screen self-care snack bar for quick mood check-ins. Name how you feel, note the small daily factors around you, and log a tiny check-in without opening a full app.</p>
+              <iframe
+                class="aide-sample-frame"
+                src="/aidesign/self_care.html"
+                title="Self Care (Beta) V1.0"
+                loading="eager"
+              ></iframe>
+              <button
+                class="aide-sample-preview"
+                type="button"
+                aria-haspopup="dialog"
+                aria-controls="aidePrototypeOverlay"
+                data-aide-prototype-open
+                data-prototype-src="/aidesign/self_care.html"
+                data-prototype-title="Self Care (Beta) V1.0"
+              >
+                <img
+                  src="/assets/aidesign/self-care-thumbnail.svg"
+                  alt=""
+                  width="360"
+                  height="678"
+                  loading="eager"
+                />
+                <span class="sr-only">Open Self Care (Beta) V1.0</span>
+              </button>
+            </section>
+
+            <section
+              class="aide-sample-project"
+              id="idea-panel-meeting-coach"
+              role="tabpanel"
+              aria-labelledby="idea-tab-meeting-coach"
+              data-aide-idea-panel="meeting-coach"
+              hidden
+            >
+              <p class="aide-idea-meta">Claude standalone HTML · Meeting Coach prototype</p>
+              <h2>Meeting Coach</h2>
+              <p class="aide-sample-description">A live lock-screen meeting coach that scrolls the conversation, tracks predetermined talking points and expertise, scores communication clarity, and separately signals whether the room is going well, mixed, or poorly.</p>
+              <iframe
+                class="aide-sample-frame"
+                data-src="/aidesign/meeting_coach.html"
+                title="Meeting Coach"
+                loading="lazy"
+              ></iframe>
+              <button
+                class="aide-sample-preview"
+                type="button"
+                aria-haspopup="dialog"
+                aria-controls="aidePrototypeOverlay"
+                data-aide-prototype-open
+                data-prototype-src="/aidesign/meeting_coach.html"
+                data-prototype-title="Meeting Coach"
+              >
+                <img
+                  src="/assets/aidesign/meeting-coach-app-thumbnail.png"
+                  alt=""
+                  width="313"
+                  height="540"
+                  loading="lazy"
+                />
+                <span class="sr-only">Open Meeting Coach</span>
+              </button>
+            </section>
+
+        </div>
+      </div>
     </main>
 
     <div
       class="aide-prototype-overlay"
-      id="selfCarePrototypeOverlay"
+      id="aidePrototypeOverlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Self Care (Beta) V1.0"
+      aria-label="Interactive AI Design Lab prototype"
       hidden
       data-aide-prototype-overlay
     >
@@ -149,7 +242,7 @@
       </button>
       <iframe
         class="aide-prototype-frame"
-        title="Self Care (Beta) V1.0"
+        title="Interactive AI Design Lab prototype"
         loading="lazy"
         data-aide-prototype-frame
       ></iframe>

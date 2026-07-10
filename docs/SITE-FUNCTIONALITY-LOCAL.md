@@ -103,7 +103,7 @@ That starts:
 ## What To Open In The Browser
 
 Main entry:
-- `http://localhost:3000`
+- `http://localhost:3000` (redirects to the Build sandbox)
 
 Live site:
 - `http://localhost:3000/livesite/`
@@ -128,10 +128,10 @@ Client admin login:
 
 ## Public Site Folder Layout
 
-Static source folders:
-- [`/Library/WebServer/Documents/livesite`](/Library/WebServer/Documents/livesite)
-- [`/Library/WebServer/Documents/comingsoon`](/Library/WebServer/Documents/comingsoon)
-- [`/Library/WebServer/Documents/build`](/Library/WebServer/Documents/build)
+Static variant folders:
+- Build, for every new public change: [`/Library/WebServer/Documents/build`](/Library/WebServer/Documents/build)
+- Livesite, for manually approved publication files only: [`/Library/WebServer/Documents/livesite`](/Library/WebServer/Documents/livesite)
+- Coming soon: [`/Library/WebServer/Documents/comingsoon`](/Library/WebServer/Documents/comingsoon)
 
 Shared assets used by those folders:
 - [`/Library/WebServer/Documents/assets`](/Library/WebServer/Documents/assets)
@@ -140,6 +140,12 @@ Shared assets used by those folders:
 Static FTP bundle commands:
 - `npm run livesite:bundle`
 - `npm run comingsoon:bundle`
+
+Build refresh command:
+- `npm run build:sync`
+
+General sync and VSCimage refreshes do not modify Livesite. Promote reviewed
+files from Build to Livesite manually.
 
 ## Passwords
 

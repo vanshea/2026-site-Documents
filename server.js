@@ -53,13 +53,9 @@ const vscimageOriginalsDir = path.join(vscimageDir, "originals");
 const vscimageGeneratedDir = path.join(vscimageDir, "generated");
 const vscimageConfigPath = path.join(vscimageDir, "config.json");
 const caseStudiesContentDir = path.join(rootDir, "content", "case-studies");
-const vscimageSyncLivesite = /^(1|true|yes)$/i.test(
-  String(process.env.VSCIMAGE_SYNC_LIVESITE || "").trim()
-);
 const homepageIndexPaths = [
   path.join(rootDir, "index.html"),
-  path.join(comingsoonDir, "index.html"),
-  ...(vscimageSyncLivesite ? [path.join(livesiteDir, "index.html")] : [])
+  path.join(comingsoonDir, "index.html")
 ];
 const featuredThumbSize = {
   width: 2400,
@@ -69,7 +65,6 @@ const publicRootFiles = new Set([
   "/analytics.js",
   "/experience.html",
   "/index.html",
-  "/index.html.en",
   "/script.js",
   "/styles.css",
   "/vscimage.css",
@@ -536,7 +531,7 @@ async function refreshStaticSiteCache() {
   await syncHomepageGeneratedGallery(config.gallery || []);
 
   const scriptPath = path.join(rootDir, "scripts", "materialize-static-variant.mjs");
-  const variants = vscimageSyncLivesite ? ["all"] : ["build"];
+  const variants = ["build"];
   const results = [];
 
   for (const variant of variants) {
@@ -555,9 +550,9 @@ async function refreshStaticSiteCache() {
   return {
     refreshed: [
       "homepage",
-      ...variants.flatMap((variant) => (variant === "all" ? ["livesite", "build"] : [variant]))
+      ...variants
     ],
-    skipped: vscimageSyncLivesite ? [] : ["livesite"],
+    skipped: ["livesite"],
     stdout: results.map((result) => result.stdout).filter(Boolean).join("\n"),
     stderr: results.map((result) => result.stderr).filter(Boolean).join("\n")
   };
@@ -2923,6 +2918,14 @@ app.get("/aidesign/self_care.html", (req, res) => {
   res.sendFile(path.join(rootDir, "content", "aidesign", "self_care.html"));
 });
 
+app.get("/aidesign/meeting_coach.html", (req, res) => {
+  res.sendFile(path.join(rootDir, "content", "aidesign", "meeting_coach.html"));
+});
+
+app.get("/aidesign/meeting_coach_demo.html", (req, res) => {
+  res.sendFile(path.join(rootDir, "content", "aidesign", "meeting_coach_demo.html"));
+});
+
 app.get(["/aidesign/experiments", "/aidesign/experiments/"], (req, res) => {
   const landing = getAiDesignLandingContent();
   const experiments = listAiDesignExperiments();
@@ -3706,6 +3709,11 @@ if (upload) {
     });
   });
 }
+
+app.get("/", (req, res) => {
+  const defaultSitePath = process.env.NODE_ENV === "production" ? "/livesite/" : "/build/";
+  res.redirect(defaultSitePath);
+});
 
 app.get("*", (req, res) => {
   const baseName = path.basename(req.path);

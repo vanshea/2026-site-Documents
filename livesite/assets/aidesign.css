@@ -36,12 +36,19 @@
 
 .aide-sample-main {
   display: grid;
-  gap: 18px;
+  gap: 30px;
   width: min(1180px, 92vw);
   min-height: 100vh;
   margin: 0 auto;
   padding: 28px 0;
   font-family: "Courier New", Courier, "Liberation Mono", monospace;
+}
+
+.aide-sample-intro {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
 }
 
 .aide-sample-main h1,
@@ -74,6 +81,119 @@
   color: var(--ink-soft);
   font-size: 1rem;
   line-height: 1.55;
+}
+
+.aide-idea-browser {
+  display: grid;
+  grid-template-columns: minmax(210px, 250px) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+
+.aide-idea-sidebar {
+  position: sticky;
+  top: 112px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.aide-idea-sidebar-label,
+.aide-idea-meta {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.aide-idea-list {
+  display: grid;
+  gap: 8px;
+}
+
+.aide-idea-tab {
+  width: 100%;
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 13px;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+  transition: 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.aide-idea-tab:hover {
+  border-color: color-mix(in srgb, var(--accent-2) 55%, var(--line));
+  color: var(--ink);
+  transform: translateX(2px);
+}
+
+.aide-idea-tab:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.aide-idea-tab.is-active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 12px 28px rgba(47, 36, 39, 0.16);
+}
+
+.aide-idea-index {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  opacity: 0.62;
+}
+
+.aide-idea-name {
+  min-width: 0;
+  font-family: "Lexend Deca", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.aide-idea-arrow {
+  font-size: 1.1rem;
+  transition: transform 180ms ease;
+}
+
+.aide-idea-tab.is-active .aide-idea-arrow {
+  transform: translateX(2px);
+}
+
+.aide-idea-workbench {
+  min-width: 0;
+}
+
+.aide-sample-project {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.aide-sample-project[hidden] {
+  display: none;
+}
+
+.aide-sample-project h2 {
+  color: var(--ink);
+  font-size: clamp(1.45rem, 2.6vw, 2.25rem);
+  line-height: 1.08;
 }
 
 .aide-sample-frame {
@@ -519,6 +639,18 @@
   display: block;
   width: 100%;
   height: auto;
+}
+
+.aide-image-card-visual {
+  aspect-ratio: 924 / 540;
+  background: #060810;
+}
+
+.aide-image-card-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .aide-self-care-card-visual {
@@ -1033,6 +1165,58 @@
 
   .aide-sample-main {
     width: min(100% - 32px, 1180px);
+    gap: 22px;
+    padding-top: 20px;
+  }
+
+  .aide-sample-intro {
+    padding-bottom: 18px;
+  }
+
+  .aide-idea-browser {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .aide-idea-sidebar {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    gap: 7px;
+    margin-inline: -16px;
+    padding: 10px 16px 12px;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    box-shadow: 0 10px 24px rgba(47, 36, 39, 0.08);
+    backdrop-filter: blur(16px);
+  }
+
+  .aide-idea-sidebar-label {
+    font-size: 0.68rem;
+  }
+
+  .aide-idea-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 1px 6px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
+  }
+
+  .aide-idea-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .aide-idea-tab {
+    flex: 0 0 min(72vw, 250px);
+    min-height: 58px;
+    scroll-snap-align: start;
+  }
+
+  .aide-idea-tab:hover {
+    transform: none;
   }
 
   .aide-sample-frame {

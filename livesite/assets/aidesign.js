@@ -1,3 +1,83 @@
+function resolveAiDesignPrototypePath(src) {
+  const value = String(src || "").trim();
+  if (
+    value.startsWith("/") &&
+    window.location.pathname.startsWith("/livesite/") &&
+    !value.startsWith("/livesite/")
+  ) {
+    return `/livesite${value}`;
+  }
+  return value;
+}
+
+(() => {
+  const browser = document.querySelector("[data-aide-idea-browser]");
+  if (!browser) return;
+
+  const tabs = Array.from(browser.querySelectorAll("[data-aide-idea-tab]"));
+  const panels = Array.from(browser.querySelectorAll("[data-aide-idea-panel]"));
+  if (!tabs.length || !panels.length) return;
+
+  function activateIdea(tab, updateHash = true) {
+    const slug = tab.getAttribute("data-aide-idea-tab");
+    const panel = panels.find(
+      (candidate) => candidate.getAttribute("data-aide-idea-panel") === slug
+    );
+    if (!slug || !panel) return;
+
+    tabs.forEach((candidate) => {
+      const active = candidate === tab;
+      candidate.classList.toggle("is-active", active);
+      candidate.setAttribute("aria-selected", String(active));
+      candidate.tabIndex = active ? 0 : -1;
+    });
+
+    panels.forEach((candidate) => {
+      candidate.hidden = candidate !== panel;
+    });
+
+    const frame = panel.querySelector(".aide-sample-frame[data-src]");
+    if (frame && !frame.hasAttribute("src")) {
+      frame.src = resolveAiDesignPrototypePath(frame.getAttribute("data-src"));
+      frame.removeAttribute("data-src");
+    }
+
+    tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+
+    if (updateHash && window.history && window.history.replaceState) {
+      window.history.replaceState(null, "", "#" + slug);
+    }
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => activateIdea(tab));
+    tab.addEventListener("keydown", (event) => {
+      const keyActions = {
+        ArrowRight: index + 1,
+        ArrowDown: index + 1,
+        ArrowLeft: index - 1,
+        ArrowUp: index - 1,
+        Home: 0,
+        End: tabs.length - 1
+      };
+      if (!(event.key in keyActions)) return;
+
+      event.preventDefault();
+      const nextIndex = Math.max(0, Math.min(tabs.length - 1, keyActions[event.key]));
+      tabs[nextIndex].focus();
+      activateIdea(tabs[nextIndex]);
+    });
+  });
+
+  const initialSlug = window.location.hash.replace(/^#/, "");
+  const initialTab = tabs.find(
+    (tab) => tab.getAttribute("data-aide-idea-tab") === initialSlug
+  );
+  if (initialTab) {
+    activateIdea(initialTab, false);
+  }
+})();
+
 (() => {
   const openers = Array.from(document.querySelectorAll("[data-aide-prototype-open]"));
   const overlay = document.querySelector("[data-aide-prototype-overlay]");
@@ -15,9 +95,10 @@
 
     activeOpener = opener;
     previousOverflow = document.body.style.overflow;
-    frame.src = src;
+    frame.src = resolveAiDesignPrototypePath(src);
     if (title) {
       frame.title = title;
+      overlay.setAttribute("aria-label", title);
     }
     overlay.hidden = false;
     document.body.style.overflow = "hidden";

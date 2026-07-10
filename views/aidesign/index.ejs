@@ -4,7 +4,7 @@
     <%- include("../partials/public_head", {
       pageTitle,
       metaDescription,
-      extraStyles: ["/assets/aidesign.css?v=20260709-self-care-responsive-1"]
+      extraStyles: ["/assets/aidesign.css?v=20260710-idea-sidebar-1"]
     }) %>
   </head>
   <body>
@@ -14,42 +14,83 @@
     <%- include("../partials/public_header", { currentPath }) %>
 
     <main id="top" class="aide-sample-main">
-      <h1><%= landing.intro %></h1>
-      <h3><%= landing.introDetail %></h3>
-      <h2><%= landing.standaloneIdea.title %></h2>
-      <p class="aide-sample-description"><%= landing.standaloneIdea.description %></p>
-      <iframe
-        class="aide-sample-frame"
-        src="<%= landing.standaloneIdea.href %>"
-        title="<%= landing.standaloneIdea.title %>"
-        loading="eager"
-      ></iframe>
-      <button
-        class="aide-sample-preview"
-        type="button"
-        aria-haspopup="dialog"
-        aria-controls="selfCarePrototypeOverlay"
-        data-aide-prototype-open
-        data-prototype-src="<%= landing.standaloneIdea.href %>"
-        data-prototype-title="<%= landing.standaloneIdea.title %>"
-      >
-        <img
-          src="/assets/aidesign/self-care-thumbnail.svg"
-          alt=""
-          width="360"
-          height="678"
-          loading="eager"
-        />
-        <span class="sr-only">Open <%= landing.standaloneIdea.title %></span>
-      </button>
+      <header class="aide-sample-intro">
+        <h1><%= landing.intro %></h1>
+        <h3><%= landing.introDetail %></h3>
+      </header>
+
+      <div class="aide-idea-browser" data-aide-idea-browser>
+        <aside class="aide-idea-sidebar" aria-label="AI Design Lab ideas">
+          <p class="aide-idea-sidebar-label">Ideas</p>
+          <div class="aide-idea-list" role="tablist" aria-label="Choose an idea">
+            <% landing.standaloneIdeas.forEach((idea, index) => { %>
+              <button
+                class="aide-idea-tab<%= index === 0 ? ' is-active' : '' %>"
+                id="idea-tab-<%= idea.slug %>"
+                type="button"
+                role="tab"
+                aria-selected="<%= index === 0 ? 'true' : 'false' %>"
+                aria-controls="idea-panel-<%= idea.slug %>"
+                tabindex="<%= index === 0 ? '0' : '-1' %>"
+                data-aide-idea-tab="<%= idea.slug %>"
+              >
+                <span class="aide-idea-index"><%= String(index + 1).padStart(2, '0') %></span>
+                <span class="aide-idea-name"><%= idea.title %></span>
+                <span class="aide-idea-arrow" aria-hidden="true">→</span>
+              </button>
+            <% }) %>
+          </div>
+        </aside>
+
+        <div class="aide-idea-workbench">
+          <% landing.standaloneIdeas.forEach((idea, index) => { %>
+            <section
+              class="aide-sample-project"
+              id="idea-panel-<%= idea.slug %>"
+              role="tabpanel"
+              aria-labelledby="idea-tab-<%= idea.slug %>"
+              data-aide-idea-panel="<%= idea.slug %>"
+              <%= index === 0 ? '' : 'hidden' %>
+            >
+              <p class="aide-idea-meta"><%= idea.meta %></p>
+              <h2><%= idea.title %></h2>
+              <p class="aide-sample-description"><%= idea.description %></p>
+              <iframe
+                class="aide-sample-frame"
+                <% if (index === 0) { %>src="<%= idea.href %>"<% } else { %>data-src="<%= idea.href %>"<% } %>
+                title="<%= idea.title %>"
+                loading="<%= index === 0 ? 'eager' : 'lazy' %>"
+              ></iframe>
+              <button
+                class="aide-sample-preview"
+                type="button"
+                aria-haspopup="dialog"
+                aria-controls="aidePrototypeOverlay"
+                data-aide-prototype-open
+                data-prototype-src="<%= idea.href %>"
+                data-prototype-title="<%= idea.title %>"
+              >
+                <img
+                  src="<%= idea.thumbnail %>"
+                  alt=""
+                  width="<%= idea.thumbnailWidth %>"
+                  height="<%= idea.thumbnailHeight %>"
+                  loading="<%= index === 0 ? 'eager' : 'lazy' %>"
+                />
+                <span class="sr-only">Open <%= idea.title %></span>
+              </button>
+            </section>
+          <% }) %>
+        </div>
+      </div>
     </main>
 
     <div
       class="aide-prototype-overlay"
-      id="selfCarePrototypeOverlay"
+      id="aidePrototypeOverlay"
       role="dialog"
       aria-modal="true"
-      aria-label="<%= landing.standaloneIdea.title %>"
+      aria-label="Interactive AI Design Lab prototype"
       hidden
       data-aide-prototype-overlay
     >
@@ -58,7 +99,7 @@
       </button>
       <iframe
         class="aide-prototype-frame"
-        title="<%= landing.standaloneIdea.title %>"
+        title="Interactive AI Design Lab prototype"
         loading="lazy"
         data-aide-prototype-frame
       ></iframe>
