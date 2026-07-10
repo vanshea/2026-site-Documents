@@ -145,6 +145,21 @@
                 <span class="aide-idea-arrow" aria-hidden="true">→</span>
               </button>
 
+              <button
+                class="aide-idea-tab"
+                id="idea-tab-contacts"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-controls="idea-panel-contacts"
+                tabindex="-1"
+                data-aide-idea-tab="contacts"
+              >
+                <span class="aide-idea-index">03</span>
+                <span class="aide-idea-name">Contacts</span>
+                <span class="aide-idea-arrow" aria-hidden="true">→</span>
+              </button>
+
           </div>
         </aside>
 
@@ -221,6 +236,43 @@
                   loading="lazy"
                 />
                 <span class="sr-only">Open Meeting Coach</span>
+              </button>
+            </section>
+
+            <section
+              class="aide-sample-project"
+              id="idea-panel-contacts"
+              role="tabpanel"
+              aria-labelledby="idea-tab-contacts"
+              data-aide-idea-panel="contacts"
+              hidden
+            >
+              <p class="aide-idea-meta">Claude standalone HTML · Contacts prototype</p>
+              <h2>Contacts</h2>
+              <p class="aide-sample-description">A people-first contact hub that brings conversations across channels into one prioritized view, surfaces who is waiting on you, and helps you prepare for the people in your next meeting.</p>
+              <iframe
+                class="aide-sample-frame"
+                data-src="/aidesign/Contact%20Prototype%20(standalone).html"
+                title="Contacts"
+                loading="lazy"
+              ></iframe>
+              <button
+                class="aide-sample-preview"
+                type="button"
+                aria-haspopup="dialog"
+                aria-controls="aidePrototypeOverlay"
+                data-aide-prototype-open
+                data-prototype-src="/aidesign/Contact%20Prototype%20(standalone).html"
+                data-prototype-title="Contacts"
+              >
+                <img
+                  src="/assets/aidesign/contacts-thumbnail.svg"
+                  alt=""
+                  width="360"
+                  height="678"
+                  loading="lazy"
+                />
+                <span class="sr-only">Open Contacts</span>
               </button>
             </section>
 

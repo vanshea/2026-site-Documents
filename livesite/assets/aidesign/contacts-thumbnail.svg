@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 678" role="img" aria-labelledby="title description">
+  <title id="title">Contacts prototype preview</title>
+  <desc id="description">A dark phone screen showing prioritized contacts.</desc>
+  <defs>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161622"/>
+      <stop offset="1" stop-color="#050507"/>
+    </linearGradient>
+    <linearGradient id="mia" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#c77b54"/>
+      <stop offset="1" stop-color="#9a5638"/>
+    </linearGradient>
+    <linearGradient id="priya" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#7b6bc7"/>
+      <stop offset="1" stop-color="#584a9e"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="678" rx="42" fill="#0d0d0f"/>
+  <rect x="16" y="16" width="328" height="646" rx="34" fill="url(#screen)" stroke="#3a3a3c" stroke-width="2"/>
+  <rect x="140" y="31" width="80" height="18" rx="9" fill="#050507"/>
+  <text x="38" y="92" fill="#8e8e93" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600" letter-spacing="1">FRIDAY, JULY 10</text>
+  <text x="38" y="130" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="34" font-weight="700">Today</text>
+  <rect x="32" y="158" width="296" height="42" rx="21" fill="#2c2c2e"/>
+  <rect x="35" y="161" width="94" height="36" rx="18" fill="#f2f2f7"/>
+  <text x="57" y="184" fill="#050507" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600">Focused</text>
+  <text x="152" y="184" fill="#aeaeb2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13">Groups</text>
+  <text x="240" y="184" fill="#aeaeb2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13">Everyone</text>
+  <text x="42" y="232" fill="#8e8e93" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13">3 people waiting on you</text>
+  <rect x="32" y="247" width="296" height="238" rx="25" fill="#1c1c1e"/>
+  <circle cx="70" cy="294" r="22" fill="url(#mia)" stroke="#e8b14e" stroke-width="2"/>
+  <text x="58" y="299" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600">MT</text>
+  <text x="104" y="289" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600">Mia Tanaka</text>
+  <text x="104" y="310" fill="#e8b14e" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Needs sign-off before 3 PM</text>
+  <line x1="104" y1="329" x2="312" y2="329" stroke="#3a3a3c"/>
+  <circle cx="70" cy="368" r="22" fill="url(#priya)"/>
+  <text x="58" y="373" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600">PS</text>
+  <text x="104" y="363" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600">Priya Sharma</text>
+  <text x="104" y="384" fill="#aeaeb2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Sent contract redlines</text>
+  <line x1="104" y1="403" x2="312" y2="403" stroke="#3a3a3c"/>
+  <circle cx="70" cy="442" r="22" fill="#477557"/>
+  <text x="65" y="447" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="600">D</text>
+  <text x="104" y="437" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600">Dad</text>
+  <text x="104" y="458" fill="#aeaeb2" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12">Following up on Tuesday's call</text>
+  <rect x="74" y="566" width="212" height="58" rx="29" fill="#27272a" stroke="#49494d"/>
+  <circle cx="112" cy="595" r="18" fill="url(#mia)"/>
+  <circle cx="137" cy="595" r="18" fill="url(#priya)" stroke="#27272a" stroke-width="3"/>
+  <text x="168" y="591" fill="#fff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600">Mia + 2 waiting</text>
+  <text x="168" y="608" fill="#e8b14e" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10">Sign-off needed by 3 PM</text>
+</svg>
