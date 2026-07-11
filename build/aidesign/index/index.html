@@ -49,7 +49,7 @@
 <link rel="stylesheet" href="/build/assets/case-studies.css?v=20260706-capital-one-logo-1" />
 
 
-<link rel="stylesheet" href="/build/assets/aidesign.css?v=20260710-idea-sidebar-1" />
+<link rel="stylesheet" href="/build/assets/aidesign.css?v=20260711-linkedin-share-1" />
 
 
   </head>
@@ -126,7 +126,7 @@
                 data-aide-idea-tab="self-care"
               >
                 <span class="aide-idea-index">01</span>
-                <span class="aide-idea-name">Self Care (Beta) V1.0</span>
+                <span class="aide-idea-name">Self Care</span>
                 <span class="aide-idea-arrow" aria-hidden="true">→</span>
               </button>
 
@@ -145,6 +145,21 @@
                 <span class="aide-idea-arrow" aria-hidden="true">→</span>
               </button>
 
+              <button
+                class="aide-idea-tab"
+                id="idea-tab-contacts"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                aria-controls="idea-panel-contacts"
+                tabindex="-1"
+                data-aide-idea-tab="contacts"
+              >
+                <span class="aide-idea-index">03</span>
+                <span class="aide-idea-name">Contact</span>
+                <span class="aide-idea-arrow" aria-hidden="true">→</span>
+              </button>
+
           </div>
         </aside>
 
@@ -159,12 +174,12 @@
 
             >
               <p class="aide-idea-meta">Claude standalone HTML · Self Care prototype</p>
-              <h2>Self Care (Beta) V1.0</h2>
+              <h2>Self Care</h2>
               <p class="aide-sample-description">A lock-screen self-care snack bar for quick mood check-ins. Name how you feel, note the small daily factors around you, and log a tiny check-in without opening a full app.</p>
               <iframe
                 class="aide-sample-frame"
                 src="/build/aidesign/self_care.html"
-                title="Self Care (Beta) V1.0"
+                title="Self Care"
                 loading="eager"
               ></iframe>
               <button
@@ -174,7 +189,7 @@
                 aria-controls="aidePrototypeOverlay"
                 data-aide-prototype-open
                 data-prototype-src="/build/aidesign/self_care.html"
-                data-prototype-title="Self Care (Beta) V1.0"
+                data-prototype-title="Self Care"
               >
                 <img
                   src="/build/assets/aidesign/self-care-thumbnail.svg"
@@ -183,8 +198,18 @@
                   height="678"
                   loading="eager"
                 />
-                <span class="sr-only">Open Self Care (Beta) V1.0</span>
+                <span class="sr-only">Open Self Care</span>
               </button>
+              <section class="aide-problem-statement" aria-labelledby="self-care-problem-title">
+                <h3 id="self-care-problem-title">Self Care — The Problem</h3>
+                <p>Self-care is consistently the first commitment people deprioritize — not from lack of intent, but because of <em>decision fatigue</em>: the well-documented depletion of willpower and judgment that accumulates across a day of choices. By evening, the mental resources needed to choose a healthy meal, go for a walk, or simply rest are the same resources already spent all day on everyone else's needs. The result is a predictable, almost mechanical pattern of self-neglect — not a personal failing, but a resource-allocation problem.</p>
+                <p>Self Care addresses this by lowering the decision cost of caring for yourself: small, well-timed nudges and low-friction choices offered at the moments willpower is already thin, rather than demanding fresh discipline on top of an already-depleted reserve. Less self-negotiation, less guilt, more room for care to actually happen.</p>
+                <p class="aide-problem-sources"><em>Sources: Baumeister, R. F. et al. (1998), "Ego Depletion: Is the Active Self a Limited Resource?", Journal of Personality and Social Psychology; Vohs, K. D. et al. (2005), "Decision Fatigue Exhausts Self-Regulatory Resources"; Tierney, J. (2011), "Do You Suffer From Decision Fatigue?", The New York Times Magazine.</em></p>
+                <div class="aide-problem-share">
+                  <button class="aide-linkedin-share" type="button" data-aide-linkedin-share data-share-url="https://www.vanshea.com/aidesign/share/self-care.html?v=20260711-2" aria-label="Share the Self Care problem on LinkedIn"><img class="aide-share-app-icon" src="/build/assets/aidesign/self-care-thumbnail.svg" alt="" width="32" height="32" /><span>Share on LinkedIn</span><svg class="aide-share-linkedin-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 7.8H1.7V22h3.6V7.8ZM3.5 2A2.1 2.1 0 1 0 3.5 6.2 2.1 2.1 0 0 0 3.5 2ZM22.3 13.9c0-4.3-2.3-6.4-5.4-6.4a4.7 4.7 0 0 0-4.2 2.3v-2h-3.6V22h3.6v-7c0-1.9.4-3.7 2.7-3.7 2.3 0 2.3 2.1 2.3 3.8V22h3.6l1-8.1Z"/></svg></button>
+                  <span class="aide-share-status" role="status" aria-live="polite"></span>
+                </div>
+              </section>
             </section>
 
             <section
@@ -214,14 +239,72 @@
                 data-prototype-title="Meeting Coach"
               >
                 <img
-                  src="/build/assets/aidesign/meeting-coach-app-thumbnail.png"
+                  src="/build/assets/aidesign/meeting-coach-app-thumbnail.png?v=20260711-thumbnail-2"
                   alt=""
-                  width="313"
-                  height="540"
+                  width="360"
+                  height="678"
                   loading="lazy"
                 />
                 <span class="sr-only">Open Meeting Coach</span>
               </button>
+              <section class="aide-problem-statement" aria-labelledby="meeting-coach-problem-title">
+                <h3 id="meeting-coach-problem-title">Meeting Coach — The Problem</h3>
+                <p>Knowledge workers spend an average of 18-23 hours a week in meetings, yet studies on "meeting recovery syndrome" show that poorly run meetings leave a residue of fatigue and unresolved tension that follows people into their next task. The core issue isn't meeting <em>quantity</em> — it's the absence of structure around preparation, real-time facilitation, and follow-through. Without a clear thread connecting what was decided, who owns what, and what changed as a result, meetings become isolated events rather than links in a chain of progress. This creates a quiet but corrosive form of organizational memory loss: decisions get re-litigated, action items evaporate, and people leave meetings uncertain whether their time was well spent.</p>
+                <p>Meeting Coach reduces this by acting as a steady hand across the full meeting lifecycle — helping people walk in prepared, stay oriented to purpose while they're in it, and leave with clarity on what happens next. Less re-explaining, less redundant discussion, more confidence that each meeting actually moved something forward.</p>
+                <p class="aide-problem-sources"><em>Sources: Allen, J. A., Mroz, J. et al., University of Nebraska Omaha, research on meeting recovery syndrome; "Why am I so exhausted?: Exploring Meeting-to-Work Transition Time and Recovery from Virtual Meeting Fatigue," PMC/National Institutes of Health.</em></p>
+                <div class="aide-problem-share">
+                  <button class="aide-linkedin-share" type="button" data-aide-linkedin-share data-share-url="https://www.vanshea.com/aidesign/share/meeting-coach.html?v=20260711-2" aria-label="Share the Meeting Coach problem on LinkedIn"><img class="aide-share-app-icon" src="/build/assets/aidesign/meeting-coach-app-thumbnail.png?v=20260711-thumbnail-2" alt="" width="32" height="32" /><span>Share on LinkedIn</span><svg class="aide-share-linkedin-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 7.8H1.7V22h3.6V7.8ZM3.5 2A2.1 2.1 0 1 0 3.5 6.2 2.1 2.1 0 0 0 3.5 2ZM22.3 13.9c0-4.3-2.3-6.4-5.4-6.4a4.7 4.7 0 0 0-4.2 2.3v-2h-3.6V22h3.6v-7c0-1.9.4-3.7 2.7-3.7 2.3 0 2.3 2.1 2.3 3.8V22h3.6l1-8.1Z"/></svg></button>
+                  <span class="aide-share-status" role="status" aria-live="polite"></span>
+                </div>
+              </section>
+            </section>
+
+            <section
+              class="aide-sample-project"
+              id="idea-panel-contacts"
+              role="tabpanel"
+              aria-labelledby="idea-tab-contacts"
+              data-aide-idea-panel="contacts"
+              hidden
+            >
+              <p class="aide-idea-meta">Claude standalone HTML · Contact prototype</p>
+              <h2>Contact</h2>
+              <p class="aide-sample-description">A people-first contact hub that brings conversations across channels into one prioritized view, surfaces who is waiting on you, and helps you prepare for the people in your next meeting.</p>
+              <iframe
+                class="aide-sample-frame"
+                data-src="/build/aidesign/Contact%20Prototype%20(standalone).html"
+                title="Contact"
+                loading="lazy"
+              ></iframe>
+              <button
+                class="aide-sample-preview"
+                type="button"
+                aria-haspopup="dialog"
+                aria-controls="aidePrototypeOverlay"
+                data-aide-prototype-open
+                data-prototype-src="/build/aidesign/Contact%20Prototype%20(standalone).html"
+                data-prototype-title="Contact"
+              >
+                <img
+                  src="/build/assets/aidesign/contacts-thumbnail.svg?v=20260711-thumbnail-2"
+                  alt=""
+                  width="360"
+                  height="678"
+                  loading="lazy"
+                />
+                <span class="sr-only">Open Contact</span>
+              </button>
+              <section class="aide-problem-statement" aria-labelledby="contact-problem-title">
+                <h3 id="contact-problem-title">Contact — The Problem</h3>
+                <p>The average knowledge worker checks 6-10 communication apps daily — Messages, Mail, Slack, WhatsApp, Teams, Phone — each with its own inbox, notification style, and mental model. Every app-switch carries a hidden tax: cognitive psychologists call it <em>task-switching cost</em>, the residual attention left behind each time your brain re-orients to a new context. Multiply that across dozens of daily switches, and the result isn't just lost time — it's cumulative cognitive load, the working-memory strain of holding open threads across fragmented systems.</p>
+                <p>The deeper issue is that these tools organize around <em>channels</em> (which app) and <em>objectives</em> (which meeting, which task) — not around the people we're actually accountable to. So we lose the thread on who's waiting, who matters most today, and what they actually need, buried under a pile of undifferentiated notifications.</p>
+                <p>Contact reduces this load by collapsing every channel into one relationship-centered layer — prioritizing people over platforms, so your attention goes to who needs you, not which app pinged you. Less switching, less noise, more presence with the people who matter.</p>
+                <p class="aide-problem-sources"><em>Sources: Leroy, S. (2009), "Why is it so hard to do my work?", Organizational Behavior and Human Decision Processes — origin of "attention residue"; Mark, G. et al., UC Irvine research on interruption recovery time; American Psychological Association, research on multitasking and switch costs.</em></p>
+                <div class="aide-problem-share">
+                  <button class="aide-linkedin-share" type="button" data-aide-linkedin-share data-share-url="https://www.vanshea.com/aidesign/share/contact.html?v=20260711-2" aria-label="Share the Contact problem on LinkedIn"><img class="aide-share-app-icon" src="/build/assets/aidesign/contacts-thumbnail.svg?v=20260711-thumbnail-2" alt="" width="32" height="32" /><span>Share on LinkedIn</span><svg class="aide-share-linkedin-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 7.8H1.7V22h3.6V7.8ZM3.5 2A2.1 2.1 0 1 0 3.5 6.2 2.1 2.1 0 0 0 3.5 2ZM22.3 13.9c0-4.3-2.3-6.4-5.4-6.4a4.7 4.7 0 0 0-4.2 2.3v-2h-3.6V22h3.6v-7c0-1.9.4-3.7 2.7-3.7 2.3 0 2.3 2.1 2.3 3.8V22h3.6l1-8.1Z"/></svg></button>
+                  <span class="aide-share-status" role="status" aria-live="polite"></span>
+                </div>
+              </section>
             </section>
 
         </div>
@@ -360,6 +443,6 @@
 
     <script src="/build/analytics.js"></script>
     <script src="/build/script.js"></script>
-    <script src="/build/assets/aidesign.js"></script>
+    <script src="/build/assets/aidesign.js?v=20260711-linkedin-share-1"></script>
   </body>
 </html>

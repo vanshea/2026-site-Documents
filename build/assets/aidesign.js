@@ -136,6 +136,75 @@ function resolveAiDesignPrototypePath(src) {
 })();
 
 (() => {
+  const buttons = Array.from(document.querySelectorAll("[data-aide-linkedin-share]"));
+  if (!buttons.length) return;
+
+  function fallbackCopy(text) {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    return copied;
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const shareUrl = button.getAttribute("data-share-url");
+      const statement = button.closest(".aide-problem-statement");
+      const status = button.parentElement.querySelector(".aide-share-status");
+      if (!shareUrl || !statement) return;
+
+      const problem = Array.from(statement.querySelectorAll("h3, h4, p"))
+        .map((node) => node.textContent.trim())
+        .filter(Boolean)
+        .join("\n\n");
+      const shareText = `${problem}\n\n${shareUrl}`;
+      const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+      const shareWindow = window.open(linkedInUrl, "_blank");
+      if (shareWindow) shareWindow.opener = null;
+
+      const showStatus = (message) => {
+        if (!status) return;
+        status.textContent = message;
+        window.setTimeout(() => {
+          status.textContent = "";
+        }, 7000);
+      };
+
+      const copyFallback = () => {
+        try {
+          showStatus(
+            fallbackCopy(shareText)
+              ? "Problem text copied — paste it into your LinkedIn post."
+              : "LinkedIn opened. Copy this problem statement if you want to add it to the post."
+          );
+        } catch (error) {
+          showStatus("LinkedIn opened. Copy this problem statement if you want to add it to the post.");
+        }
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(shareText).then(
+          () => showStatus("Problem text copied — paste it into your LinkedIn post."),
+          copyFallback
+        );
+      } else {
+        copyFallback();
+      }
+
+      if (!shareWindow) {
+        showStatus("Pop-up blocked. Allow pop-ups, then try sharing again.");
+      }
+    });
+  });
+})();
+
+(() => {
   const prototype = document.querySelector("[data-stock-prototype]");
   if (!prototype) return;
 

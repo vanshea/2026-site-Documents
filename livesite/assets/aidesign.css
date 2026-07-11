@@ -83,6 +83,97 @@
   line-height: 1.55;
 }
 
+.aide-problem-statement {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 640px;
+  margin-top: 14px;
+  padding: clamp(24px, 4vw, 36px);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--accent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--paper) 88%, var(--accent) 12%);
+}
+
+.aide-problem-statement h3 {
+  margin: 0;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.25;
+}
+
+.aide-problem-statement p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.aide-problem-statement .aide-problem-sources {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  opacity: 0.82;
+  font-style: italic;
+}
+
+.aide-problem-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.aide-linkedin-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 12px 6px 6px;
+  border: 1px solid color-mix(in srgb, #0a66c2 72%, var(--line));
+  border-radius: 10px;
+  background: #0a66c2;
+  color: #fff;
+  font: 700 0.86rem/1 "Open Sans", sans-serif;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.aide-linkedin-share:hover {
+  transform: translateY(-1px);
+  background: #004182;
+  box-shadow: 0 8px 20px rgba(10, 102, 194, 0.2);
+}
+
+.aide-linkedin-share:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.aide-share-app-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  object-fit: cover;
+  object-position: top center;
+  background: #0d0d0f;
+}
+
+.aide-share-linkedin-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.aide-share-status {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
 .aide-idea-browser {
   display: grid;
   grid-template-columns: minmax(210px, 250px) minmax(0, 1fr);
@@ -1159,6 +1250,10 @@
 }
 
 @media (max-width: 720px) {
+  .aide-problem-statement {
+    max-width: none;
+  }
+
   .aide-main {
     gap: 46px;
   }
