@@ -69,42 +69,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
+    />
+    <link
       href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
-    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20260706-work-tabs-contrast-1" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" /></noscript>
+    <link rel="stylesheet" href="styles.css?v=20260714-home-hero-padding-1" />
   </head>
   <body>
+    <a class="skip-link" href="#top">Skip to content</a>
     <div class="bg-shape bg-shape-a"></div>
     <div class="bg-shape bg-shape-b"></div>
 
     <header class="site-header">
       <a href="#top" class="brand" aria-label="Back to top">
         <picture>
-          <source
-            id="brandLogoDarkSource"
-            srcset="assets/sm_logo_hor_3x.png"
-            media="(prefers-color-scheme: dark)"
-          />
           <img
             id="brandLogoLightImage"
             class="brand-logo"
-            src="assets/sm_logo_hor_3x.png"
+            src="/assets/new-logo-mark.svg"
+            data-logo-light="/assets/new-logo-mark.svg"
+            data-logo-dark="/assets/new-logo-mark-lite.svg"
             alt="Van Shea Creative"
-            width="889"
-            height="192"
+            width="56"
+            height="56"
           />
         </picture>
+        <span class="brand-name">Van Shea Creative</span>
       </a>
-      <!--
-      <div class="theme-switcher theme-switcher-mini" role="group" aria-label="Choose site theme">
-        <button class="theme-link" type="button" data-theme="theme1" aria-label="Clear" aria-pressed="false"></button>
-        <button class="theme-link" type="button" data-theme="theme2" aria-label="Tinted" aria-pressed="false"></button>
-        <button class="theme-link" type="button" data-theme="theme3" aria-label="High Contrast" aria-pressed="false"></button>
-        <button class="theme-link" type="button" data-theme="theme4" aria-label="Wild" aria-pressed="false"></button>
-      </div>
-      -->
       <button
         class="nav-toggle"
         type="button"
@@ -120,33 +118,33 @@
         </span>
       </button>
       <nav id="siteNav" class="nav">
-        <a href="#work" aria-current="page">Work</a>
+        <a href="#work">Work</a>
         <a href="/case-studies">Case Studies</a>
-        <a href="/aidesign">AIdesign</a>
+        <a href="/aidesign/">AIdesign</a>
         <a href="/blog/">Blog</a>
       </nav>
     </header>
 
-    <main id="top">
+    <main id="top" class="home-main">
       <section class="hero reveal">
         <!-- <p class="eyebrow">Design · Delaware</p> -->
         <h1>Human Agency Design</h1>
         
-        <h3 class="lead">
+        <p class="lead">
           Making design, art, and AI work together to ensure complex systems are understandable, navigable, and humane.
-        </h3>
-        
+        </p>
+        <a class="btn hero-cta" href="#contact">Start a project</a>
       </section>
 
       <section id="work" class="work reveal" data-filter-scope>
         <div class="section-head">
-          <h2>Selected Work</h2>
-          <div class="work-filter-panel" aria-label="Selected work views">
-            <div class="work-type-tabs" role="tablist" aria-label="Work context">
-              <button class="work-type-tab active" type="button" role="tab" data-work-type="corporate" aria-selected="true">
+          <h2 class="sr-only">Selected Work</h2>
+          <div class="work-filter-panel">
+            <div class="work-type-tabs" role="group" aria-label="Filter selected work by context">
+              <button class="work-type-tab active" type="button" data-work-type="corporate" aria-pressed="true">
                 Corporate
               </button>
-              <button class="work-type-tab" type="button" role="tab" data-work-type="independent" aria-selected="false">
+              <button class="work-type-tab" type="button" data-work-type="independent" aria-pressed="false">
                 Independent
               </button>
             </div>
@@ -156,26 +154,26 @@
         <div class="grid" data-filter-grid>
           <!-- VSCIMAGE_GENERATED_START -->
           <article class="card reveal generated-card" data-category="service-design" data-work-type="corporate" data-designation="corporate" data-generated="true">
-            <a class="work-link" data-project-id="generated_m-t3200x1800-1777582622640" href="/case-studies/mt-bank-commercial-banking-transformation" data-detail-url="/case-studies/mt-bank-commercial-banking-transformation" data-lightbox-src="assets/vscimage/generated/m-t3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="M&amp;T Bank Case Study" data-lightbox-description="">
-              <img class="card-image" src="assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp" alt="Preview image for M&amp;T Bank Case Study" loading="lazy" />
+            <a class="work-link" data-project-id="generated_m-t3200x1800-1777582622640" href="/case-studies/mt-bank-commercial-banking-transformation" data-detail-url="/case-studies/mt-bank-commercial-banking-transformation" data-lightbox-src="assets/vscimage/generated/m-t3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/m-t3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="M&amp;T Bank Case Study" data-lightbox-description="A service design program that mapped commercial lending complexity and aligned teams around a clearer future state.">
+              <img class="card-image" src="assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>M&amp;T Bank Case Study</h3>
             </a>
           </article>
           <article class="card reveal generated-card" data-category="service-design" data-work-type="corporate" data-designation="corporate" data-generated="true">
-            <a class="work-link" data-project-id="generated_vanguard3200x1800-1777582623149" href="/case-studies/vanguard-innovation-lab-integration" data-detail-url="/case-studies/vanguard-innovation-lab-integration" data-lightbox-src="assets/vscimage/generated/vanguard3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Vanguard Case Study" data-lightbox-description="">
-              <img class="card-image" src="assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp" alt="Preview image for Vanguard Case Study" loading="lazy" />
+            <a class="work-link" data-project-id="generated_vanguard3200x1800-1777582623149" href="/case-studies/vanguard-innovation-lab-integration" data-detail-url="/case-studies/vanguard-innovation-lab-integration" data-lightbox-src="assets/vscimage/generated/vanguard3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Vanguard Case Study" data-lightbox-description="Research and strategy connecting smart-home voice interfaces, security, business needs, analytics, and legacy systems.">
+              <img class="card-image" src="assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Vanguard Case Study</h3>
             </a>
           </article>
           <article class="card reveal generated-card" data-category="ux-design" data-work-type="corporate" data-designation="corporate" data-generated="true">
             <a class="work-link" data-project-id="generated_large-web-portfolio-pat760x570-1772332872992" href="/case-studies/capital-one-gesture-patent" data-detail-url="/case-studies/capital-one-gesture-patent" data-lightbox-src="assets/vscimage/generated/capital-one-patent-diagram-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/capital-one-patent-diagram-fullscreen-3200x1800.webp" data-lightbox-title="Capital One Patent" data-lightbox-description="Led a small team from usability findings through prototype development, hackathon recognition, executive review, and patent collaboration." data-lightbox-link-url="http://www.vanshea.com/case-studies/capital-one-gesture-patent">
-              <img class="card-image" src="assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp" alt="Preview image for Capital One Patent" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/capital-one-patent-diagram-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Capital One Patent</h3>
             </a>
           </article>
           <article class="card reveal generated-card" data-category="branding" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_politico-1776701606120" href="assets/vscimage/generated/politico-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/politico-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/politico-fullscreen-3200x1800.webp" data-lightbox-title="POLITICO" data-lightbox-description="In 2008, I was asked to design a logo for a new news company.">
-              <img class="card-image" src="assets/vscimage/generated/politico-thumb-760x570.webp" alt="Preview image for POLITICO" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/politico-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>POLITICO</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -183,8 +181,8 @@
             </button>
           </article>
           <article class="card reveal generated-card" data-category="ux-design" data-work-type="independent" data-designation="independent" data-generated="true">
-            <a class="work-link" data-project-id="generated_large-web-portfolio-fluidx3200x1800-1772332870827" href="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Product Design for Crypto Exchange" data-lightbox-description="">
-              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp" alt="Preview image for Product Design for Crypto Exchange" loading="lazy" />
+            <a class="work-link" data-project-id="generated_large-web-portfolio-fluidx3200x1800-1772332870827" href="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Product Design for Crypto Exchange" data-lightbox-description="Product interface design for a cryptocurrency exchange.">
+              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-fluidx3200x1800-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Product Design for Crypto Exchange</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -192,14 +190,14 @@
             </button>
           </article>
           <article class="card reveal generated-card" data-category="education" data-work-type="corporate" data-designation="corporate" data-generated="true">
-            <a class="work-link" data-project-id="generated_nyu-2000-1-2000x1000-1777582589877" href="/case-studies/nyu-curriculum-alignment" data-detail-url="/case-studies/nyu-curriculum-alignment" data-lightbox-src="assets/vscimage/generated/nyu-2000-1-2000x1000-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/nyu-2000-1-2000x1000-fullscreen-3200x1800.webp" data-lightbox-title="NYU Contributions" data-lightbox-description="">
-              <img class="card-image" src="assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp" alt="Preview image for NYU Contributions" loading="lazy" />
+            <a class="work-link" data-project-id="generated_nyu-2000-1-2000x1000-1777582589877" href="/case-studies/nyu-curriculum-alignment" data-detail-url="/case-studies/nyu-curriculum-alignment" data-lightbox-src="assets/vscimage/generated/nyu-2000-1-2000x1000-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/nyu-2000-1-2000x1000-fullscreen-3200x1800.webp" data-lightbox-title="NYU Contributions" data-lightbox-description="A curriculum redesign that connected information architecture to modern UX research and practice.">
+              <img class="card-image" src="assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>NYU Contributions</h3>
             </a>
           </article>
           <article class="card reveal generated-card" data-category="ux-design" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_exchange-1440-v01-default-1776702887536" href="assets/vscimage/generated/exchange-1440-v01-default-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/exchange-1440-v01-default-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/exchange-1440-v01-default-fullscreen-3200x1800.webp" data-lightbox-title="Candlestick Chart View for Crypto Project" data-lightbox-description="Candlestick chart interface for a cryptocurrency product.">
-              <img class="card-image" src="assets/vscimage/generated/exchange-1440-v01-default-thumb-760x570.webp" alt="Preview image for Candlestick Chart View for Crypto Project" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/exchange-1440-v01-default-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Candlestick Chart View for Crypto Project</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -208,7 +206,7 @@
           </article>
           <article class="card reveal generated-card" data-category="branding" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_large-web-portfolio-greif3200x1800-1772332871783" href="assets/vscimage/generated/large-web-portfolio-greif3200x1800-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Greif Plus Logo" data-lightbox-description="Brand identity for a client portal.">
-              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-thumb-760x570.webp" alt="Preview image for Greif Plus Logo" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-greif3200x1800-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Greif Plus Logo</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -217,7 +215,7 @@
           </article>
           <article class="card reveal generated-card" data-category="illustration" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_large-web-portfolio-gore3200x1800-1772332871171" href="assets/vscimage/generated/large-web-portfolio-gore3200x1800-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-gore3200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-gore3200x1800-fullscreen-3200x1800.webp" data-lightbox-title="3D Illustration for Wiring Product" data-lightbox-description="3D product illustration created in Blender.">
-              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-gore3200x1800-thumb-760x570.webp" alt="Preview image for 3D Illustration for Wiring Product" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-gore3200x1800-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>3D Illustration for Wiring Product</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -225,8 +223,8 @@
             </button>
           </article>
           <article class="card reveal generated-card" data-category="all" data-work-type="independent" data-designation="independent" data-generated="true">
-            <a class="work-link" data-project-id="generated_large-web-portfolio-greif-1772332871523" href="assets/vscimage/generated/large-web-portfolio-greif-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-greif-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-greif-large-1900x1600.webp" data-lightbox-title="Greif Catalog Cover Design 2025" data-lightbox-description="">
-              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-greif-thumb-760x570.webp" alt="Preview image for Greif Catalog Cover Design 2025" loading="lazy" />
+            <a class="work-link" data-project-id="generated_large-web-portfolio-greif-1772332871523" href="assets/vscimage/generated/large-web-portfolio-greif-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-greif-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-greif-large-1900x1600.webp" data-lightbox-title="Greif Catalog Cover Design 2025" data-lightbox-description="2025 catalog cover design for Greif.">
+              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-greif-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Greif Catalog Cover Design 2025</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -235,7 +233,7 @@
           </article>
           <article class="card reveal generated-card" data-category="illustration" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_large-web-portfolio-airdolly23200x1800-1772332870266" href="assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-fullscreen-3200x1800.webp" data-lightbox-title="Isometric Illustration" data-lightbox-description="Isometric illustration created for AirDolly.">
-              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-thumb-760x570.webp" alt="Preview image for Isometric Illustration" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/large-web-portfolio-airdolly23200x1800-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Isometric Illustration</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -244,7 +242,7 @@
           </article>
           <article class="card reveal generated-card" data-category="illustration" data-work-type="independent" data-designation="independent" data-generated="true">
             <a class="work-link" data-project-id="generated_nft-1776703281219" href="assets/vscimage/generated/sketches-and-nfts-large-1900x1600.webp" data-lightbox-src="assets/vscimage/generated/sketches-and-nfts-large-1900x1600.webp" data-fullscreen-src="assets/vscimage/generated/sketches-and-nfts-fullscreen-3200x1800.webp" data-lightbox-title="Sketches and NFTs" data-lightbox-description="Original sketches and digital collectible artwork." data-lightbox-link-text="for sale here" data-lightbox-link-url="https://opensea.io/item/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/16558468591630651215346334032891504440586029420939591605290779045548959727617">
-              <img class="card-image" src="assets/vscimage/generated/sketches-and-nfts-thumb-760x570.webp" alt="Preview image for Sketches and NFTs" loading="lazy" />
+              <img class="card-image" src="assets/vscimage/generated/sketches-and-nfts-thumb-760x570.webp" alt="" loading="lazy" />
               <h3>Sketches and NFTs</h3>
             </a>
             <button class="card-fullscreen" type="button" aria-label="View generated image in fullscreen">
@@ -293,7 +291,6 @@
           <div
             id="recommendationsTrack"
             class="recommendations-track"
-            dir="rtl"
             tabindex="0"
             role="region"
             aria-roledescription="carousel"
@@ -302,8 +299,6 @@
             <!-- Recommendation cards are plain HTML so new quotes can be added by duplicating an article. -->
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Recommendation from Ashley Montgomery"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -327,8 +322,6 @@
 
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Recommendation from Patti Carlson"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -350,8 +343,6 @@
 
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Recommendation from Steven Capriotti"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -371,8 +362,6 @@
 
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Recommendation from Claudio Baptista"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -391,8 +380,6 @@
 
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Recommendation from Jan Grabski"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -414,8 +401,6 @@
 
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Anonymous recommendation from M&T Bank commercial banking executive"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -435,8 +420,6 @@
 
             <article
               class="recommendation-card"
-              dir="ltr"
-              tabindex="0"
               aria-label="Anonymous recommendation from Vanguard product leader"
             >
               <div class="recommendation-mark" aria-hidden="true">&ldquo;</div>
@@ -465,23 +448,18 @@
         </div>
       </section>
 
-      <section id="contact" class="contact reveal">
+      <section id="contact" class="contact reveal" data-analytics-location="contact">
         <div class="contact-shell">
           <p class="contact-kicker">Let&apos;s Build Something Useful</p>
           <h2>Project Inquiry</h2>
           <p class="contact-intro">
             Share your goals, scope, and timeline. I review every submission.
           </p>
-          <div class="form-embed-slot" aria-label="Project inquiry form area">
+          <div class="form-embed-slot" role="region" aria-label="Project inquiry form area">
             <form
               id="projectInquiryForm"
               class="project-inquiry-form"
-              data-google-form-action="https://docs.google.com/forms/d/e/1FAIpQLScVOIMpFAFvqvonZWWH-2HJws0vDJyuCAajoaRgLwCDRF_3Aw/formResponse"
               data-google-form-link="https://docs.google.com/forms/d/e/1FAIpQLScVOIMpFAFvqvonZWWH-2HJws0vDJyuCAajoaRgLwCDRF_3Aw/viewform"
-              data-google-prefill-url=""
-              data-google-entry-name="entry.811253843"
-              data-google-entry-email="entry.76883097"
-              data-google-entry-brief="entry.1676585977"
               novalidate
             >
               <label for="inquiryName">Name</label>
@@ -491,8 +469,10 @@
                 type="text"
                 required
                 autocomplete="name"
+                aria-describedby="inquiryNameError"
                 placeholder="Your name"
               />
+              <p class="field-error" id="inquiryNameError" hidden></p>
 
               <label for="inquiryEmail">Email</label>
               <input
@@ -501,8 +481,10 @@
                 type="email"
                 required
                 autocomplete="email"
+                aria-describedby="inquiryEmailError"
                 placeholder="you@example.com"
               />
+              <p class="field-error" id="inquiryEmailError" hidden></p>
 
               <label for="inquiryBrief">Project Brief</label>
               <textarea
@@ -510,8 +492,10 @@
                 name="brief"
                 rows="6"
                 required
+                aria-describedby="inquiryBriefError"
                 placeholder="Tell me about your project goals, timeline, and scope."
               ></textarea>
+              <p class="field-error" id="inquiryBriefError" hidden></p>
 
               <div class="project-inquiry-actions">
                 <button class="btn" id="projectInquirySubmit" type="submit">
@@ -527,7 +511,7 @@
             </form>
 
             <p class="google-form-fallback">
-              Prefer the original form?
+              Prefer Google Forms?
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLScVOIMpFAFvqvonZWWH-2HJws0vDJyuCAajoaRgLwCDRF_3Aw/viewform"
                 target="_blank"
@@ -543,30 +527,28 @@
 
     <footer class="site-footer" id="siteFooter" data-footer-pattern>
       <div class="footer-pattern-layer" aria-hidden="true"></div>
-      <div
+      <button
+        type="button"
         class="site-footer-art"
         data-footer-art-trigger
-        role="button"
-        tabindex="0"
         aria-label="Activate footer artwork animation"
       >
-        <img
-          src="assets/footer-art/site-footer-rev-sm.png"
-          alt="Artwork that is evolving, made by hand, summarizing past work. No A.I. was used or harmed in this creation."
-          width="1800"
-          height="1973"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+        <picture>
+          <source type="image/avif" srcset="assets/footer-art/site-footer-rev-720.avif 720w, assets/footer-art/site-footer-rev-1200.avif 1200w, assets/footer-art/site-footer-rev-1800.avif 1800w" sizes="100vw" />
+          <source type="image/webp" srcset="assets/footer-art/site-footer-rev-720.webp 720w, assets/footer-art/site-footer-rev-1200.webp 1200w, assets/footer-art/site-footer-rev-1800.webp 1800w" sizes="100vw" />
+          <img
+            src="assets/footer-art/site-footer-rev-sm.png"
+            alt="Colorful abstract portfolio artwork."
+            width="1800"
+            height="1973"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      </button>
       <div class="site-footer-inner">
         <div class="site-footer-controls">
-          <div class="footer-actions" aria-label="Connect with Van Shea">
-            <script
-              src="https://assets.calendly.com/assets/external/widget.js"
-              type="text/javascript"
-              async
-            ></script>
+          <div class="footer-actions" role="group" aria-label="Connect with Van Shea">
             <a
               class="theme-link"
               href="https://calendly.com/van-shea/30min"
@@ -628,8 +610,37 @@
         </p>
       </div>
     </footer>
-<div class="lightbox" id="lightbox" aria-hidden="true">
-      <button class="lightbox-close" id="lightboxClose" aria-label="Close image">
+
+    <aside
+      class="consent-banner"
+      id="consentBanner"
+      role="region"
+      aria-label="Analytics consent"
+      hidden
+    >
+      <p class="consent-text">
+        Privacy-first analytics only. No personal tracking.
+      </p>
+      <div class="consent-actions">
+        <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+          Deny
+        </button>
+        <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+          Allow Analytics
+        </button>
+      </div>
+    </aside>
+
+    <div
+      class="lightbox"
+      id="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+      aria-hidden="true"
+      inert
+    >
+      <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close image viewer">
         x
       </button>
       <button
@@ -644,21 +655,22 @@
       <button
         class="lightbox-nav lightbox-prev"
         id="lightboxPrev"
+        type="button"
         aria-label="Previous image"
       >
-        <span aria-hidden="true"><</span>
+        <span aria-hidden="true">&lsaquo;</span>
       </button>
       <button
         class="lightbox-nav lightbox-next"
         id="lightboxNext"
+        type="button"
         aria-label="Next image"
       >
-        <span aria-hidden="true">></span>
+        <span aria-hidden="true">&rsaquo;</span>
       </button>
       <figure class="lightbox-figure">
         <img
           id="lightboxImage"
-          src=""
           alt=""
           width="1900"
           height="1600"
@@ -667,6 +679,8 @@
         <figcaption id="lightboxCaption"></figcaption>
       </figure>
     </div>
-<script src="script.js?v=20260706-clear-logo-1"></script>
+
+    <script src="analytics.js" defer></script>
+    <script src="script.js?v=20260714-logo-1" defer></script>
   </body>
 </html>

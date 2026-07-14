@@ -39,40 +39,55 @@
 </script>
 <title>NYU Curriculum Alignment | Case Study | Van Shea Creative</title>
 <meta name="description" content="Van expanded NYU’s information architecture curriculum beyond classification methods into a broader human-centered UX process." />
+<link rel="canonical" href="https://www.vanshea.com/case-studies/nyu-curriculum-alignment/" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Van Shea Creative" />
+<meta property="og:title" content="NYU Curriculum Alignment | Case Study" />
+<meta property="og:description" content="Van expanded NYU’s information architecture curriculum beyond classification methods into a broader human-centered UX process." />
+<meta property="og:url" content="https://www.vanshea.com/case-studies/nyu-curriculum-alignment/" />
+<meta property="og:image" content="https://www.vanshea.com/assets/vscimage/generated/nyu-2000-1-2000x1000-fullscreen-3200x1800.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="NYU Curriculum Alignment | Case Study" />
+<meta name="twitter:description" content="Van expanded NYU’s information architecture curriculum beyond classification methods into a broader human-centered UX process." />
+<meta name="twitter:image" content="https://www.vanshea.com/assets/vscimage/generated/nyu-2000-1-2000x1000-fullscreen-3200x1800.webp" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap"
-  rel="stylesheet"
-/>
-<link rel="stylesheet" href="/styles.css?v=20260706-capital-one-logo-1" />
-<link rel="stylesheet" href="/assets/case-studies.css?v=20260706-capital-one-logo-1" />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" /></noscript>
+<link rel="stylesheet" href="/styles.css?v=20260714-logo-1" />
+<link rel="stylesheet" href="/assets/case-studies.css?v=20260615-local-video-1" />
 
 
 
   </head>
   <body>
+    <a class="skip-link" href="#top">Skip to content</a>
     <div class="bg-shape bg-shape-a"></div>
     <div class="bg-shape bg-shape-b"></div>
 
     <header class="site-header">
   <a href="/" class="brand" aria-label="Back to homepage">
     <picture>
-      <source
-        id="brandLogoDarkSource"
-        srcset="/assets/sm_logo_hor_3x.png"
-        media="(prefers-color-scheme: dark)"
-      />
       <img
         id="brandLogoLightImage"
         class="brand-logo"
-        src="/assets/sm_logo_hor_3x.png"
+        src="/assets/new-logo-mark.svg"
+        data-logo-light="/assets/new-logo-mark.svg"
+        data-logo-dark="/assets/new-logo-mark-lite.svg"
         alt="Van Shea Creative"
-        width="889"
-        height="192"
+        width="56"
+        height="56"
       />
     </picture>
+    <span class="brand-name">Van Shea Creative</span>
   </a>
+  <div class="theme-switcher theme-switcher-mini" role="group" aria-label="Choose site theme">
+    <button class="theme-link" type="button" data-theme="theme1" aria-label="Clear" aria-pressed="false"></button>
+    <button class="theme-link" type="button" data-theme="theme2" aria-label="Tinted" aria-pressed="false"></button>
+    <button class="theme-link" type="button" data-theme="theme3" aria-label="High Contrast" aria-pressed="false"></button>
+    <button class="theme-link" type="button" data-theme="theme4" aria-label="Wild" aria-pressed="false"></button>
+  </div>
   <button
     class="nav-toggle"
     type="button"
@@ -92,9 +107,7 @@
     <a href="/case-studies" aria-current="page">
       Case Studies
     </a>
-    <a href="/aidesign">
-      AIdesign
-    </a>
+    <a href="/aidesign/">AIdesign</a>
     <a href="/blog/">
       Blog
     </a>
@@ -261,30 +274,21 @@
 
     <footer class="site-footer" id="siteFooter" data-footer-pattern>
   <div class="footer-pattern-layer" aria-hidden="true"></div>
-  <div
+  <button
+    type="button"
     class="site-footer-art"
     data-footer-art-trigger
-    role="button"
-    tabindex="0"
     aria-label="Activate footer artwork animation"
   >
-    <img
-      src="/assets/footer-art/site-footer-rev-sm.png"
-      alt="Artwork that is evolving, made by hand, summarizing past work. No A.I. was used or harmed in this creation."
-      width="1800"
-      height="1973"
-      loading="lazy"
-      decoding="async"
-    />
-  </div>
+    <picture>
+      <source type="image/avif" srcset="/assets/footer-art/site-footer-rev-720.avif 720w, /assets/footer-art/site-footer-rev-1200.avif 1200w, /assets/footer-art/site-footer-rev-1800.avif 1800w" sizes="100vw" />
+      <source type="image/webp" srcset="/assets/footer-art/site-footer-rev-720.webp 720w, /assets/footer-art/site-footer-rev-1200.webp 1200w, /assets/footer-art/site-footer-rev-1800.webp 1800w" sizes="100vw" />
+      <img src="/assets/footer-art/site-footer-rev-sm.png" alt="Colorful abstract portfolio artwork." width="1800" height="1973" loading="lazy" decoding="async" />
+    </picture>
+  </button>
   <div class="site-footer-inner">
     <div class="site-footer-controls">
-      <div class="footer-actions" aria-label="Connect with Van Shea">
-        <script
-          src="https://assets.calendly.com/assets/external/widget.js"
-          type="text/javascript"
-          async
-        ></script>
+      <div class="footer-actions" role="group" aria-label="Connect with Van Shea">
         <a
           class="theme-link"
           href="https://calendly.com/van-shea/30min"
@@ -309,7 +313,7 @@
           data-theme="theme1"
           aria-pressed="false"
         >
-          Basic Theme
+          Clear
         </button>
         <button
           class="theme-link"
@@ -317,7 +321,7 @@
           data-theme="theme2"
           aria-pressed="false"
         >
-          Pro Theme
+          Tinted
         </button>
         <button
           class="theme-link"
@@ -333,7 +337,7 @@
           data-theme="theme4"
           aria-pressed="true"
         >
-          Wild Theme
+          Wild
         </button>
       </div>
     </div>
@@ -346,7 +350,31 @@
     </p>
   </div>
 </footer>
-<script src="/script.js?v=20260706-clear-logo-1"></script>
-    <script src="/assets/case-studies.js"></script>
+
+    <aside
+  class="consent-banner"
+  id="consentBanner"
+  role="region"
+  aria-label="Analytics consent"
+  hidden
+>
+  <p class="consent-text">
+    We use privacy-first analytics to measure meaningful actions, not personal identity.
+  </p>
+  <div class="consent-actions">
+    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+      Deny
+    </button>
+    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+      Allow Analytics
+    </button>
+  </div>
+</aside>
+
+
+
+    <script src="/analytics.js" defer></script>
+    <script src="/script.js?v=20260714-logo-1" defer></script>
+    <script src="/assets/case-studies.js" defer></script>
   </body>
 </html>

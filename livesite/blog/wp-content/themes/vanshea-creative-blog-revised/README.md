@@ -1,6 +1,6 @@
 # Van Shea Creative Blog Revised
 
-Version 1.4.2 of the custom Van Shea Creative WordPress theme.
+Version 1.4.6 of the custom Van Shea Creative WordPress theme.
 
 ## Revision highlights
 
@@ -9,6 +9,7 @@ Version 1.4.2 of the custom Van Shea Creative WordPress theme.
 - Matches the main site theme names: Clear, Tinted, High Contrast, and Wild.
 - Makes Wild the default while preserving visitor and Customizer preferences.
 - Keeps the header logo theme-driven so Clear uses the dark mark.
+- Bundles the updated dark and light logo marks inside the theme.
 - Retains featured-image repair support for imported posts.
 
 ## Requirements

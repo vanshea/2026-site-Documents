@@ -14,7 +14,7 @@ Text Domain: vanshea-creative-blog
 :root {
   color-scheme: light;
   --control-scale: 1.1;
-  --header-logo-size: 42px;
+  --header-logo-size: 38px;
   --header-height: calc(var(--header-logo-size) * 2);
   --site-content-width: 1120px;
   --site-content-gutter: 88vw;

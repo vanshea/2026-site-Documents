@@ -100,8 +100,12 @@ function resolveAiDesignPrototypePath(src) {
       frame.title = title;
       overlay.setAttribute("aria-label", title);
     }
+    overlay.classList.toggle("is-wide", title === "Partner");
     overlay.hidden = false;
     document.body.style.overflow = "hidden";
+    if (opener.hasAttribute("data-aide-request-fullscreen") && overlay.requestFullscreen) {
+      overlay.requestFullscreen().catch(() => {});
+    }
     closeButton.focus();
   }
 
@@ -109,6 +113,10 @@ function resolveAiDesignPrototypePath(src) {
     if (overlay.hidden) return;
 
     overlay.hidden = true;
+    if (document.fullscreenElement === overlay && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+    overlay.classList.remove("is-wide");
     frame.removeAttribute("src");
     document.body.style.overflow = previousOverflow;
     if (activeOpener) {

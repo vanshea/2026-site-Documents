@@ -3,34 +3,40 @@ import path from "node:path";
 import sharp from "sharp";
 
 const projectRoot = process.cwd();
+const newLogoPaths = `
+  <path d="M31.62,42.89l-1.83,1.83-1.83,1.83L1.21,19.8c-.79,2.58-1.21,5.32-1.21,8.15,0,15.44,12.52,27.95,27.95s27.95-12.52,27.95-27.95c0-2.83-.42-5.57-1.21-8.14l-23.08,23.08Z"/>
+  <path d="M27.96,39.22l24.58-24.58c-1.05-1.94-2.33-3.74-3.8-5.37l-17.12,17.12-3.66,3.66L7.17,9.26c-1.47,1.63-2.74,3.43-3.8,5.37l24.59,24.59Z"/>
+  <path d="M27.96,22.72L44.93,5.75C40.23,2.14,34.34,0,27.95,0S15.69,2.14,10.98,5.74l16.98,16.98Z"/>
+`;
+
 const touchIconSvg = Buffer.from(`
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 320 320">
-  <rect width="320" height="320" fill="#f7f4ec"/>
-  <circle cx="160" cy="160" r="140" fill="#020319"/>
-  <path d="M40 95 L145 200 L280 65" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter"/>
-  <path d="M28 122 L145 240 L248 137" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="-4 -4 63.91 63.91">
+  <rect x="-4" y="-4" width="63.91" height="63.91" fill="#f8f2e8"/>
+  <g fill="#161616">${newLogoPaths}</g>
 </svg>
 `);
 
 const tabIconSvg = Buffer.from(`
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 320 320">
-  <circle cx="160" cy="160" r="140" fill="#020319"/>
-  <path d="M40 95 L145 200 L280 65" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter"/>
-  <path d="M28 122 L145 240 L248 137" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="-3 -3 61.91 61.91">
+  <circle cx="27.955" cy="27.955" r="27.955" fill="#161616"/>
+  <g fill="#f8f2e8">${newLogoPaths}</g>
 </svg>
 `);
 
 const faviconSvg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-label="Van Shea Creative">
-  <circle cx="160" cy="160" r="140" fill="#020319"/>
-  <path d="M40 95 L145 200 L280 65" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter"/>
-  <path d="M28 122 L145 240 L248 137" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="square" stroke-linejoin="miter"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="-3 -3 61.91 61.91" role="img" aria-label="Van Shea Creative">
+  <style>
+    .mark { fill: #161616; }
+    @media (prefers-color-scheme: dark) { .mark { fill: #f8f2e8; } }
+  </style>
+  <g class="mark">${newLogoPaths}</g>
 </svg>
 `;
 
 const targets = [
   { dir: path.join(projectRoot, "assets", "icons"), prefix: "/assets/icons" },
   { dir: path.join(projectRoot, "livesite"), prefix: "" },
+  { dir: path.join(projectRoot, "livesite", "assets", "icons"), prefix: "/assets/icons" },
   { dir: path.join(projectRoot, "comingsoon"), prefix: "/comingsoon" },
   { dir: path.join(projectRoot, "build"), prefix: "/build" }
 ];
@@ -95,8 +101,8 @@ function manifest(prefix) {
           type: "image/png"
         }
       ],
-      theme_color: "#020319",
-      background_color: "#f7f4ec",
+      theme_color: "#161616",
+      background_color: "#f8f2e8",
       display: "standalone"
     },
     null,

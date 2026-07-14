@@ -4,7 +4,7 @@
     <%- include("../partials/public_head", {
       pageTitle,
       metaDescription,
-      extraStyles: ["/assets/aidesign.css?v=20260710-idea-sidebar-1"]
+      extraStyles: ["/assets/aidesign.css?v=20260712-borderless-images-1"]
     }) %>
   </head>
   <body>
@@ -79,6 +79,34 @@
                 />
                 <span class="sr-only">Open <%= idea.title %></span>
               </button>
+              <% if (idea.slug === 'partner') { %>
+                <button
+                  class="aide-partner-fullscreen"
+                  type="button"
+                  data-aide-prototype-open
+                  data-aide-request-fullscreen
+                  data-prototype-src="/aidesign/partner_fullscreen.html"
+                  data-prototype-title="<%= idea.title %>"
+                >
+                  <span aria-hidden="true">⛶</span>
+                  Test full screen
+                </button>
+                <section class="aide-problem-statement" aria-labelledby="partner-problem-title">
+                  <h3 id="partner-problem-title">Partner — The Problem</h3>
+                  <p>Sharing personal information with someone close should feel simple, intentional, and mutual. Instead, people must choose between fragmented one-at-a-time sending and broad permissions that are hard to understand, easy to forget, and unclear once the moment has passed.</p>
+                  <p>Communication Privacy Management theory describes shared personal information as <em>co-owned</em>, requiring ongoing rules between both people. Most tools treat consent as a one-time grant, creating “boundary turbulence” when access no longer matches expectations. Repeated, low-clarity privacy prompts can also cause privacy fatigue, leading people to accept defaults rather than make meaningful choices.</p>
+                  <p>Partner turns sharing into a temporary, visible agreement. Both people bring their devices together, choose specific Apple system data, and approve the connection on their watches. A live status plus pause and stop controls make consent coordinated, revisitable, and mutual—reducing ambiguity and forgotten permissions.</p>
+                  <p class="aide-problem-sources"><strong>Sources:</strong><br><em>Petronio, S. (1991). “Communication Boundary Management: A Theoretical Model of Managing Disclosure of Private Information Between Marital Couples.” Communication Theory, 1(4), 311–335.<br>Petronio, S. (2002). Boundaries of Privacy: Dialectics of Disclosure. SUNY Press.<br>Choi, H., Park, J., &amp; Jung, Y. (2018). “The Role of Privacy Fatigue in Online Privacy Behavior.” Computers in Human Behavior, 81, 42–51.</em></p>
+                  <div class="aide-problem-share">
+                    <button class="aide-linkedin-share" type="button" data-aide-linkedin-share data-share-url="https://www.vanshea.com/aidesign/share/partner.html?v=20260711-5" aria-label="Share the Partner problem on LinkedIn">
+                      <img class="aide-share-app-icon" src="/assets/aidesign/partner-app-thumbnail.png?v=20260712-2" alt="" width="32" height="32" />
+                      <span>Share on LinkedIn</span>
+                      <svg class="aide-share-linkedin-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 7.8H1.7V22h3.6V7.8ZM3.5 2A2.1 2.1 0 1 0 3.5 6.2 2.1 2.1 0 0 0 3.5 2ZM22.3 13.9c0-4.3-2.3-6.4-5.4-6.4a4.7 4.7 0 0 0-4.2 2.3v-2h-3.6V22h3.6v-7c0-1.9.4-3.7 2.7-3.7 2.3 0 2.3 2.1 2.3 3.8V22h3.6l1-8.1Z"/></svg>
+                    </button>
+                    <span class="aide-share-status" role="status" aria-live="polite"></span>
+                  </div>
+                </section>
+              <% } %>
             </section>
           <% }) %>
         </div>
@@ -110,6 +138,6 @@
 
     <script src="/analytics.js"></script>
     <script src="/script.js"></script>
-    <script src="/assets/aidesign.js"></script>
+    <script src="/assets/aidesign.js?v=20260711-partner-fullscreen-1"></script>
   </body>
 </html>

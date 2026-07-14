@@ -37,7 +37,7 @@
 .aide-sample-main {
   display: grid;
   gap: 30px;
-  width: min(1180px, 92vw);
+  width: min(1580px, 96vw);
   min-height: 100vh;
   margin: 0 auto;
   padding: 28px 0;
@@ -201,11 +201,18 @@
   width: min(100%, 640px);
   aspect-ratio: 520 / 980;
   min-height: 980px;
-  border: 1px solid var(--line);
+  border: 1px solid #000;
   border-radius: 8px;
   background: #faf9f5;
   -webkit-user-select: none;
   user-select: none;
+}
+
+[data-aide-idea-panel="partner"] .aide-sample-frame {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 3 / 2;
+  min-height: 820px;
 }
 
 .aide-sample-preview {
@@ -213,11 +220,11 @@
   justify-self: start;
   width: min(100%, 360px);
   margin-top: 8px;
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: 8px;
   padding: 0;
   background: color-mix(in srgb, var(--paper) 82%, transparent);
-  box-shadow: 0 18px 42px rgba(47, 36, 39, 0.14);
+  box-shadow: none;
   cursor: pointer;
   overflow: hidden;
 }
@@ -230,7 +237,7 @@
 
 .aide-sample-preview:hover {
   transform: translateY(-2px);
-  box-shadow: 0 22px 52px rgba(47, 36, 39, 0.18);
+  box-shadow: none;
 }
 
 .aide-sample-preview:focus-visible {
@@ -261,6 +268,44 @@
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
   -webkit-user-select: none;
   user-select: none;
+}
+
+.aide-prototype-overlay.is-wide .aide-prototype-frame {
+  width: min(96vw, 1600px);
+  height: min(92vh, 1000px);
+}
+
+.aide-partner-fullscreen {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 11px 17px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: "Lexend Deca", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.aide-partner-fullscreen:hover { transform: translateY(-1px); }
+.aide-partner-fullscreen:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+
+.aide-prototype-overlay:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+
+.aide-prototype-overlay.is-wide:fullscreen .aide-prototype-frame {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
 }
 
 .aide-prototype-close {

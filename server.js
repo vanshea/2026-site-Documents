@@ -82,8 +82,8 @@ const acceptedImageExt = new Set([
 
 const defaultVscimageConfig = {
   logos: {
-    light: "assets/sm_logo_hor_3x.png",
-    dark: "assets/sm_logo_hor_3x.png"
+    light: "assets/new-logo-mark.svg",
+    dark: "assets/new-logo-mark-lite.svg"
   },
   gallery: [],
   projects: {

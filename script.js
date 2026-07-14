@@ -3,6 +3,13 @@ if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
+function syncPageAnimationState() {
+  document.documentElement.classList.toggle("is-page-hidden", document.hidden);
+}
+
+syncPageAnimationState();
+document.addEventListener("visibilitychange", syncPageAnimationState);
+
 const footerAnimationMeta = document.getElementById("footerAnimationMeta");
 const siteFooter = document.getElementById("siteFooter");
 
@@ -66,20 +73,19 @@ const darkBrowserMedia =
     : null;
 
 if (brandLogoLightImage) {
-  brandLogoLightImage.dataset.logoLight =
+  brandLogoLightImage.dataset.logoLight ||=
     brandLogoLightImage.getAttribute("src") || brandLogoLightImage.src;
 
   if (brandLogoDarkSource?.getAttribute("srcset")) {
-    brandLogoLightImage.dataset.logoDark = brandLogoDarkSource.getAttribute("srcset");
+    brandLogoLightImage.dataset.logoDark ||=
+      brandLogoDarkSource.getAttribute("srcset");
   }
 }
 
-function isClearThemeOnDarkBrowser(theme) {
-  return theme === "theme1" && Boolean(darkBrowserMedia?.matches);
-}
-
 function isDarkBackgroundTheme(theme) {
-  return theme === "theme3" || isClearThemeOnDarkBrowser(theme);
+  const usesDarkBrowserPalette =
+    (theme === "theme1" || theme === "theme2") && Boolean(darkBrowserMedia?.matches);
+  return theme === "theme3" || usesDarkBrowserPalette;
 }
 
 function normalizeLogoPath(path) {
@@ -104,7 +110,7 @@ function updateBrandLogoForTheme(theme) {
   brandLogoLightImage.src = shouldUseDarkBackgroundLogo ? darkLogo : lightLogo;
   brandLogoLightImage.classList.toggle(
     "uses-dark-browser-logo",
-    isClearThemeOnDarkBrowser(theme) && hasAlternateDarkLogo
+    shouldUseDarkBackgroundLogo && hasAlternateDarkLogo
   );
 }
 
@@ -400,16 +406,13 @@ function buildFooterPattern(patternHost) {
       effectLayer.appendChild(circle);
     }
   };
-  const movePatternCircles = () => {
-    circles.forEach((circle) => {
-      const radius = Number(circle.getAttribute("r")) || 12;
-      circle.setAttribute("cx", rand(radius, width - radius).toFixed(1));
-      circle.setAttribute("cy", rand(radius, height - radius).toFixed(1));
-    });
-  };
+  patternLayer.addEventListener("pointerover", (event) => {
+    const circle = event.target.closest?.(".footer-pattern-circle");
+    if (!circle || !patternLayer.contains(circle)) return;
 
-  circles.forEach((circle) => {
-    circle.addEventListener("pointerenter", movePatternCircles);
+    const radius = Number(circle.getAttribute("r")) || 12;
+    circle.setAttribute("cx", rand(radius, width - radius).toFixed(1));
+    circle.setAttribute("cy", rand(radius, height - radius).toFixed(1));
   });
 
   if (artTrigger) {
@@ -637,11 +640,10 @@ function refreshWorkCardState() {
   });
 
   sortWorkGridCards();
-  syncProjectFilters();
 }
 
 async function readSiteImageConfig() {
-  const sources = ["/api/vscimage/config", "/assets/vscimage/config.json"];
+  const sources = ["/assets/vscimage/config.json", "/api/vscimage/config"];
 
   for (const source of sources) {
     try {
@@ -743,10 +745,7 @@ async function loadSiteImageConfig() {
       const thumb = link.querySelector(".card-image");
       if (thumb && projectConfig.thumb) {
         thumb.setAttribute("src", toSitePath(projectConfig.thumb));
-        thumb.setAttribute(
-          "alt",
-          `Preview image for ${projectConfig.title || link.dataset.lightboxTitle || "portfolio project"}`
-        );
+        thumb.setAttribute("alt", "");
       }
     });
 
@@ -762,53 +761,23 @@ async function loadSiteImageConfig() {
 const projectInquiryForm = document.getElementById("projectInquiryForm");
 const projectInquiryStatus = document.getElementById("projectInquiryStatus");
 const projectInquirySubmit = document.getElementById("projectInquirySubmit");
+const projectInquiryFields = {
+  name: {
+    input: document.getElementById("inquiryName"),
+    error: document.getElementById("inquiryNameError")
+  },
+  email: {
+    input: document.getElementById("inquiryEmail"),
+    error: document.getElementById("inquiryEmailError")
+  },
+  brief: {
+    input: document.getElementById("inquiryBrief"),
+    error: document.getElementById("inquiryBriefError")
+  }
+};
 
 function isValidPublicEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function parseGoogleEntryMap(formEl) {
-  const entryName = String(formEl?.dataset.googleEntryName || "").trim();
-  const entryEmail = String(formEl?.dataset.googleEntryEmail || "").trim();
-  const entryBrief = String(formEl?.dataset.googleEntryBrief || "").trim();
-  const entryPattern = /^entry\.\d+$/;
-
-  if (
-    entryPattern.test(entryName) &&
-    entryPattern.test(entryEmail) &&
-    entryPattern.test(entryBrief)
-  ) {
-    return {
-      name: entryName,
-      email: entryEmail,
-      brief: entryBrief
-    };
-  }
-
-  const prefillUrl = String(formEl?.dataset.googlePrefillUrl || "").trim();
-  if (!prefillUrl) return null;
-
-  try {
-    const parsed = new URL(prefillUrl);
-    const keys = [];
-    parsed.searchParams.forEach((value, key) => {
-      if (!entryPattern.test(key)) return;
-      if (keys.includes(key)) return;
-      keys.push(key);
-    });
-
-    if (keys.length < 3) {
-      return null;
-    }
-
-    return {
-      name: keys[0],
-      email: keys[1],
-      brief: keys[2]
-    };
-  } catch (error) {
-    return null;
-  }
 }
 
 function setProjectInquiryStatus(message, state = "") {
@@ -823,43 +792,55 @@ function setProjectInquiryStatus(message, state = "") {
   delete projectInquiryStatus.dataset.state;
 }
 
-async function submitToGoogleForm(action, fieldMap, values) {
-  const payload = new URLSearchParams();
-  payload.set(fieldMap.name, values.name);
-  payload.set(fieldMap.email, values.email);
-  payload.set(fieldMap.brief, values.brief);
-  payload.set("fvv", "1");
-  payload.set("draftResponse", "[]");
-  payload.set("pageHistory", "0");
-  payload.set("fbzx", String(Date.now()));
+function setProjectInquiryFieldError(fieldName, message = "") {
+  const field = projectInquiryFields[fieldName];
+  if (!field?.input || !field?.error) return;
 
-  await fetch(action, {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    },
-    body: payload.toString()
+  if (message) {
+    field.input.setAttribute("aria-invalid", "true");
+    field.error.textContent = message;
+    field.error.hidden = false;
+    return;
+  }
+
+  field.input.removeAttribute("aria-invalid");
+  field.error.textContent = "";
+  field.error.hidden = true;
+}
+
+function clearProjectInquiryFieldErrors() {
+  Object.keys(projectInquiryFields).forEach((fieldName) => {
+    setProjectInquiryFieldError(fieldName);
   });
 }
 
+async function submitContactInquiry(values) {
+  const response = await fetch("/api/contact", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "same-origin",
+    body: JSON.stringify(values)
+  });
+
+  if (response.ok) return;
+
+  let message = "Unable to send your inquiry right now.";
+  try {
+    const payload = await response.json();
+    if (payload?.error) message = payload.error;
+  } catch (error) {
+    // Keep the generic error when the response is not JSON.
+  }
+
+  throw new Error(message);
+}
+
 if (projectInquiryForm) {
-  const googleFormAction = String(
-    projectInquiryForm.dataset.googleFormAction || ""
-  ).trim();
   const googleFormLink = String(projectInquiryForm.dataset.googleFormLink || "").trim();
-  const googleEntryMap = parseGoogleEntryMap(projectInquiryForm);
   const contactLocation =
     window.siteAnalytics?.getElementLocation?.(projectInquiryForm) || "contact";
-
-  if (!googleFormAction || !googleEntryMap) {
-    setProjectInquiryStatus(
-      googleFormLink
-        ? "Form mapping is not configured yet. Add entry IDs or a prefill URL, or use the Google Form link below."
-        : "Form mapping is not configured yet.",
-      "error"
-    );
-  }
 
   projectInquiryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -869,27 +850,29 @@ if (projectInquiryForm) {
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const brief = String(formData.get("brief") || "").trim();
+    clearProjectInquiryFieldErrors();
+    let firstInvalidField = null;
 
-    if (!name || !email || !brief) {
+    if (!name) {
+      setProjectInquiryFieldError("name", "Enter your name.");
+      firstInvalidField ||= projectInquiryFields.name.input;
+    }
+    if (!email) {
+      setProjectInquiryFieldError("email", "Enter your email address.");
+      firstInvalidField ||= projectInquiryFields.email.input;
+    } else if (!isValidPublicEmail(email)) {
+      setProjectInquiryFieldError("email", "Enter a valid email address.");
+      firstInvalidField ||= projectInquiryFields.email.input;
+    }
+    if (!brief) {
+      setProjectInquiryFieldError("brief", "Tell me about your project.");
+      firstInvalidField ||= projectInquiryFields.brief.input;
+    }
+
+    if (firstInvalidField) {
       setProjectInquiryStatus("Please complete all required fields.", "error");
       window.siteAnalytics?.trackContactFormSubmit?.(false);
-      return;
-    }
-
-    if (!isValidPublicEmail(email)) {
-      setProjectInquiryStatus("Please enter a valid email address.", "error");
-      window.siteAnalytics?.trackContactFormSubmit?.(false);
-      return;
-    }
-
-    if (!googleFormAction || !googleEntryMap) {
-      setProjectInquiryStatus(
-        googleFormLink
-          ? "This page is not fully configured yet. Add entry IDs or a prefill URL, or use the Google Form link below."
-          : "This page is not fully configured yet.",
-        "error"
-      );
-      window.siteAnalytics?.trackContactFormSubmit?.(false);
+      firstInvalidField.focus();
       return;
     }
 
@@ -899,12 +882,9 @@ if (projectInquiryForm) {
     setProjectInquiryStatus("Submitting...", "loading");
 
     try {
-      await submitToGoogleForm(googleFormAction, googleEntryMap, {
-        name,
-        email,
-        brief
-      });
+      await submitContactInquiry({ name, email, brief });
       projectInquiryForm.reset();
+      clearProjectInquiryFieldErrors();
       setProjectInquiryStatus("Thanks. Your inquiry was sent.", "success");
       window.siteAnalytics?.trackContactFormSubmit?.(true);
     } catch (error) {
@@ -978,29 +958,11 @@ function scrollRecommendationIntoView(track, index) {
   });
 }
 
-function getRecommendationLeftEdgeScroll(track) {
-  if (!track) return 0;
-
-  const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
-  if (!maxScroll) return 0;
-
-  const isRtl = window.getComputedStyle(track).direction.toLowerCase() === "rtl";
-  if (!isRtl) return 0;
-
-  track.scrollLeft = -maxScroll;
-  if (Math.abs(track.scrollLeft + maxScroll) <= 1) return -maxScroll;
-
-  track.scrollLeft = maxScroll;
-  if (Math.abs(track.scrollLeft - maxScroll) <= 1) return maxScroll;
-
-  return 0;
-}
-
-function scrollRecommendationsToLeftEdge(track) {
+function scrollRecommendationsToEnd(track) {
   if (!track) return;
 
   window.requestAnimationFrame(() => {
-    track.scrollLeft = getRecommendationLeftEdgeScroll(track);
+    track.scrollLeft = Math.max(0, track.scrollWidth - track.clientWidth);
     updateRecommendationNavState();
   });
 }
@@ -1014,16 +976,10 @@ function updateRecommendationNavState() {
     0,
     recommendationsTrack.scrollWidth - recommendationsTrack.clientWidth
   );
-  const isRtl =
-    window.getComputedStyle(recommendationsTrack).direction.toLowerCase() === "rtl";
   const currentScroll = recommendationsTrack.scrollLeft;
   const tolerance = 2;
-  const isAtLeftEdge = isRtl
-    ? currentScroll <= -maxScroll + tolerance
-    : currentScroll <= tolerance;
-  const isAtRightEdge = isRtl
-    ? currentScroll >= -tolerance
-    : currentScroll >= maxScroll - tolerance;
+  const isAtLeftEdge = currentScroll <= tolerance;
+  const isAtRightEdge = currentScroll >= maxScroll - tolerance;
 
   recommendationsPrevButton.disabled = isAtLeftEdge;
   recommendationsNextButton.disabled = isAtRightEdge;
@@ -1035,9 +991,7 @@ function scrollRecommendationsBy(direction) {
   const step = getRecommendationScrollStep(recommendationsTrack);
   if (!step) return;
 
-  const isRtl =
-    window.getComputedStyle(recommendationsTrack).direction.toLowerCase() === "rtl";
-  const scrollLeft = isRtl ? -direction * step : direction * step;
+  const scrollLeft = direction * step;
   const startPosition = recommendationsTrack.scrollLeft;
 
   recommendationsTrack.scrollBy({
@@ -1061,16 +1015,16 @@ function scrollRecommendationsBy(direction) {
 
 if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButton) {
   updateRecommendationNavState();
-  scrollRecommendationsToLeftEdge(recommendationsTrack);
+  scrollRecommendationsToEnd(recommendationsTrack);
   window.addEventListener(
     "load",
     () => {
-      scrollRecommendationsToLeftEdge(recommendationsTrack);
+      scrollRecommendationsToEnd(recommendationsTrack);
     },
     { once: true }
   );
   document.fonts?.ready?.then(() => {
-    scrollRecommendationsToLeftEdge(recommendationsTrack);
+    scrollRecommendationsToEnd(recommendationsTrack);
   });
   recommendationsTrack.addEventListener("scroll", updateRecommendationNavState, {
     passive: true
@@ -1078,23 +1032,23 @@ if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButt
   window.addEventListener("resize", updateRecommendationNavState);
 
   recommendationsPrevButton.addEventListener("click", () => {
-    scrollRecommendationsBy(1);
+    scrollRecommendationsBy(-1);
   });
 
   recommendationsNextButton.addEventListener("click", () => {
-    scrollRecommendationsBy(-1);
+    scrollRecommendationsBy(1);
   });
 
   recommendationsTrack.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      scrollRecommendationsBy(1);
+      scrollRecommendationsBy(-1);
       return;
     }
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      scrollRecommendationsBy(-1);
+      scrollRecommendationsBy(1);
       return;
     }
 
@@ -1166,7 +1120,6 @@ function syncWorkTypeTabs() {
 
   workTypeButtons.forEach((button) => {
     const isActive = button.classList.contains("active");
-    button.setAttribute("aria-selected", isActive ? "true" : "false");
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 }
@@ -1177,13 +1130,8 @@ function activateWorkTypeTab(button) {
   workTypeButtons.forEach((btn) => btn.classList.remove("active"));
   button.classList.add("active");
   syncWorkTypeTabs();
-  syncProjectFilters();
   visibleWorkCards = getWorkCardsPerPage();
   applyActiveFilter();
-}
-
-function syncProjectFilters() {
-  // Category metadata is kept on cards, but category filter UI is intentionally retired.
 }
 
 function getFilteredCards() {
@@ -1257,19 +1205,17 @@ function applyActiveFilter() {
   cards.forEach((card) => {
     const show = visibleSet.has(card);
     card.classList.toggle("hide", !show);
-    card.setAttribute("aria-hidden", show ? "false" : "true");
+    card.hidden = !show;
   });
 
   if (workLoadMoreButton) {
     const hasMore = filteredCards.length > getWorkCardsPerPage() && filteredCards.length > maxVisible;
     workLoadMoreButton.hidden = !hasMore;
-    workLoadMoreButton.setAttribute("aria-hidden", hasMore ? "false" : "true");
   }
 
   if (workFilterEmptyState) {
     const hasMatches = filteredCards.length > 0;
     workFilterEmptyState.hidden = hasMatches;
-    workFilterEmptyState.setAttribute("aria-hidden", hasMatches ? "true" : "false");
   }
 
   scheduleFeaturedCardHeightUpdate();
@@ -1426,26 +1372,6 @@ window.addEventListener("resize", () => {
   }, 100);
 });
 
-const revealItems = document.querySelectorAll(".reveal");
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-visible");
-      observer.unobserve(entry.target);
-    });
-  },
-  {
-    threshold: 0.16,
-    rootMargin: "0px 0px -8% 0px"
-  }
-);
-
-revealItems.forEach((item, index) => {
-  item.style.transitionDelay = `${Math.min(index * 45, 220)}ms`;
-  observer.observe(item);
-});
-
 const lightbox = document.getElementById("lightbox");
 const lightboxImage = document.getElementById("lightboxImage");
 const lightboxCaption = document.getElementById("lightboxCaption");
@@ -1456,6 +1382,7 @@ const lightboxPrev = document.getElementById("lightboxPrev");
 const lightboxNext = document.getElementById("lightboxNext");
 let activeLightboxIndex = 0;
 let useFullscreenAssets = false;
+let lightboxPreviouslyFocused = null;
 
 function getWorkLinks() {
   return Array.from(document.querySelectorAll(".card:not(.hide) .work-link"));
@@ -1566,22 +1493,28 @@ function renderLightboxImage(index) {
 
   activeLightboxIndex = safeIndex;
   lightboxImage.setAttribute("src", source);
-  lightboxImage.setAttribute("alt", `Large FPO image for ${title}`);
+  lightboxImage.setAttribute("alt", title);
   renderLightboxCaption(link, title, description, safeIndex, workLinks.length);
 }
 
-function openLightbox(index, useFullscreenVersion = false) {
+function openLightbox(index, useFullscreenVersion = false, trigger = null) {
   const workLinks = getWorkLinks();
   if (workLinks.length === 0) return;
   if (!lightbox) return;
   useFullscreenAssets = useFullscreenVersion;
   activeLightboxIndex =
     ((index % workLinks.length) + workLinks.length) % workLinks.length;
+  lightboxPreviouslyFocused =
+    trigger ||
+    (document.activeElement instanceof HTMLElement ? document.activeElement : null) ||
+    workLinks[activeLightboxIndex];
   renderLightboxImage(activeLightboxIndex);
+  lightbox.inert = false;
   lightbox.classList.add("is-open");
   lightbox.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
   updateLightboxFullscreenButton();
+  window.requestAnimationFrame(() => lightboxClose?.focus());
 }
 
 function requestElementFullscreen(element) {
@@ -1607,8 +1540,37 @@ function closeLightbox() {
   useFullscreenAssets = false;
   lightbox.classList.remove("is-open");
   lightbox.setAttribute("aria-hidden", "true");
+  lightbox.inert = true;
   document.body.style.overflow = "";
   updateLightboxFullscreenButton();
+
+  const returnFocus = lightboxPreviouslyFocused;
+  lightboxPreviouslyFocused = null;
+  window.requestAnimationFrame(() => {
+    if (returnFocus?.isConnected) returnFocus.focus();
+  });
+}
+
+function trapLightboxFocus(event) {
+  if (event.key !== "Tab" || !lightbox?.classList.contains("is-open")) return;
+
+  const focusable = Array.from(
+    lightbox.querySelectorAll(
+      'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((element) => !element.hidden && element.getClientRects().length > 0);
+
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 if (lightbox && lightboxImage && lightboxCaption) {
@@ -1630,7 +1592,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
         const index = workLinks.indexOf(link);
         if (index < 0) return;
 
-        openLightbox(index, true);
+        openLightbox(index, true, fullscreenButton);
         requestElementFullscreen(lightbox);
         return;
       }
@@ -1653,7 +1615,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
       const workLinks = getWorkLinks();
       const index = workLinks.indexOf(link);
       if (index < 0) return;
-      openLightbox(index, false);
+      openLightbox(index, false, link);
     });
   }
 
@@ -1708,6 +1670,7 @@ if (lightbox && lightboxImage && lightboxCaption) {
   document.addEventListener("keydown", (event) => {
     const workLinks = getWorkLinks();
     const isOpen = lightbox.classList.contains("is-open");
+    trapLightboxFocus(event);
     if (event.key === "Escape" && isOpen) {
       if (isFullscreenActive()) return;
       closeLightbox();
