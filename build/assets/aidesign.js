@@ -42,7 +42,7 @@ function resolveAiDesignPrototypePath(src) {
       frame.removeAttribute("data-src");
     }
 
-    tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    tab.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "nearest", inline: "nearest" });
 
     if (updateHash && window.history && window.history.replaceState) {
       window.history.replaceState(null, "", "#" + slug);
@@ -137,6 +137,20 @@ function resolveAiDesignPrototypePath(src) {
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Tab" && !overlay.hidden) {
+      const focusable = Array.from(overlay.querySelectorAll('button:not([disabled]), iframe, a[href]'));
+      if (focusable.length) {
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
     if (event.key === "Escape" && !overlay.hidden) {
       closePrototype();
     }

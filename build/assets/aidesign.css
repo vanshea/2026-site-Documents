@@ -13,7 +13,7 @@
 
 .aide-main h1 {
   margin-bottom: 18px;
-  font-size: 2.85rem;
+  font-size: var(--site-h1-size);
 }
 
 .aide-main h2 {
@@ -46,7 +46,7 @@
 
 .aide-sample-intro {
   display: grid;
-  gap: 12px;
+  gap: 24px;
   padding-bottom: 22px;
   border-bottom: 1px solid var(--line);
 }
@@ -247,7 +247,7 @@
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  opacity: 0.62;
+  opacity: 1;
 }
 
 .aide-idea-name {
@@ -824,7 +824,7 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background: #ff8a4c;
-  color: #fff;
+  color: #151023;
   font-family: "Space Grotesk", sans-serif;
   font-size: 0.62rem;
   font-weight: 800;
@@ -1268,7 +1268,7 @@
 
 @media (max-width: 960px) {
   .aide-main h1 {
-    font-size: 2.25rem;
+    font-size: var(--site-h1-size);
   }
 
   .aide-hero,
@@ -1379,7 +1379,7 @@
   }
 
   .aide-main h1 {
-    font-size: 1.95rem;
+    font-size: var(--site-h1-size);
   }
 
   .aide-main h2 {
@@ -1428,7 +1428,7 @@
 
 @media (max-width: 430px) {
   .aide-main h1 {
-    font-size: 1.65rem;
+    font-size: var(--site-h1-size);
   }
 
   .aide-visual-row {

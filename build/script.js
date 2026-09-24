@@ -844,6 +844,23 @@ async function submitToGoogleForm(action, fieldMap, values) {
 }
 
 if (projectInquiryForm) {
+  const inquiryFields = {
+    name: projectInquiryForm.querySelector("#inquiryName"),
+    email: projectInquiryForm.querySelector("#inquiryEmail"),
+    brief: projectInquiryForm.querySelector("#inquiryBrief")
+  };
+  function setInquiryError(field, message) {
+    const input = inquiryFields[field];
+    const error = document.getElementById("inquiry" + field.charAt(0).toUpperCase() + field.slice(1) + "Error");
+    if (error) error.textContent = message;
+    if (input) {
+      if (message) input.setAttribute("aria-invalid", "true");
+      else input.removeAttribute("aria-invalid");
+    }
+  }
+  Object.entries(inquiryFields).forEach(([field, input]) => {
+    input?.addEventListener("input", () => setInquiryError(field, ""));
+  });
   const googleFormAction = String(
     projectInquiryForm.dataset.googleFormAction || ""
   ).trim();
@@ -869,15 +886,21 @@ if (projectInquiryForm) {
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const brief = String(formData.get("brief") || "").trim();
+    setInquiryError("name", name ? "" : "Enter your name.");
+    setInquiryError("email", email ? "" : "Enter your email address.");
+    setInquiryError("brief", brief ? "" : "Tell me a little about your project.");
 
     if (!name || !email || !brief) {
       setProjectInquiryStatus("Please complete all required fields.", "error");
+      Object.values(inquiryFields).find(input => input?.getAttribute("aria-invalid") === "true")?.focus();
       window.siteAnalytics?.trackContactFormSubmit?.(false);
       return;
     }
 
     if (!isValidPublicEmail(email)) {
+      setInquiryError("email", "Enter a valid email address.");
       setProjectInquiryStatus("Please enter a valid email address.", "error");
+      inquiryFields.email?.focus();
       window.siteAnalytics?.trackContactFormSubmit?.(false);
       return;
     }
@@ -905,7 +928,7 @@ if (projectInquiryForm) {
         brief
       });
       projectInquiryForm.reset();
-      setProjectInquiryStatus("Thanks. Your inquiry was sent.", "success");
+      setProjectInquiryStatus("Your browser submitted the inquiry. If you do not receive a reply, use the Google Form link below.", "success");
       window.siteAnalytics?.trackContactFormSubmit?.(true);
     } catch (error) {
       setProjectInquiryStatus(
@@ -1166,7 +1189,6 @@ function syncWorkTypeTabs() {
 
   workTypeButtons.forEach((button) => {
     const isActive = button.classList.contains("active");
-    button.setAttribute("aria-selected", isActive ? "true" : "false");
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 }
@@ -1302,8 +1324,14 @@ workTypeButtons.forEach((button, index) => {
 
 if (workLoadMoreButton) {
   workLoadMoreButton.addEventListener("click", () => {
+    const before = getFilteredCards().filter(card => !card.classList.contains("hide")).length;
     visibleWorkCards += getWorkCardsPerPage();
     applyActiveFilter();
+    const shown = getFilteredCards().filter(card => !card.classList.contains("hide"));
+    const added = Math.max(0, shown.length - before);
+    const status = document.getElementById("workLoadStatus");
+    if (status) status.textContent = added + " more projects loaded";
+    shown[before]?.querySelector("a,button")?.focus();
   });
 }
 
@@ -1454,6 +1482,7 @@ const lightboxFullscreen = document.getElementById("lightboxFullscreen");
 const lightboxFullscreenIcon = document.getElementById("lightboxFullscreenIcon");
 const lightboxPrev = document.getElementById("lightboxPrev");
 const lightboxNext = document.getElementById("lightboxNext");
+let lightboxReturnFocus = null;
 let activeLightboxIndex = 0;
 let useFullscreenAssets = false;
 
@@ -1566,7 +1595,7 @@ function renderLightboxImage(index) {
 
   activeLightboxIndex = safeIndex;
   lightboxImage.setAttribute("src", source);
-  lightboxImage.setAttribute("alt", `Large FPO image for ${title}`);
+  lightboxImage.setAttribute("alt", link.querySelector("img")?.alt || title);
   renderLightboxCaption(link, title, description, safeIndex, workLinks.length);
 }
 
@@ -1574,14 +1603,17 @@ function openLightbox(index, useFullscreenVersion = false) {
   const workLinks = getWorkLinks();
   if (workLinks.length === 0) return;
   if (!lightbox) return;
+  lightboxReturnFocus = document.activeElement;
   useFullscreenAssets = useFullscreenVersion;
   activeLightboxIndex =
     ((index % workLinks.length) + workLinks.length) % workLinks.length;
   renderLightboxImage(activeLightboxIndex);
   lightbox.classList.add("is-open");
+  lightbox.removeAttribute("inert");
   lightbox.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
   updateLightboxFullscreenButton();
+  lightboxClose?.focus();
 }
 
 function requestElementFullscreen(element) {
@@ -1607,11 +1639,18 @@ function closeLightbox() {
   useFullscreenAssets = false;
   lightbox.classList.remove("is-open");
   lightbox.setAttribute("aria-hidden", "true");
+  lightbox.setAttribute("inert", "");
   document.body.style.overflow = "";
   updateLightboxFullscreenButton();
+  lightboxReturnFocus?.focus();
+  lightboxReturnFocus = null;
 }
 
 if (lightbox && lightboxImage && lightboxCaption) {
+  workGrid?.querySelectorAll(".card-fullscreen").forEach(button => {
+    const title = button.closest(".card")?.querySelector("h3")?.textContent?.trim() || "project";
+    button.setAttribute("aria-label", `Expand ${title} preview`);
+  });
   if (workGrid) {
     workGrid.addEventListener("click", (event) => {
       const fullscreenButton = event.target.closest(".card-fullscreen");
@@ -1712,6 +1751,18 @@ if (lightbox && lightboxImage && lightboxCaption) {
       if (isFullscreenActive()) return;
       closeLightbox();
     }
+    if (event.key === "Tab" && isOpen) {
+      const focusable = Array.from(lightbox.querySelectorAll("button:not([disabled]),a[href]"))
+        .filter(element => element.getClientRects().length);
+      if (focusable.length) {
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault(); last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault(); first.focus();
+        }
+      }
+    }
     if (event.key === "ArrowLeft" && isOpen && workLinks.length > 0) {
       activeLightboxIndex =
         (activeLightboxIndex - 1 + workLinks.length) % workLinks.length;
@@ -1722,6 +1773,17 @@ if (lightbox && lightboxImage && lightboxCaption) {
       renderLightboxImage(activeLightboxIndex);
     }
   });
+  let swipeStartX = null;
+  lightbox.addEventListener("touchstart", event => {
+    swipeStartX = event.changedTouches[0]?.clientX ?? null;
+  }, { passive: true });
+  lightbox.addEventListener("touchend", event => {
+    if (swipeStartX === null || !lightbox.classList.contains("is-open")) return;
+    const distance = (event.changedTouches[0]?.clientX ?? swipeStartX) - swipeStartX;
+    swipeStartX = null;
+    if (Math.abs(distance) < 50) return;
+    (distance > 0 ? lightboxPrev : lightboxNext)?.click();
+  }, { passive: true });
 
   document.addEventListener("fullscreenchange", () => {
     if (!lightbox.classList.contains("is-open")) {
