@@ -1,0 +1,108 @@
+{
+  "slug": "nami-delaware-988-campaign",
+  "sortOrder": 0,
+  "title": "NAMI Delaware 988 Campaign",
+  "subtitle": "Know What to Say: helping people recognize where to turn for support.",
+  "summary": "A public-awareness campaign and service design challenge for NAMI Delaware: making pathways to crisis support easier to understand through plain language, distinct visual cues, and consistent messaging across outdoor, print, and mobile touchpoints.",
+  "heroImage": {
+    "src": "/assets/vscimage/generated/nami-988-campaign-large-1693x929.webp",
+    "alt": "Know What to Say campaign shown on a DART bus in a transit placement concept.",
+    "title": "Transit campaign concept",
+    "caption": "Transit placement concept from the campaign presentation."
+  },
+  "cardImage": {
+    "src": "/assets/vscimage/generated/nami-988-campaign-large-1693x929.webp",
+    "thumbSrc": "/assets/vscimage/generated/nami-988-campaign-featured-thumb-1200x659.webp",
+    "alt": "Know What to Say campaign shown on a DART bus in a transit placement concept."
+  },
+  "featuredImages": [],
+  "sections": [
+    {
+      "id": "challenge",
+      "heading": "Recognition Is Only the Beginning",
+      "body": [
+        "A service can be available without people knowing when or how to use it. The July 2026 campaign strategy focused on that gap: recognizing a number is different from understanding the help it represents.",
+        "The strategy drew on the 2025 NAMI–Ipsos poll, which found that 28% of people were familiar with 988, leaving 72% unfamiliar. From a service design perspective, the challenge was to make the service easier to understand before someone needed it—and easier to recognize when they did."
+      ]
+    },
+    {
+      "id": "strategy",
+      "heading": "Make the First Step Understandable",
+      "body": [
+        "The campaign uses a grapheme strategy: connecting a recognizable group of digits to a clear meaning. Using the familiarity of 911 as a reference point, the design distinguishes the two numbers while giving each a memorable purpose.",
+        "“Know What to Say” starts with the person’s experience. The campaign pairs “I need support” with 988 and “I’m in danger” with 911. These first-person statements aim to reduce the effort required to interpret the message and identify a next step."
+      ]
+    },
+    {
+      "id": "visual-system",
+      "heading": "Create Consistency Across Touchpoints",
+      "body": [
+        "Each encounter with the campaign offers an opportunity to build familiarity. Yellow and red panels separate the messages, large numerals establish a clear hierarchy, and a consistent headline connects the applications.",
+        "That repetition supports a continuous experience across otherwise separate touchpoints. Someone might first notice the campaign on a bus, encounter it again at a shelter, and later receive it in a text message. The format changes, but the central association remains recognizable."
+      ]
+    },
+    {
+      "id": "formats",
+      "heading": "Design Around the Moment of Use",
+      "bodyHtml": "<p>Service design considers where an interaction happens, how much attention someone can give it, and what they can reasonably do next.</p><ul><li><strong>Billboard:</strong> A brief encounter calls for an immediately recognizable message, prominent numbers, and minimal reading.</li><li><strong>Bus shelter:</strong> Longer viewing time creates room for supporting information, a QR code, and a chat URL.</li><li><strong>Bus side:</strong> Movement and viewing distance favor larger numerals and less supporting copy.</li><li><strong>School poster:</strong> A familiar community setting creates an opportunity to encounter the message during everyday routines.</li><li><strong>SMS and magazine:</strong> Formats that allow closer reading can pair the core message with more detailed information.</li></ul><p>These adaptations preserve consistency while responding to different contexts, attention levels, and opportunities to act.</p>"
+    },
+    {
+      "id": "result",
+      "heading": "The Service Design Contribution",
+      "body": [
+        "The campaign addresses the entry point to a service: helping people understand what support exists and recognize a route toward it. It connects communication design with service access by making the first interaction clearer and more familiar.",
+        "The resulting work is a coordinated set of campaign touchpoints, illustrated through transit concepts, outdoor advertising, school posters, SMS outreach, and print. Its intended contribution is to reduce uncertainty at the point of seeking help. Changes in understanding, confidence, or service use would require evaluation beyond the creative work presented here."
+      ]
+    }
+  ],
+  "galleryImages": [
+    {
+      "src": "/assets/case-studies/nami-delaware-988-campaign/sms.webp",
+      "thumbSrc": "/assets/case-studies/nami-delaware-988-campaign/sms-thumb.webp",
+      "title": "SMS outreach",
+      "alt": "NAMI Delaware text message containing the Know What to Say campaign artwork and accompanying support message.",
+      "caption": "SMS outreach pairs the campaign artwork with a longer supporting message."
+    },
+    {
+      "src": "/assets/case-studies/nami-delaware-988-campaign/billboard.webp",
+      "thumbSrc": "/assets/case-studies/nami-delaware-988-campaign/billboard-thumb.webp",
+      "title": "Billboard application",
+      "alt": "Know What to Say campaign displayed on a billboard with yellow and red message panels.",
+      "caption": "Billboard application: large numerals and contrasting panels establish the message hierarchy."
+    },
+    {
+      "src": "/assets/case-studies/nami-delaware-988-campaign/school-poster.webp",
+      "thumbSrc": "/assets/case-studies/nami-delaware-988-campaign/school-poster-thumb.webp",
+      "title": "School bulletin board concept",
+      "alt": "Campaign poster shown on a school bulletin board alongside student notices.",
+      "caption": "School bulletin board concept: the poster brings the message into a familiar everyday setting."
+    },
+    {
+      "src": "/assets/case-studies/nami-delaware-988-campaign/bus-shelter.webp",
+      "thumbSrc": "/assets/case-studies/nami-delaware-988-campaign/bus-shelter-thumb.webp",
+      "title": "Wilmington bus shelter concept",
+      "alt": "Know What to Say poster shown in a downtown Wilmington bus shelter.",
+      "caption": "Bus shelter concept: longer viewing time allows room for supporting information and a QR code."
+    },
+    {
+      "src": "/assets/case-studies/nami-delaware-988-campaign/magazine.webp",
+      "thumbSrc": "/assets/case-studies/nami-delaware-988-campaign/magazine-thumb.webp",
+      "title": "Magazine application",
+      "alt": "A reader holding an open magazine featuring the NAMI Delaware campaign as a full-page advertisement.",
+      "caption": "Magazine application: a full-page format combines the central message with more detailed information."
+    }
+  ],
+  "metadata": {
+    "client": "NAMI Delaware",
+    "role": "",
+    "year": "2026",
+    "industry": "Public-service communications",
+    "services": [
+      "Campaign Strategy",
+      "Visual Communication",
+      "Cross-channel Design"
+    ]
+  },
+  "updatedAt": "2026-09-16",
+  "readingTime": "4 min read"
+}

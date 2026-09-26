@@ -24,12 +24,24 @@
 
 .case-study-index-copy,
 .case-study-hero-copy {
+  min-width: 0;
   max-width: 66ch;
+}
+
+.case-study-index-copy {
+  align-self: start;
+  max-width: min(100%, 760px);
 }
 
 :root .case-study-index-hero .case-study-index-copy h1,
 :root .case-study-hero .case-study-hero-copy h1 {
+  font-size: var(--site-h1-size);
+  line-height: 1.05;
   max-width: 100%;
+  hyphens: none;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  word-break: normal;
 }
 
 .case-study-index-copy > .eyebrow {
@@ -196,7 +208,17 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.92fr);
   gap: 24px;
-  align-items: center;
+  align-items: start;
+}
+
+:root[data-theme="theme4"] .case-study-index-hero,
+:root[data-theme="theme4"] .case-study-hero {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+:root .case-study-index-hero .case-study-index-copy h1 {
+  margin-top: 0;
 }
 
 :root[data-theme="theme4"] .case-study-hero {
@@ -582,4 +604,19 @@ body.case-study-lightbox-open {
   .case-study-meta-item-services {
     grid-column: span 1;
   }
+}
+
+/* Preserve the full NAMI campaign artwork across portrait and landscape formats. */
+body[data-case-study="nami-delaware-988-campaign"] .case-study-gallery-item { align-content: start; }
+body[data-case-study="nami-delaware-988-campaign"] .case-study-gallery-item img { height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
+
+/* Keep portrait images proportional when the lightbox height is constrained. */
+body[data-case-study="nami-delaware-988-campaign"] .case-study-lightbox .lightbox-figure img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 82vh;
+  object-fit: contain;
+  margin-inline: auto;
 }

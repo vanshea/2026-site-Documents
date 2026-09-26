@@ -3,8 +3,6 @@ html.agency-site { background:var(--bg); color:var(--ink); }
 body.agency-site { background:var(--bg)!important; color:var(--ink)!important; font-family:var(--sans)!important; }
 body.agency-site::before, body.agency-site::after, body.agency-site .bg-shape { display:none!important; }
 .agency-site .home-header { position:sticky; top:0; z-index:50; }
-.agency-site .page-wave-stage { position:relative; height:clamp(150px,20vw,300px); overflow:hidden; margin:0; background:var(--bg); }
-.agency-site .page-wave-stage img { position:absolute; top:-4%; left:-7%; width:114%; max-width:none; height:auto; transform:scaleY(.82); transform-origin:center top; }
 .agency-main { width:calc(100% - 10.55%); max-width:1288px; margin:0 auto; padding:76px 0 100px; }
 .agency-main h1,.agency-main h2,.agency-main h3 { color:var(--ink)!important; font-family:var(--serif)!important; text-shadow:none!important; }
 .agency-main h1 { font-size:clamp(40px,4.5vw,62px)!important; line-height:1.15!important; }
@@ -41,7 +39,5 @@ body.agency-site::before, body.agency-site::after, body.agency-site .bg-shape { 
   .agency-site *, .agency-home * { animation-duration:0.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; }
 }
 @media(max-width:700px) {
-  .agency-site .page-wave-stage { height:190px; }
-  .agency-site .page-wave-stage img { width:150%; left:-25%; }
   .agency-main { width:calc(100% - 40px); padding:52px 0 70px; }
 }

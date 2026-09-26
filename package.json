@@ -25,7 +25,8 @@
     "launch:bundle": "node scripts/create-launch-ready-bundle.mjs",
     "siteground:bundle": "npm run comingsoon:bundle",
     "backup:dynamic": "node scripts/create-dynamic-backup.mjs",
-    "backup:dynamic-and-static": "node scripts/create-dynamic-and-static-packages.mjs"
+    "backup:dynamic-and-static": "node scripts/create-dynamic-and-static-packages.mjs",
+    "build:redesign": "node scripts/build-redesign.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

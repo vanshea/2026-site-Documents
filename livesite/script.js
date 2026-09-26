@@ -743,9 +743,12 @@ async function loadSiteImageConfig() {
       }
 
       const thumb = link.querySelector(".card-image");
-      if (thumb && projectConfig.thumb) {
-        thumb.setAttribute("src", toSitePath(projectConfig.thumb));
-        thumb.setAttribute("alt", "");
+      const configuredThumb =
+        card?.classList.contains("is-featured") && projectConfig.featuredThumb
+          ? projectConfig.featuredThumb
+          : projectConfig.thumb;
+      if (thumb && configuredThumb) {
+        thumb.setAttribute("src", toSitePath(configuredThumb));
       }
     });
 

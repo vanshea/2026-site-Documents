@@ -46,34 +46,20 @@
     });
     matchMedia('(min-width:701px)').addEventListener('change', closeMenu);
 
-    const wave = document.querySelector('#case-morph-wave');
-    const stage = document.querySelector('.case-wave-stage');
-    const control = document.querySelector('.case-motion-toggle');
+    const stage = document.querySelector('.footer-wave');
+    const control = stage?.querySelector('.footer-wave-toggle');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-    let playing = false, inView = true, svg = null;
+    let playing = true, inView = true;
     const syncMotion = () => {
       const stop = !playing || reduce.matches || document.hidden || !inView;
-      const label = reduce.matches ? 'Reduced motion' : playing ? 'Pause wave' : 'Play wave';
+      const label = playing ? 'Pause wave animation' : 'Play wave animation';
       if (control) {
         control.textContent = label;
         control.setAttribute('aria-label', label);
-        control.setAttribute('aria-pressed', String(playing && !reduce.matches));
-        control.disabled = reduce.matches;
+        control.setAttribute('aria-pressed', String(playing));
       }
-      if (!svg) return;
-      if (stop) svg.pauseAnimations(); else svg.unpauseAnimations();
-      svg.querySelectorAll('.z').forEach(layer => { layer.style.animationPlayState = stop ? 'paused' : 'running'; });
+      stage?.classList.toggle('is-paused', stop);
     };
-    const connectWave = () => {
-      if (!wave || !stage || !control) return;
-      svg = wave.contentDocument?.querySelector('svg');
-      if (!svg) return;
-      syncMotion();
-      stage.classList.add('is-ready');
-      control.hidden = false;
-    };
-    wave?.addEventListener('load', connectWave);
-    connectWave();
     control?.addEventListener('click', () => { playing = !playing; syncMotion(); });
     reduce.addEventListener('change', syncMotion);
     document.addEventListener('visibilitychange', syncMotion);

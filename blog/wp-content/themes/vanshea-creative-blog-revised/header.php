@@ -17,35 +17,12 @@
 	<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
 	<link rel="manifest" href="/assets/icons/site.webmanifest">
 	<meta name="theme-color" content="#020319">
-	<script>
-		(() => {
-			const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
-			const root = document.documentElement;
-			let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
-
-			try {
-				const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
-					.map((key) => window.localStorage.getItem(key))
-					.find((value) => themes.has(value));
-
-				if (savedTheme) {
-					theme = savedTheme;
-					window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
-				}
-			} catch (error) {
-				// Keep the WordPress default when storage is unavailable.
-			}
-
-			root.dataset.theme = theme;
-			root.style.colorScheme =
-				theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
-					? "dark"
-					: "light";
-		})();
-	</script>
+	<script src="/src/js/theme.js"></script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<?php wp_head(); ?>
+	<link rel="stylesheet" href="/src/styles/tokens.css">
+	<link rel="stylesheet" href="/src/styles/blog-theme.css">
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
@@ -68,26 +45,10 @@
 	</button>
 
 	<nav id="siteNav" class="nav" aria-label="<?php esc_attr_e( 'Primary navigation', 'vanshea-creative-blog' ); ?>">
-		<?php
-		if ( has_nav_menu( 'primary' ) ) {
-			wp_nav_menu(
-				array(
-					'theme_location' => 'primary',
-					'container'      => false,
-					'menu_class'     => 'nav-menu',
-					'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-					'depth'          => 1,
-				)
-			);
-		} else {
-			?>
-			<a href="https://www.vanshea.com/#work"><?php esc_html_e( 'Work', 'vanshea-creative-blog' ); ?></a>
-			<a href="https://www.vanshea.com/case-studies"><?php esc_html_e( 'Case Studies', 'vanshea-creative-blog' ); ?></a>
-			<a href="https://www.vanshea.com/aidesign"><?php esc_html_e( 'AIdesign', 'vanshea-creative-blog' ); ?></a>
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-current="page"><?php esc_html_e( 'Blog', 'vanshea-creative-blog' ); ?></a>
-			<?php
-		}
-		?>
+		<a href="/#work">Work</a>
+		<a href="/#writing">Writing</a>
+		<a href="/about/">About</a>
+		<a href="/#contact">Contact</a>
 	</nav>
 </header>
 

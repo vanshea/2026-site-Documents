@@ -28,16 +28,10 @@
       <span class="nav-toggle-bar"></span>
     </span>
   </button>
-  <nav id="siteNav" class="nav">
-    <a href="/#work" <%- currentPath === "/" ? 'aria-current="page"' : "" %>>Work</a>
-    <a href="/case-studies"<%- currentPath.startsWith("/case-studies") ? ' aria-current="page"' : "" %>>
-      Case Studies
-    </a>
-    <a href="/aidesign"<%- currentPath.startsWith("/aidesign") ? ' aria-current="page"' : "" %>>
-      AIdesign
-    </a>
-    <a href="/blog/"<%- currentPath.startsWith("/blog") ? ' aria-current="page"' : "" %>>
-      Blog
-    </a>
+  <nav id="siteNav" class="nav" aria-label="Main navigation">
+    <a href="/#work">Work</a>
+    <a href="/#writing">Writing</a>
+    <a href="/about/">About</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </header>

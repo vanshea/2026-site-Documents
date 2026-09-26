@@ -15,6 +15,7 @@
   --type-heading-weight: 700;
   --type-heading-letter-spacing: -0.03em;
   --type-heading-line-height: 1.18;
+  --site-h1-size: clamp(2.6rem, 4.8vw, 5rem);
   --bg: #eef7ff;
   --ink: #122033;
   --ink-soft: #56687c;
@@ -669,10 +670,37 @@ main {
 }
 
 h1 {
-  font-size: clamp(1.377rem, 2.907vw, 2.754rem);
+  font-size: var(--site-h1-size);
   max-width: 80%;
   margin: 16px 0 18px;
   text-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.hero-title-end {
+  white-space: nowrap;
+}
+
+.hero-title-asterisk {
+  display: inline-block;
+  margin-left: 0.04em;
+  color: currentColor;
+  font-size: 1.2em;
+  line-height: 0;
+  text-decoration: none;
+  transform: translateY(0.08em);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.hero-title-asterisk:hover,
+.hero-title-asterisk:focus-visible {
+  color: var(--accent);
+  transform: translateY(0.08em) scale(1.12);
+}
+
+.hero-title-asterisk:focus-visible {
+  border-radius: 0.08em;
+  outline: 0.06em solid currentColor;
+  outline-offset: 0.08em;
 }
 
 .lead {
@@ -2396,7 +2424,7 @@ textarea[aria-invalid="true"] {
   margin: clamp(18px, 2.8vw, 34px) 0 clamp(20px, 3vw, 38px);
   color: #0b0710;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3rem, 7vw, 6.7rem);
+  font-size: var(--site-h1-size);
   font-style: normal;
   font-weight: 700;
   letter-spacing: var(--type-heading-letter-spacing);
@@ -2408,7 +2436,7 @@ textarea[aria-invalid="true"] {
 :root[data-theme="theme4"] .aide-sample-main h1 {
   color: #0b0710;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3rem, 7vw, 6.7rem);
+  font-size: var(--site-h1-size);
   font-style: normal;
   font-weight: 700;
   letter-spacing: var(--type-heading-letter-spacing);
@@ -2696,7 +2724,7 @@ textarea[aria-invalid="true"] {
   :root[data-theme="theme4"] .hero h1 {
     max-width: 100%;
     margin: 20px 0 26px;
-    font-size: clamp(3rem, 14vw, 4.25rem);
+    font-size: var(--site-h1-size);
     line-height: 1.02;
     text-shadow: none;
   }
@@ -3297,7 +3325,7 @@ html.is-page-hidden .bg-shape {
   }
 
   h1 {
-    font-size: clamp(1.488rem, 7.65vw, 1.87rem);
+    font-size: var(--site-h1-size);
   }
 
   .btn {
@@ -3427,7 +3455,7 @@ html.is-page-hidden .bg-shape {
   }
 
   h1 {
-    font-size: clamp(2.72rem, 3.4vw, 4.25rem);
+    font-size: var(--site-h1-size);
   }
 
   h2 {
@@ -3477,4 +3505,9 @@ main#top.home-main > .hero {
   .lightbox-next {
     right: 8px;
   }
+}
+
+main#top.home-main > .hero .lead {
+  max-width: 68ch;
+  text-wrap: pretty;
 }

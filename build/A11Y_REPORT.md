@@ -62,3 +62,11 @@ The baseline rule types were `color-contrast` (13 page/theme instances), `aria-h
 ## Reproduction
 
 The scan data are in `build/qa/axe-before.json`, `build/qa/axe-final.json`, and `build/qa/axe-dark.json`; keyboard results are in `build/qa/smoke.json`. The local runners are `build/qa/run-axe.mjs` and `build/qa/run-smoke.mjs`. They require Chrome, Node.js, axe-core, and puppeteer-core; set `VSC_A11Y_DEPS` to the Node module directory if it differs from the local test environment.
+
+## Footer wave regression, September 24, 2026
+
+The decorative wave now appears only in the shared footer on all 28 navigable Build pages. Its five paths use smooth cubic curves with round joins and caps. The footer provides a visible pause/play control, pauses the animation while offscreen or the tab is hidden, and disables animation and hides the control when reduced motion is requested.
+
+The post-change axe-core run covered all 28 pages in Clear, Tinted, High Contrast, and Wild: **112 scans, zero violations, zero scan errors**. There were 36 manual-review results, 24 for color contrast over layered content and 12 for prerecorded video captions, matching the remaining review categories above. Results are in `build/qa/axe-footer-wave.json`.
+
+Visual and interaction checks at 390, 1440, and 2560 CSS pixels found no horizontal overflow, one footer wave per page, and no waves in main content. The pause control changes to “Play wave animation” and stops the CSS animation. Under `prefers-reduced-motion: reduce`, the animation is removed and the control is hidden.

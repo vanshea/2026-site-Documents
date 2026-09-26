@@ -13,7 +13,7 @@
 
 .aide-main h1 {
   margin-bottom: 18px;
-  font-size: 2.85rem;
+  font-size: var(--site-h1-size);
 }
 
 .aide-main h2 {
@@ -46,7 +46,7 @@
 
 .aide-sample-intro {
   display: grid;
-  gap: 12px;
+  gap: 24px;
   padding-bottom: 22px;
   border-bottom: 1px solid var(--line);
 }
@@ -1268,7 +1268,7 @@
 
 @media (max-width: 960px) {
   .aide-main h1 {
-    font-size: 2.25rem;
+    font-size: var(--site-h1-size);
   }
 
   .aide-hero,
@@ -1379,7 +1379,7 @@
   }
 
   .aide-main h1 {
-    font-size: 1.95rem;
+    font-size: var(--site-h1-size);
   }
 
   .aide-main h2 {
@@ -1428,7 +1428,7 @@
 
 @media (max-width: 430px) {
   .aide-main h1 {
-    font-size: 1.65rem;
+    font-size: var(--site-h1-size);
   }
 
   .aide-visual-row {

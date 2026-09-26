@@ -1,0 +1,11 @@
+/* Loaded after the WordPress theme. Shared tokens are the only palette source. */
+html[data-theme] body{background:var(--surface);color:var(--ink);animation:none}
+html[data-theme] p,html[data-theme] .entry-content{color:var(--ink-soft)}
+html[data-theme] .site-header{background:var(--surface)}
+html[data-theme] .site-header a{color:var(--ink)}
+html[data-theme] :focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+html[data-theme] .site-footer{background:var(--surface);color:var(--ink)}
+html[data-theme] .site-footer p,html[data-theme] .site-footer a,html[data-theme] .site-footer button{color:var(--ink)}
+html[data-theme] .site-footer .theme-link.is-active{background:var(--btn-bg);color:var(--btn-text)}
+@media(prefers-color-scheme:dark){html[data-theme=theme1],html[data-theme=theme2]{color-scheme:dark!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
