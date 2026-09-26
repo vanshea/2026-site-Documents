@@ -1,0 +1,10 @@
+{
+  "archive": "Design system setup request.zip",
+  "images": [
+    "build/assets/vscimage/generated/mt-bank-future-b2b-lending-board-fullscreen-3200x1800.webp",
+    "build/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp",
+    "build/assets/vscimage/generated/nami-988-campaign-fullscreen-1693x929.webp"
+  ],
+  "content": "build/index.html; supplied ui_kits/leadership/Page.jsx",
+  "note": "Reference snapshot for Phase 2. build and livesite are unchanged."
+}

@@ -1,0 +1,197 @@
+/* Single source of truth. Edit values here;
+   components reference these properties. */
+:root {
+  --font-display: "Lexend Deca", sans-serif;
+  --font-text: "Open Sans", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
+  --font-mono: "Courier New", Courier, "Liberation Mono", monospace;
+  --serif: Georgia, "Times New Roman", serif;
+  --color-white: #ffffff;
+  --color-lightbox: #0b0b10;
+  --color-lightbox-backdrop: rgba(6,6,14,.9);
+  --color-lightbox-border: rgba(255,255,255,.6);
+  --color-lightbox-muted: #e4e4ea;
+  --color-lightbox-slot: #1c1c2e;
+  --color-inverse-muted: #e6f0c2;
+  --wave-chartreuse: #d9ff00;
+  --wave-coral: #f36070;
+  --wave-cyan: #00d6ff;
+  --wave-tan: #cfbead;
+  --content-max: 1180px;
+  --measure-section: 760px;
+  --measure-problem: 640px;
+  --duration-hover: .18s;
+  --duration-dialog: .22s;
+  --duration-progress: .3s;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --line-body: 1.65;
+  --line-heading: 1.2;
+  --line-tight: 1.05;
+  --tracking-label: .08em;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --focus-width: 3px;
+  --focus-offset: 3px;
+  --preview-swatch-height: 88px;
+  --preview-column-min: 220px;
+  --preview-section-space: 64px;
+  --text-body: 1rem;
+  --space-20: 20px;
+  --space-56: 56px;
+  --space-28: 28px;
+  --space-88: 88px;
+  --space-64: 64px;
+  --space-negative-14: -14px;
+  --space-24: 24px;
+  --text-small: .92rem;
+  --underline-hover-offset: .2em;
+  --text-label: .78rem;
+  --tracking-headline: -.02em;
+  --text-h2: 2rem;
+  --text-h3: 1.2rem;
+  --line-subheading: 1.3;
+  --text-lead: 1.25rem;
+  --line-lead: 1.55;
+  --space-48: 48px;
+  --space-12: 12px;
+  --space-22: 22px;
+  --text-button: .95rem;
+  --space-negative-2: -2px;
+  --underline-width: .12em;
+  --underline-offset: .16em;
+  --hero-media-min: 280px;
+  --space-72: 72px;
+  --space-10: 10px;
+  --text-caption: .9rem;
+  --line-caption: 1.45;
+  --text-micro: .72rem;
+  --space-16: 16px;
+  --space-8: 8px;
+  --space-18: 18px;
+  --space-36: 36px;
+  --space-4: 4px;
+  --text-problem-max: 1.55rem;
+  --line-problem: 1.25;
+  --line-longform: 1.7;
+  --text-detail: .82rem;
+  --space-6: 6px;
+  --space-23: 23px;
+  --space-14: 14px;
+  --tracking-meta: .09em;
+  --text-meta: .75rem;
+  --line-detail: 1.5;
+  --text-topline: .76rem;
+  --text-quote-min: 1.4rem;
+  --text-quote-max: 2.2rem;
+  --space-5: 5px;
+  --space-80: 80px;
+  --space-34: 34px;
+  --space-32: 32px;
+  --text-footer: .85rem;
+  --space-negative-12: -12px;
+  --space-2: 2px;
+  --space-negative-80: -80px;
+  --space-3: 3px;
+  --space-44: 44px;
+  --opacity-_4: .4;
+  --opacity-0: 0;
+  --opacity-1: 1;
+  --lightbox-max: 1200px;
+  --text-counter: .8rem;
+  --space-220: 220px;
+  --lightbox-slot-max: 637px;
+  --space-200: 200px;
+  --space-30: 30px;
+  --text-recommendation: 1.18rem;
+  --text-attribution: .88rem;
+  --tracking-status: .06em;
+  --space-40: 40px;
+}
+
+:root, [data-theme="clear"], [data-theme="theme1"]{
+  --paper:#fffcf3;
+  --panel:#f6f1e6;
+  --surface:var(--panel);
+  --ink:#2f2427;
+  --ink-soft:#5e5357;
+  --muted:var(--ink-soft);
+  --line:#e2d9c9;
+  --accent:#2d7a58;
+  --accent-ink:#fffcf3;
+  --accent-2:#ff8a4c;
+  --accent-3:#cfbead;
+  --focus-ring:#2d7a58;
+  --radius-soft:10px;
+  --shadow-soft:0 14px 34px rgba(47,36,39,.1);
+}
+
+[data-theme="tinted"], [data-theme="theme2"]{
+  --paper:#f5efe2;
+  --panel:#ebe1cd;
+  --surface:var(--panel);
+  --ink:#2f2427;
+  --ink-soft:#594b47;
+  --muted:var(--ink-soft);
+  --line:#d5c6ab;
+  --accent:#94472f;
+  --accent-ink:#fff8eb;
+  --accent-2:#ff8a4c;
+  --focus-ring:#94472f;
+  --radius-soft:10px;
+  --shadow-soft:0 18px 42px rgba(47,36,39,.12);
+}
+
+[data-theme="contrast"], [data-theme="theme3"]{
+  --paper:#060810;
+  --panel:#151023;
+  --surface:var(--panel);
+  --ink:#ffffff;
+  --ink-soft:#c9cbd6;
+  --muted:var(--ink-soft);
+  --line:#3b3552;
+  --accent:#d9ff00;
+  --accent-ink:#060810;
+  --accent-2:#00e5ff;
+  --focus-ring:#00e5ff;
+  --radius-soft:8px;
+  --shadow-soft:none;
+}
+
+/* Wild (site theme4) — palette derived from wave-05-morph.svg (chartreuse #d9ff00, coral #f36070, cyan #00d6ff, tan #cfbead) + aidesign.css ink #151023. Structural rules from case-studies.css theme4: flush hero, borderless media, white card hover. */
+[data-theme="wild"], [data-theme="theme4"]{
+  --paper:#d9ff00;
+  --panel:#ffffff;
+  --surface:var(--panel);
+  --ink:#151023;
+  --ink-soft:#3b3450;
+  --muted:var(--ink-soft);
+  --line:#151023;
+  --accent:#f36070;
+  --accent-ink:#151023;
+  --accent-2:#00d6ff;
+  --accent-3:#cfbead;
+  --focus-ring:#151023;
+  --radius-soft:12px;
+  --shadow-soft:none;
+}
+
+ :root, [data-theme]{
+  --headline:#f16070;
+  --site-h1-size:clamp(2.6rem,5.6vw,4.9rem);
+  --space-42:42px
+}
+
+[data-theme="tinted"], [data-theme="theme2"], [data-theme="wild"], [data-theme="theme4"] {
+   --headline:#d94a5b;
+}
+
+/* Component-specific values that remain editable without opening component CSS. */
+:root {
+  --focus-on-dark: #ffffff;
+  --line-quote-mark: .6;
+  --radius-panel: 12px;
+  --radius-none: 0;
+  --lift-hover: -2px;
+  --hover-brightness: .94;
+}

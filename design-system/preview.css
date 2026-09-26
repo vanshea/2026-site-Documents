@@ -1,0 +1,129 @@
+/* Documentation layout only. Not distributed with site components. */
+.ds-intro {
+   display:grid;
+   gap:var(--space-22);
+   padding-block:var(--preview-section-space);
+   max-width:var(--measure-section);
+}
+
+.ds-section {
+   padding-block:var(--preview-section-space);
+   border-top:var(--border-width) solid var(--line);
+   display:grid;
+   gap:var(--space-28);
+}
+
+.ds-grid {
+   display:grid;
+   grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--preview-column-min)),1fr));
+   gap:var(--space-16);
+}
+
+.ds-token {
+   border:var(--border-width) solid var(--line);
+   border-radius:var(--radius-soft);
+   overflow:hidden;
+   margin:0;
+   background:var(--paper);
+}
+
+.ds-token-swatch {
+   min-height:var(--preview-swatch-height);
+   border-bottom:var(--border-width) solid var(--line);
+}
+
+.ds-token figcaption {
+   padding:var(--space-12);
+   display:grid;
+   gap:var(--space-6);
+   font-size:var(--text-detail);
+   overflow-wrap:anywhere;
+}
+
+.ds-token code,.ds-value code,pre {
+   font-family:var(--font-mono);
+}
+
+.ds-value {
+   display:grid;
+   gap:var(--space-8);
+   padding:var(--space-16);
+   border:var(--border-width) solid var(--line);
+   overflow-wrap:anywhere;
+}
+
+.ds-type {
+   display:grid;
+   gap:var(--space-28);
+}
+
+.ds-note {
+   padding:var(--space-18) var(--space-22);
+   border-left:var(--space-4) solid var(--accent);
+   background:var(--panel);
+}
+
+.ds-note p {
+   margin:0;
+}
+
+.ds-small {
+   font-size:var(--text-footer);
+   color:var(--ink-soft);
+}
+
+.ds-tabs {
+   display:flex;
+   flex-wrap:wrap;
+   gap:var(--space-16);
+}
+
+.ds-tabs a {
+   min-height:var(--space-44);
+   display:inline-flex;
+   align-items:center;
+}
+
+.ds-theme-preview {
+   padding:var(--space-22);
+   background:var(--paper);
+   color:var(--ink);
+   border:var(--border-width) solid var(--line);
+   border-radius:var(--radius-soft);
+}
+
+.ds-theme-preview button {
+   margin-top:var(--space-16);
+}
+
+.ds-type .vsx-h1 {
+   overflow-wrap:anywhere;
+}
+
+.ds-section>h2,.ds-section>p {
+   margin:0;
+}
+
+pre {
+   overflow:auto;
+   background:var(--panel);
+   padding:var(--space-16);
+}
+
+#theme-palettes {
+   display:grid;
+   gap:var(--space-16);
+}
+
+#theme-palettes details {
+   background:var(--paper);
+   color:var(--ink);
+   padding:var(--space-16);
+   border:var(--border-width) solid var(--line);
+}
+
+#theme-palettes summary {
+   cursor:pointer;
+   min-height:var(--space-44);
+   font-weight:var(--weight-bold);
+}
