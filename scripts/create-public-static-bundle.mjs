@@ -41,7 +41,7 @@ function stripStaticOnlyFeatures(html) {
   return String(html || "")
     .replace(/\s*<script src="\/?(?:livesite|comingsoon|build)\/analytics\.js"><\/script>\s*/g, "\n")
     .replace(/\s*<script src="\/?analytics\.js"><\/script>\s*/g, "\n")
-    .replace(/\s*<aside[\s\S]*?id="consentBanner"[\s\S]*?<\/aside>\s*/g, "\n")
+    .replace(/\s*<aside\b[^>]*\bid="consentBanner"[^>]*>[\s\S]*?<\/aside>\s*/g, "\n")
     .replace(/\s*<button class="theme-link consent-manage-btn"[\s\S]*?<\/button>\s*/g, "\n")
     .replace(/\sdata-analytics(?:-location)?="[^"]*"/g, "");
 }
