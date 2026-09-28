@@ -1,0 +1,1 @@
+<section class="empty-state"><p class="eyebrow"><?php esc_html_e( 'Nothing found', 'human-agency-design-2027' ); ?></p><h1><?php esc_html_e( 'No posts matched that request.', 'human-agency-design-2027' ); ?></h1><?php get_search_form(); ?></section>

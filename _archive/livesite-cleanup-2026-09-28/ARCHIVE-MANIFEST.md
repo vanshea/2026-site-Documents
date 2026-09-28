@@ -1,0 +1,89 @@
+# Local livesite cleanup archive — 2026-09-28
+
+These files were removed from the local `livesite/` upload tree because they are internal reports/QA, non-indexed design previews, duplicate homepage drafts, or unreferenced generation helpers. The move preserved their relative paths, so they can be restored. Sitemap pages and their direct prototype dependencies were retained. The missing WordPress blog directory was restored from `_archive/livesite-backup-2026-09-28/blog` (5,456 files copied); its `php_errorlog` runtime log was kept out of the live tree and archived here under `blog/php_errorlog`.
+
+Files moved: 82
+
+- `.DS_Store`
+- `A11Y_REPORT.md`
+- `COPY_CHANGES.md`
+- `README.md`
+- `aidesign/.DS_Store`
+- `aidesign/index/index.html`
+- `assets/.DS_Store`
+- `assets/aidesign/.DS_Store`
+- `assets/aidesign/New Folder With Items/contact-app-thumbnail.png`
+- `assets/aidesign/New Folder With Items/meeting-coach-app-thumbnail.png`
+- `assets/aidesign/New Folder With Items/partner-app-thumbnail.png`
+- `assets/aidesign/New Folder With Items/self-care-app-thumbnail.png`
+- `assets/home-2027/README.md`
+- `assets/home-2027/apply-site-theme.py`
+- `assets/home-2027/demos/macos26-slider--index.html`
+- `assets/home-2027/demos/nft-prototype.html`
+- `assets/home-2027/home.css`
+- `assets/home-2027/home.js`
+- `assets/home-2027/propagate-agency.py`
+- `assets/home-2027/render-homes.cjs`
+- `assets/home-2027/selected-home.html`
+- `assets/home-2027/site.css`
+- `assets/home-2027/site.js`
+- `assets/home-2027/wave-header-02.js`
+- `case-studies/.DS_Store`
+- `design-qa.md`
+- `home-2.html`
+- `home-3.html`
+- `home.html`
+- `macos26-slider/assets/wallpaper-aqua.svg`
+- `macos26-slider/assets/wallpaper-aurora.svg`
+- `macos26-slider/assets/wallpaper-ember.svg`
+- `macos26-slider/assets/wallpaper-graphite.svg`
+- `macos26-slider/index.html`
+- `macos26-slider/script.js`
+- `macos26-slider/styles.css`
+- `nft-prototype.css`
+- `nft-prototype.html`
+- `nft-prototype.js`
+- `qa/after-build-aidesign-index.png`
+- `qa/after-build-case-studies-index.png`
+- `qa/after-build-index.png`
+- `qa/after-build-work.png`
+- `qa/axe-after.json`
+- `qa/axe-before.json`
+- `qa/axe-dark.json`
+- `qa/axe-final.json`
+- `qa/axe-footer-wave.json`
+- `qa/before-build-aidesign-index.png`
+- `qa/before-build-case-studies-index.png`
+- `qa/before-build-index.png`
+- `qa/before-build-work.png`
+- `qa/dark-build-aidesign-index.png`
+- `qa/dark-build-case-studies-index.png`
+- `qa/dark-build-case-studies-nami-delaware-988-campaign-index.png`
+- `qa/dark-build-index.png`
+- `qa/dark-build-work.png`
+- `qa/final-build-aidesign-index.png`
+- `qa/final-build-case-studies-index.png`
+- `qa/final-build-case-studies-nami-delaware-988-campaign-index.png`
+- `qa/final-build-index.png`
+- `qa/final-build-work.png`
+- `qa/footer-wave-build-aidesign-index.png`
+- `qa/footer-wave-build-case-studies-index.png`
+- `qa/footer-wave-build-case-studies-nami-delaware-988-campaign-index.png`
+- `qa/footer-wave-build-index.png`
+- `qa/footer-wave-build-work.png`
+- `qa/home-2027/comparison.jpg`
+- `qa/home-2027/desktop-first.jpg`
+- `qa/home-2027/desktop-hero.jpg`
+- `qa/home-2027/featured-work.jpg`
+- `qa/home-2027/high-contrast.jpg`
+- `qa/home-2027/mobile-hero.jpg`
+- `qa/home-2027/mt-feature.jpg`
+- `qa/home-2027/tinted-dark.jpg`
+- `qa/normalize-shell.py`
+- `qa/run-axe.mjs`
+- `qa/run-smoke.mjs`
+- `qa/smoke.json`
+- `seo/AUDIT.md`
+- `seo/REPORT.md`
+
+- `blog/php_errorlog` (runtime log excluded from restored WordPress blog)

@@ -1,0 +1,50 @@
+{
+  "logos": {
+    "light": "assets/sm_logo_hor_3x.png",
+    "dark": "assets/sm_logo_hor_3x.png"
+  },
+  "projects": {
+    "northline": {
+      "title": "Northline Coffee",
+      "thumb": "",
+      "large": "",
+      "fullscreen": "",
+      "description": ""
+    },
+    "atlas": {
+      "title": "Atlas Wellness",
+      "thumb": "",
+      "large": "",
+      "fullscreen": "",
+      "description": ""
+    },
+    "city_transit": {
+      "title": "City Transit Posters",
+      "thumb": "",
+      "large": "",
+      "fullscreen": "",
+      "description": ""
+    },
+    "wren": {
+      "title": "Wren Studio",
+      "thumb": "",
+      "large": "",
+      "fullscreen": "",
+      "description": ""
+    },
+    "hollow_creek": {
+      "title": "Hollow Creek Cider",
+      "thumb": "",
+      "large": "",
+      "fullscreen": "",
+      "description": ""
+    },
+    "field_notes": {
+      "title": "Field Notes Covers",
+      "thumb": "",
+      "large": "",
+      "fullscreen": "",
+      "description": ""
+    }
+  }
+}

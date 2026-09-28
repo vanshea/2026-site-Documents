@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="theme4">
+  <head>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="/assets/icons/favicon.ico" sizes="any" />
+<link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/assets/icons/site.webmanifest" />
+<meta name="theme-color" content="#020319" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
+<title>Vanguard Smart Home &amp; Security | Case Study | Van Shea Creative</title>
+<meta name="description" content="Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems." />
+<link rel="canonical" href="https://www.vanshea.com/case-studies/vanguard-innovation-lab-integration/" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Van Shea Creative" />
+<meta property="og:title" content="Vanguard Smart Home Voice &amp; Security Strategy | Case Study" />
+<meta property="og:description" content="Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems." />
+<meta property="og:url" content="https://www.vanshea.com/case-studies/vanguard-innovation-lab-integration/" />
+<meta property="og:image" content="https://www.vanshea.com/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Vanguard Smart Home Voice &amp; Security Strategy | Case Study" />
+<meta name="twitter:description" content="Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems." />
+<meta name="twitter:image" content="https://www.vanshea.com/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" /></noscript>
+<link rel="stylesheet" href="/styles.css?v=20260901-uniform-h1-1" />
+<link rel="stylesheet" href="/assets/case-studies.css?v=20260901-case-title-scale-4" />
+
+
+
+  </head>
+  <body>
+    <a class="skip-link" href="#top">Skip to content</a>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <header class="site-header">
+  <a href="/" class="brand" aria-label="Back to homepage">
+    <picture>
+      <img
+        id="brandLogoLightImage"
+        class="brand-logo"
+        src="/assets/new-logo-mark.svg"
+        data-logo-light="/assets/new-logo-mark.svg"
+        data-logo-dark="/assets/new-logo-mark-lite.svg"
+        alt="Van Shea Creative"
+        width="56"
+        height="56"
+      />
+    </picture>
+    <span class="brand-name">Van Shea Creative</span>
+  </a>
+  <button
+    class="nav-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="siteNav"
+    aria-label="Open navigation menu"
+  >
+    <span class="sr-only">Toggle navigation</span>
+    <span class="nav-toggle-icon" aria-hidden="true">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </span>
+  </button>
+  <nav id="siteNav" class="nav">
+    <a href="/#work" >Work</a>
+    <a href="/case-studies" aria-current="page">
+      Case Studies
+    </a>
+    <a href="/aidesign/">AIdesign</a>
+    <a href="/blog/">
+      Blog
+    </a>
+  </nav>
+</header>
+
+
+    <main id="top" class="case-study-page">
+      <section class="hero case-study-hero reveal">
+  <div class="case-study-hero-copy">
+    <a class="theme-link case-study-breadcrumb" href="/case-studies">
+      Back to all case studies
+    </a>
+    <p class="eyebrow">Case Study</p>
+    <h1>Vanguard Smart Home Voice &amp; Security Strategy</h1>
+
+    
+      <p class="case-study-subtitle">Research and strategy for evaluating smart-home voice interfaces, security, and operational readiness.</p>
+    
+
+    
+      <p class="lead">Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems.</p>
+    
+
+    <div class="case-study-hero-meta">
+      
+        <span class="case-study-pill">5 min read</span>
+      
+      
+        <span class="case-study-pill">Updated 2026-05-01</span>
+      
+    </div>
+  </div>
+
+  
+    <div class="case-study-hero-media case-study-hero-video">
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        poster="/assets/vscimage/generated/vanguard3200x1800-fullscreen-3200x1800.webp"
+        aria-label="Silent demo video: Vanguard smart-home voice and security concepts"
+      >
+        <source src="/assets/videos/vanguard-samples.mp4" type="video/mp4" />
+        Your browser does not support HTML video.
+      </video>
+    </div>
+  
+</section>
+
+      <!-- Case study metadata panel temporarily disabled.
+      
+
+<section class="case-study-meta-panel reveal" aria-label="Case study metadata">
+  <div class="case-study-meta-grid">
+    
+      <article class="case-study-meta-item">
+        <span class="case-study-meta-label">Client</span>
+        <strong class="case-study-meta-value">Vanguard</strong>
+      </article>
+    
+      <article class="case-study-meta-item">
+        <span class="case-study-meta-label">Role</span>
+        <strong class="case-study-meta-value">Lead UX Strategist</strong>
+      </article>
+    
+      <article class="case-study-meta-item">
+        <span class="case-study-meta-label">Year</span>
+        <strong class="case-study-meta-value">2018</strong>
+      </article>
+    
+      <article class="case-study-meta-item">
+        <span class="case-study-meta-label">Industry</span>
+        <strong class="case-study-meta-value">Financial Services</strong>
+      </article>
+    
+
+    
+      <article class="case-study-meta-item case-study-meta-item-services">
+        <span class="case-study-meta-label">Services</span>
+        <div class="case-study-services">
+          
+            <span class="case-study-pill">Design Research</span>
+          
+            <span class="case-study-pill">UX Strategy</span>
+          
+            <span class="case-study-pill">Security Experience Design</span>
+          
+            <span class="case-study-pill">Concept Prototyping</span>
+          
+        </div>
+      </article>
+    
+  </div>
+</section>
+
+      -->
+
+      
+
+      <section class="case-study-sections">
+        
+          <article class="case-study-section reveal ">
+  <div class="case-study-section-copy">
+    <h2>The Story</h2>
+
+    
+      <div class="case-study-rich-text"><p>Smart-home devices were growing, but clients did not yet trust the security and privacy of voice technology. Vanguard needed to assess the effort, timing, and risks of a consumer voice strategy.</p><p>The strategy had to balance market opportunity with trust, security messaging, usage data, current systems, and legacy constraints.</p></div>
+    
+
+    
+  </div>
+
+  
+</article>
+
+        
+          <article class="case-study-section reveal ">
+  <div class="case-study-section-copy">
+    <h2>The Strategic Action</h2>
+
+    
+      <div class="case-study-rich-text"><p>Van led research, prototypes, and security experience design, grounding the work in client usage data, analytics, current systems, and legacy constraints.</p><p>He also directed smart-home concepts that helped leaders evaluate the market, client experience, and operational readiness.</p></div>
+    
+
+    
+  </div>
+
+  
+</article>
+
+        
+          <article class="case-study-section reveal ">
+  <div class="case-study-section-copy">
+    <h2>Impact Beyond the Roadmap</h2>
+
+    
+      <div class="case-study-rich-text"><ul><li><strong>Customer Win:</strong> Privacy and security became core experience requirements.</li><li><strong>Strategic Win:</strong> Vanguard gained a clearer position on the smart-home voice market.</li><li><strong>Organizational Win:</strong> Digital leaders formed teams to support stronger security.</li><li><strong>Execution Win:</strong> The strategy informed credentials-reset and profile-update experiences.</li></ul></div>
+    
+
+    
+  </div>
+
+  
+</article>
+
+        
+          <article class="case-study-section reveal ">
+  <div class="case-study-section-copy">
+    <h2>Strategic Takeaway</h2>
+
+    
+      <div class="case-study-rich-text"><p>Van turned an abstract voice-device question into an actionable roadmap connecting market opportunity, client trust, security, systems, and prototypes.</p></div>
+    
+
+    
+  </div>
+
+  
+</article>
+
+        
+      </section>
+
+      
+    </main>
+
+    <footer class="site-footer" id="siteFooter" data-footer-pattern>
+  <div class="footer-pattern-layer" aria-hidden="true"></div>
+  <button
+    type="button"
+    class="site-footer-art"
+    data-footer-art-trigger
+    aria-label="Activate footer artwork animation"
+  >
+    <picture>
+      <source type="image/avif" srcset="/assets/footer-art/site-footer-rev-720.avif 720w, /assets/footer-art/site-footer-rev-1200.avif 1200w, /assets/footer-art/site-footer-rev-1800.avif 1800w" sizes="100vw" />
+      <source type="image/webp" srcset="/assets/footer-art/site-footer-rev-720.webp 720w, /assets/footer-art/site-footer-rev-1200.webp 1200w, /assets/footer-art/site-footer-rev-1800.webp 1800w" sizes="100vw" />
+      <img src="/assets/footer-art/site-footer-rev-sm.png" alt="Colorful abstract portfolio artwork." width="1800" height="1973" loading="lazy" decoding="async" />
+    </picture>
+  </button>
+  <div class="site-footer-inner">
+    <div class="site-footer-controls">
+      <div class="footer-actions" role="group" aria-label="Connect with Van Shea">
+        <a
+          class="theme-link"
+          href="https://calendly.com/van-shea/30min"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Schedule Time
+        </a>
+        <a
+          class="theme-link"
+          href="https://www.linkedin.com/in/vanshea/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          LinkedIn
+        </a>
+      </div>
+      <div class="theme-switcher" role="group" aria-label="Choose site theme">
+        <button
+          class="theme-link"
+          type="button"
+          data-theme="theme1"
+          aria-pressed="false"
+        >
+          Clear
+        </button>
+        <button
+          class="theme-link"
+          type="button"
+          data-theme="theme2"
+          aria-pressed="false"
+        >
+          Tinted
+        </button>
+        <button
+          class="theme-link"
+          type="button"
+          data-theme="theme3"
+          aria-pressed="false"
+        >
+          High Contrast
+        </button>
+        <button
+          class="theme-link is-active"
+          type="button"
+          data-theme="theme4"
+          aria-pressed="true"
+        >
+          Wild
+        </button>
+      </div>
+    </div>
+    <p>&copy; <span id="year"></span> Van Shea Sedita. All rights reserved.</p>
+    <button class="footer-privacy-link" id="consentManageBtn" type="button">
+      Privacy Policy
+    </button>
+    <p class="footer-animation-meta" id="footerAnimationMeta" data-footer-floating-meta>
+      Animation generated 1 time · 2026-05-21 16:39:39 EDT
+    </p>
+  </div>
+</footer>
+
+    <aside
+  class="consent-banner"
+  id="consentBanner"
+  role="region"
+  aria-label="Analytics consent"
+  hidden
+>
+  <p class="consent-text">
+    We use privacy-first analytics to measure meaningful actions, not personal identity.
+  </p>
+  <div class="consent-actions">
+    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+      Deny
+    </button>
+    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+      Allow Analytics
+    </button>
+  </div>
+</aside>
+
+
+
+    <script src="/analytics.js" defer></script>
+    <script src="/script.js?v=20260714-logo-1" defer></script>
+    <script src="/assets/case-studies.js" defer></script>
+  </body>
+</html>

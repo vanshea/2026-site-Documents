@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="theme4">
+  <head>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="/assets/icons/favicon.ico" sizes="any" />
+<link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/assets/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
+<link rel="icon" href="/assets/icons/favicon-16x16.png" type="image/png" sizes="16x16" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/assets/icons/site.webmanifest" />
+<meta name="theme-color" content="#020319" />
+<script>
+  (() => {
+    const themes = new Set(["theme1", "theme2", "theme3", "theme4"]);
+    const root = document.documentElement;
+    let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+    try {
+      const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+        .map((key) => window.localStorage.getItem(key))
+        .find((value) => themes.has(value));
+
+      if (savedTheme) {
+        theme = savedTheme;
+        window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+      }
+    } catch (error) {
+      // Keep the markup default when storage is unavailable.
+    }
+
+    root.dataset.theme = theme;
+    root.style.colorScheme =
+      theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
+  })();
+</script>
+<title>Case Studies | Van Shea Creative</title>
+<meta name="description" content="UX, service design, strategy, and product case studies from Van Shea Creative." />
+<link rel="canonical" href="https://www.vanshea.com/case-studies/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Van Shea Creative" />
+<meta property="og:title" content="Case Studies | Van Shea Creative" />
+<meta property="og:description" content="UX, service design, strategy, and product case studies from Van Shea Creative." />
+<meta property="og:url" content="https://www.vanshea.com/case-studies/" />
+<meta property="og:image" content="https://www.vanshea.com/assets/vscimage/generated/case-studies-fullscreen-3200x1800.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Case Studies | Van Shea Creative" />
+<meta name="twitter:description" content="UX, service design, strategy, and product case studies from Van Shea Creative." />
+<meta name="twitter:image" content="https://www.vanshea.com/assets/vscimage/generated/case-studies-fullscreen-3200x1800.webp" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;700;800&family=Open+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" /></noscript>
+<link rel="stylesheet" href="/styles.css?v=20260901-uniform-h1-1" />
+<link rel="stylesheet" href="/assets/case-studies.css?v=20260901-case-title-scale-4" />
+
+
+
+  </head>
+  <body>
+    <a class="skip-link" href="#top">Skip to content</a>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <header class="site-header">
+  <a href="/" class="brand" aria-label="Back to homepage">
+    <picture>
+      <img
+        id="brandLogoLightImage"
+        class="brand-logo"
+        src="/assets/new-logo-mark.svg"
+        data-logo-light="/assets/new-logo-mark.svg"
+        data-logo-dark="/assets/new-logo-mark-lite.svg"
+        alt="Van Shea Creative"
+        width="56"
+        height="56"
+      />
+    </picture>
+    <span class="brand-name">Van Shea Creative</span>
+  </a>
+  <button
+    class="nav-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="siteNav"
+    aria-label="Open navigation menu"
+  >
+    <span class="sr-only">Toggle navigation</span>
+    <span class="nav-toggle-icon" aria-hidden="true">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </span>
+  </button>
+  <nav id="siteNav" class="nav">
+    <a href="/#work" >Work</a>
+    <a href="/case-studies" aria-current="page">
+      Case Studies
+    </a>
+    <a href="/aidesign/">AIdesign</a>
+    <a href="/blog/">
+      Blog
+    </a>
+  </nav>
+</header>
+
+    
+
+    <main id="top">
+      <section class="hero case-study-index-hero reveal">
+        <div class="case-study-index-copy">
+          <h1 id="caseStudiesIndexHeading">Selected Collaborations</h1>
+          <p class="lead">A closer look at work created with talented teams and collaborators.</p>
+        </div>
+      </section>
+
+      <section class="case-study-block reveal" aria-labelledby="caseStudiesIndexHeading">
+        <h2 class="sr-only">Case studies</h2>
+        <div class="grid case-study-card-grid">
+          
+            <article class="card case-study-card reveal">
+  <a class="case-study-card-link" href="/case-studies/nami-delaware-988-campaign">
+    
+    
+      <span class="card-image-shell case-study-card-image-shell">
+        <img
+          class="card-image case-study-card-image"
+          src="/assets/vscimage/generated/nami-988-campaign-featured-thumb-1200x659.webp"
+          alt="Know What to Say campaign shown on a DART bus in a transit placement concept."
+          loading="lazy"
+        />
+      </span>
+    
+
+    <div class="case-study-card-topline">
+      
+        <span>NAMI Delaware</span>
+      
+      
+        <span>2026</span>
+      
+    </div>
+
+    <h3>NAMI Delaware 988 Campaign</h3>
+
+    
+      <p class="case-study-card-subtitle">Know What to Say: helping people recognize where to turn for support.</p>
+    
+
+    
+      <p>A public-awareness campaign and service design challenge for NAMI Delaware: making pathways to crisis support easier to understand through plain language, distinct visual cues, and consistent messaging across outdoor, print, and mobile touchpoints.</p>
+    
+
+    
+      <div class="case-study-card-tags" aria-label="Services">
+        
+          <span class="case-study-pill">Campaign Strategy</span>
+        
+          <span class="case-study-pill">Visual Communication</span>
+        
+          <span class="case-study-pill">Cross-channel Design</span>
+        
+      </div>
+    
+  </a>
+</article>
+
+<article class="card case-study-card reveal">
+  <a class="case-study-card-link" href="/case-studies/capital-one-gesture-patent">
+    
+      <span class="card-image-shell case-study-card-image-shell case-study-logo-card-shell">
+        <img
+          class="case-study-logo-card-image"
+          src="/assets/capital-one-logo.svg"
+          alt="Capital One logo"
+          loading="lazy"
+        />
+      </span>
+    
+
+    <div class="case-study-card-topline">
+      
+        <span>Capital One</span>
+      
+      
+        <span>2017</span>
+      
+    </div>
+
+    <h3>Capital One: The Patent and Beyond</h3>
+
+    
+      <p class="case-study-card-subtitle">A self-directed prototype that turned navigation friction into a patented gesture-based interaction model.</p>
+    
+
+    
+      <p>When user testing revealed friction caused by a complex, multi-screen experience, Van formed a lean team to design and test a simpler prototype. The concept advanced from early ideation to a granted patent.</p>
+    
+
+    
+      <div class="case-study-card-tags" aria-label="Services">
+        
+          <span class="case-study-pill">Interaction Design</span>
+        
+          <span class="case-study-pill">Information Architecture</span>
+        
+          <span class="case-study-pill">Prototyping</span>
+        
+      </div>
+    
+  </a>
+</article>
+
+          
+            <article class="card case-study-card reveal">
+  <a class="case-study-card-link" href="/case-studies/vanguard-innovation-lab-integration">
+    
+      <span class="card-image-shell case-study-card-image-shell">
+        <img
+          class="card-image case-study-card-image"
+          src="/assets/vscimage/generated/vanguard3200x1800-thumb-760x570.webp"
+          alt="Vanguard smart-home voice and security strategy overview."
+          loading="lazy"
+        />
+      </span>
+    
+
+    <div class="case-study-card-topline">
+      
+        <span>Vanguard</span>
+      
+      
+        <span>2018</span>
+      
+    </div>
+
+    <h3>Vanguard Smart Home Voice &amp; Security Strategy</h3>
+
+    
+      <p class="case-study-card-subtitle">Research and strategy for evaluating smart-home voice interfaces, security, and operational readiness.</p>
+    
+
+    
+      <p>Vanguard needed a voice-interface strategy that protected client trust. Van led research and prototypes connecting security concepts to business needs, analytics, and legacy systems.</p>
+    
+
+    
+      <div class="case-study-card-tags" aria-label="Services">
+        
+          <span class="case-study-pill">Design Research</span>
+        
+          <span class="case-study-pill">UX Strategy</span>
+        
+          <span class="case-study-pill">Security Experience Design</span>
+        
+      </div>
+    
+  </a>
+</article>
+
+          
+            <article class="card case-study-card reveal">
+  <a class="case-study-card-link" href="/case-studies/mt-bank-commercial-banking-transformation">
+    
+      <span class="card-image-shell case-study-card-image-shell">
+        <img
+          class="card-image case-study-card-image"
+          src="/assets/vscimage/generated/m-t3200x1800-thumb-760x570.webp"
+          alt="M&amp;T Bank commercial banking service design overview."
+          loading="lazy"
+        />
+      </span>
+    
+
+    <div class="case-study-card-topline">
+      
+        <span>M&amp;T Bank</span>
+      
+      
+        <span>2019</span>
+      
+    </div>
+
+    <h3>M&amp;T Bank Commercial Banking Transformation</h3>
+
+    
+      <p class="case-study-card-subtitle">A service design program that mapped lending complexity and aligned stakeholders around a clearer future state.</p>
+    
+
+    
+      <p>Fragmented processes and repeated handoffs created friction and waste. Van turned research and journey maps into a service blueprint for commercial lending.</p>
+    
+
+    
+      <div class="case-study-card-tags" aria-label="Services">
+        
+          <span class="case-study-pill">Service Design</span>
+        
+          <span class="case-study-pill">Journey Mapping</span>
+        
+          <span class="case-study-pill">Experience Strategy</span>
+        
+      </div>
+    
+  </a>
+</article>
+
+          
+            <article class="card case-study-card reveal">
+  <a class="case-study-card-link" href="/case-studies/nyu-curriculum-alignment">
+    
+      <span class="card-image-shell case-study-card-image-shell">
+        <img
+          class="card-image case-study-card-image"
+          src="/assets/vscimage/generated/nyu-2000-1-2000x1000-thumb-760x570.webp"
+          alt="NYU information architecture curriculum and teaching work."
+          loading="lazy"
+        />
+      </span>
+    
+
+    <div class="case-study-card-topline">
+      
+        <span>NYU</span>
+      
+      
+        <span>2020</span>
+      
+    </div>
+
+    <h3>NYU Curriculum Alignment</h3>
+
+    
+      <p class="case-study-card-subtitle">A curriculum redesign that connected information architecture to modern UX research and practice.</p>
+    
+
+    
+      <p>Van expanded NYU’s information architecture curriculum beyond classification methods into a broader human-centered UX process.</p>
+    
+
+    
+      <div class="case-study-card-tags" aria-label="Services">
+        
+          <span class="case-study-pill">Curriculum Design</span>
+        
+          <span class="case-study-pill">UX Education</span>
+        
+          <span class="case-study-pill">Information Architecture</span>
+        
+      </div>
+    
+  </a>
+</article>
+
+          
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="siteFooter" data-footer-pattern>
+  <div class="footer-pattern-layer" aria-hidden="true"></div>
+  <button
+    type="button"
+    class="site-footer-art"
+    data-footer-art-trigger
+    aria-label="Activate footer artwork animation"
+  >
+    <picture>
+      <source type="image/avif" srcset="/assets/footer-art/site-footer-rev-720.avif 720w, /assets/footer-art/site-footer-rev-1200.avif 1200w, /assets/footer-art/site-footer-rev-1800.avif 1800w" sizes="100vw" />
+      <source type="image/webp" srcset="/assets/footer-art/site-footer-rev-720.webp 720w, /assets/footer-art/site-footer-rev-1200.webp 1200w, /assets/footer-art/site-footer-rev-1800.webp 1800w" sizes="100vw" />
+      <img src="/assets/footer-art/site-footer-rev-sm.png" alt="Colorful abstract portfolio artwork." width="1800" height="1973" loading="lazy" decoding="async" />
+    </picture>
+  </button>
+  <div class="site-footer-inner">
+    <div class="site-footer-controls">
+      <div class="footer-actions" role="group" aria-label="Connect with Van Shea">
+        <a
+          class="theme-link"
+          href="https://calendly.com/van-shea/30min"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Schedule Time
+        </a>
+        <a
+          class="theme-link"
+          href="https://www.linkedin.com/in/vanshea/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          LinkedIn
+        </a>
+      </div>
+    </div>
+    <p>&copy; <span id="year"></span> Van Shea Sedita. All rights reserved.</p>
+    <button class="footer-privacy-link" id="consentManageBtn" type="button">
+      Privacy Policy
+    </button>
+    <p class="footer-animation-meta" id="footerAnimationMeta" data-footer-floating-meta>
+      Animation generated 1 time · 2026-05-21 16:39:39 EDT
+    </p>
+  </div>
+</footer>
+
+    <aside
+  class="consent-banner"
+  id="consentBanner"
+  role="region"
+  aria-label="Analytics consent"
+  hidden
+>
+  <p class="consent-text">
+    We use privacy-first analytics to measure meaningful actions, not personal identity.
+  </p>
+  <div class="consent-actions">
+    <button class="theme-link consent-btn" id="consentDenyBtn" type="button">
+      Deny
+    </button>
+    <button class="btn consent-btn consent-allow" id="consentAllowBtn" type="button">
+      Allow Analytics
+    </button>
+  </div>
+</aside>
+
+
+    <script src="/analytics.js" defer></script>
+    <script src="/script.js?v=20260714-logo-1" defer></script>
+  </body>
+</html>

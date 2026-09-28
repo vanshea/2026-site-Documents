@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Meeting Coach Prototype</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        background: #060810;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #060810;
+      }
+
+      body {
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+      }
+
+      .meeting-coach-stage {
+        width: 450px;
+        height: 938px;
+        flex: 0 0 auto;
+        transform-origin: center center;
+        will-change: transform;
+      }
+
+      .meeting-coach-stage iframe {
+        display: block;
+        width: 450px;
+        height: 938px;
+        border: 0;
+        background: #060810;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .meeting-coach-stage {
+          will-change: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="meeting-coach-stage" id="meetingCoachStage">
+      <iframe
+        src="./meeting_coach_demo.html"
+        title="Meeting Coach interactive lock-screen prototype"
+        loading="eager"
+      ></iframe>
+    </div>
+
+    <script>
+      (() => {
+        const stage = document.getElementById("meetingCoachStage");
+        const stageWidth = 450;
+        const stageHeight = 938;
+        const inset = 12;
+
+        function fitPrototype() {
+          const availableWidth = Math.max(1, window.innerWidth - inset * 2);
+          const availableHeight = Math.max(1, window.innerHeight - inset * 2);
+          const scale = Math.min(1, availableWidth / stageWidth, availableHeight / stageHeight);
+          stage.style.transform = "scale(" + scale + ")";
+        }
+
+        fitPrototype();
+        window.addEventListener("resize", fitPrototype, { passive: true });
+        window.addEventListener("orientationchange", fitPrototype, { passive: true });
+      })();
+    </script>
+  </body>
+</html>

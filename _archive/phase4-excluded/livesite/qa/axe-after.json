@@ -1,0 +1,1632 @@
+[
+  {
+    "page": "build/aidesign/contact-prototype-standalone.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/contact-prototype-standalone.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/contact-prototype-standalone.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/contact-prototype-standalone.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/stock-performance-test/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/stock-performance-test/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/stock-performance-test/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/experiments/stock-performance-test/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/index/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach_demo.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach_demo.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach_demo.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/meeting_coach_demo.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner_fullscreen.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner_fullscreen.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner_fullscreen.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/partner_fullscreen.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/self_care.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/self_care.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/self_care.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/self_care.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/contact.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/contact.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/contact.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/contact.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/meeting-coach.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/meeting-coach.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/meeting-coach.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/meeting-coach.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/partner.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/partner.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/partner.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/partner.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/self-care.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/self-care.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/self-care.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/aidesign/share/self-care.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/capital-one-gesture-patent/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/capital-one-gesture-patent/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/capital-one-gesture-patent/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/capital-one-gesture-patent/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/mt-bank-commercial-banking-transformation/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/mt-bank-commercial-banking-transformation/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/mt-bank-commercial-banking-transformation/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/mt-bank-commercial-banking-transformation/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nami-delaware-988-campaign/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": [
+          {
+            "target": [
+              ".btn[target=\"_blank\"][rel=\"noopener noreferrer\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.72 (foreground color: #ffffff, background color: #64d2ff, font size: 12.0pt (15.96px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nami-delaware-988-campaign/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nami-delaware-988-campaign/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nami-delaware-988-campaign/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 49
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nyu-curriculum-alignment/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nyu-curriculum-alignment/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nyu-curriculum-alignment/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/nyu-curriculum-alignment/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/vanguard-innovation-lab-integration/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/vanguard-innovation-lab-integration/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/vanguard-innovation-lab-integration/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/case-studies/vanguard-innovation-lab-integration/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/experience.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "page": "build/experience.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "page": "build/experience.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 3
+      }
+    ]
+  },
+  {
+    "page": "build/experience.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 3
+      }
+    ]
+  },
+  {
+    "page": "build/home-2.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-2.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-2.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-2.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-3.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-3.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-3.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home-3.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/home.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 2
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      },
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/macos26-slider/index.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/macos26-slider/index.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/macos26-slider/index.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/macos26-slider/index.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/nft-prototype.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/nft-prototype.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/nft-prototype.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/nft-prototype.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "page": "build/work.html",
+    "theme": "theme1",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 3
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 41
+      }
+    ]
+  },
+  {
+    "page": "build/work.html",
+    "theme": "theme2",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 3
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 41
+      }
+    ]
+  },
+  {
+    "page": "build/work.html",
+    "theme": "theme3",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 3
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 30
+      }
+    ]
+  },
+  {
+    "page": "build/work.html",
+    "theme": "theme4",
+    "status": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "nodes": 3
+      },
+      {
+        "id": "color-contrast",
+        "nodes": 33
+      }
+    ]
+  }
+]
