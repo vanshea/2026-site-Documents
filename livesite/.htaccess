@@ -1,14 +1,68 @@
-DirectoryIndex index.html
-Options -MultiViews
+DirectoryIndex index.html index.php
+Options -Indexes -MultiViews
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
-RewriteRule ^experience/?$ /experience.html [R=302,L]
+# Canonical host and HTTPS. X-Forwarded-Proto supports trusted TLS proxies.
+RewriteCond %{HTTP_HOST} !^vanshea\.com$ [NC]
+RewriteRule ^ https://vanshea.com%{REQUEST_URI} [R=301,L,NE]
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+RewriteRule ^ https://vanshea.com%{REQUEST_URI} [R=301,L,NE]
+
+# Normalize duplicate static index URLs and preserve established route aliases.
+RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html(?:[?\s]) [NC]
+RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L,NE]
+RewriteRule ^experience/?$ /experience.html [R=301,L,NE]
+RewriteRule ^aidesign/share/?$ /aidesign/ [R=301,L,NE]
+RewriteRule ^aidesign/Contact(?:%20|[[:space:]])Prototype(?:%20|[[:space:]])\(standalone\)\.html$ /aidesign/contact-prototype-standalone.html [R=301,L,NC,NE]
+
+# Preserve the existing static-export redirects for application-only routes.
 RewriteRule ^login/?$ / [R=302,L]
 RewriteRule ^app(?:/.*)?$ / [R=302,L]
 RewriteRule ^analytics(?:/.*)?$ / [R=302,L]
 RewriteRule ^vscimage(?:/.*)?$ / [R=302,L]
+
+# Block direct access to repository and version-control paths.
+RewriteRule ^(?:\.git|\.svn|\.hg)(?:/|$) - [F,L]
 </IfModule>
 
-ErrorDocument 404 /index.html
+ErrorDocument 404 /404.html
+
+<IfModule mod_authz_core.c>
+  <FilesMatch "(?i)(^\.env(?:\..*)?$|^\.DS_Store$|^wp-config(?:-sample)?\.php$|\.(?:bak|backup|old|orig|sql|log|map|swp|zip)$|~$)">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/manifest+json application/xml text/xml image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType text/javascript "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType application/json "access plus 7 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/avif "access plus 30 days"
+  ExpiresByType font/woff2 "access plus 30 days"
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  <FilesMatch "\.(?:html|php)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(?:css|js|mjs|png|jpe?g|webp|avif|svg|woff2?)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
