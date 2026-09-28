@@ -2255,6 +2255,12 @@ const publicBuildStatic = express.static(buildDir, {
   index: false,
   redirect: false
 });
+const publicRootBuildStatic = express.static(buildDir, {
+  dotfiles: "ignore",
+  fallthrough: true,
+  index: "index.html",
+  redirect: false
+});
 
 function serveStaticSubpath(staticHandler, routePrefix) {
   return (req, res, next) => {
@@ -2313,6 +2319,43 @@ app.use((req, res, next) => {
     return next();
   }
 
+  if (req.path === "/livesite" || req.path.startsWith("/livesite/")) {
+    return serveLivesiteStatic(req, res, next);
+  }
+
+  if (req.path === "/comingsoon" || req.path.startsWith("/comingsoon/")) {
+    return serveComingsoonStatic(req, res, next);
+  }
+
+  if (req.path === "/build" || req.path.startsWith("/build/")) {
+    return serveBuildStatic(req, res, next);
+  }
+
+  const rootBuildReservedPaths = [
+    "/api",
+    "/analytics",
+    "/app",
+    "/assets/vscimage",
+    "/blog",
+    "/livesite",
+    "/login",
+    "/logout",
+    "/vscimage"
+  ];
+  const isRootBuildReservedPath = rootBuildReservedPaths.some(
+    (prefix) => req.path === prefix || req.path.startsWith(`${prefix}/`)
+  );
+
+  if (!isRootBuildReservedPath) {
+    return publicRootBuildStatic(req, res, (error) => {
+      if (error) return next(error);
+      if (publicRootFiles.has(req.path)) {
+        return publicRootStatic(req, res, next);
+      }
+      return next();
+    });
+  }
+
   if (publicRootFiles.has(req.path)) {
     return publicRootStatic(req, res, next);
   }
@@ -2328,18 +2371,6 @@ app.use((req, res, next) => {
 
   if (req.path.startsWith("/large_web_portfolio/")) {
     return serveLargePortfolioStatic(req, res, next);
-  }
-
-  if (req.path === "/livesite" || req.path.startsWith("/livesite/")) {
-    return serveLivesiteStatic(req, res, next);
-  }
-
-  if (req.path === "/comingsoon" || req.path.startsWith("/comingsoon/")) {
-    return serveComingsoonStatic(req, res, next);
-  }
-
-  if (req.path === "/build" || req.path.startsWith("/build/")) {
-    return serveBuildStatic(req, res, next);
   }
 
   return next();
