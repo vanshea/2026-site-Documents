@@ -11,4 +11,4 @@ RewriteRule ^analytics(?:/.*)?$ / [R=302,L]
 RewriteRule ^vscimage(?:/.*)?$ / [R=302,L]
 </IfModule>
 
-ErrorDocument 404 /index.html
+ErrorDocument 404 /404.html
