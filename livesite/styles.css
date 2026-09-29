@@ -1336,7 +1336,7 @@ h2 {
 }
 
 .experience-page {
-  margin-top: var(--space-42);
+  margin-top: 0;
   max-width: min(980px, 100%);
 }
 
@@ -3392,3 +3392,9 @@ main#top.home-main > .hero .lead {
   max-width: 68ch;
   text-wrap: pretty;
 }
+
+/* Accessible skip link and balanced line endings at standard breakpoints. */
+.skip { position: fixed; top: 0; left: 0; transform: translateY(-100%); transition: transform .15s ease; }
+.skip:focus { top: 0; left: 0; transform: translateY(0); }
+p { text-wrap: pretty; }
+.form-honeypot { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }

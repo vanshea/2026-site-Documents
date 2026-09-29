@@ -2853,7 +2853,10 @@ if (ANALYTICS_UI_ENABLED) {
 }
 
 app.post("/api/contact", async (req, res) => {
-  const { name, email, brief } = req.body || {};
+  const { name, email, brief, website } = req.body || {};
+  if (String(website || "").trim()) {
+    return res.json({ ok: true });
+  }
 
   if (!name || !email || !brief) {
     return res.status(400).json({ error: "Missing required fields." });

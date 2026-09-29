@@ -5,12 +5,18 @@
   const dark = matchMedia('(prefers-color-scheme: dark)');
   let theme = 'theme1';
   try { theme = [localStorage.getItem('vsc-site-theme-v2'), localStorage.getItem('vsc-site-theme')].find(value => themes.includes(value)) || theme; } catch {}
+  function syncThemeFavicons(isDark) {
+    document.querySelectorAll('[data-theme-favicon]').forEach(link => {
+      link.media = link.dataset.themeFavicon === (isDark ? 'dark' : 'light') ? 'all' : 'not all';
+    });
+  }
   function apply(value, persist = false) {
     if (!themes.includes(value)) return;
     theme = value;
     root.dataset.theme = theme;
     const isDark = theme === 'theme3' || (['theme1', 'theme2'].includes(theme) && dark.matches);
     root.style.colorScheme = isDark ? 'dark' : 'light';
+    syncThemeFavicons(isDark);
     document.querySelectorAll('.theme-switcher button[data-theme]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.theme === theme)));
     const slider = document.querySelector('#theme-range');
     if (slider) { slider.value = String(themes.indexOf(theme) + 1); slider.setAttribute('aria-valuetext', labels[themes.indexOf(theme)]); }

@@ -145,7 +145,11 @@ function syncThemeSliders(theme) {
 }
 
 function setResolvedColorScheme(theme) {
-  rootEl.style.colorScheme = isDarkBackgroundTheme(theme) ? "dark" : "light";
+  const isDark = isDarkBackgroundTheme(theme);
+  rootEl.style.colorScheme = isDark ? "dark" : "light";
+  document.querySelectorAll("[data-theme-favicon]").forEach((link) => {
+    link.media = link.dataset.themeFavicon === (isDark ? "dark" : "light") ? "all" : "not all";
+  });
 }
 
 function runWithoutThemeTransitions(changeTheme) {
@@ -260,7 +264,7 @@ function enhanceThemeSwitchers() {
   });
 }
 
-let initialTheme = "theme4";
+let initialTheme = "theme1";
 try {
   const savedThemes = [
     localStorage.getItem(themeStorageKey),
@@ -460,7 +464,11 @@ const FPO_ASSET_PATTERN = /(^|\/)assets\/fpo-(thumb|large)-/i;
 function toSitePath(filePath) {
   if (!filePath) return "";
   if (/^(https?:)?\/\//.test(filePath)) return filePath;
-  return filePath.startsWith("/") ? filePath : `/${filePath}`;
+
+  const localPath = `/${String(filePath).replace(/^\/+/, "")}`;
+  return localPath === "/build" || localPath.startsWith("/build/")
+    ? localPath
+    : `/build${localPath === "/" ? "/" : localPath}`;
 }
 
 function normalizeAsciiText(value) {
@@ -641,7 +649,7 @@ function refreshWorkCardState() {
 }
 
 async function readSiteImageConfig() {
-  const sources = ["/api/vscimage/config", "/assets/vscimage/config.json"];
+  const sources = ["/api/vscimage/config", "/build/assets/vscimage/config.json"];
 
   for (const source of sources) {
     try {
@@ -880,6 +888,12 @@ if (projectInquiryForm) {
 
   projectInquiryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const honeypot = projectInquiryForm.querySelector('[name="website"]');
+    if (honeypot?.value.trim()) {
+      projectInquiryForm.reset();
+      setProjectInquiryStatus("Your inquiry has been received.", "success");
+      return;
+    }
     window.siteAnalytics?.trackContactClick?.("form", contactLocation);
 
     const formData = new FormData(projectInquiryForm);
@@ -1083,7 +1097,18 @@ function scrollRecommendationsBy(direction) {
 }
 
 if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButton) {
+  const recommendationCards = getRecommendationCards(recommendationsTrack);
+  const recommendationsStatus = document.getElementById("recommendationsStatus");
+  const updateRecommendationAnnouncement = () => {
+    const index = getClosestRecommendationIndex(recommendationsTrack);
+    if (recommendationsStatus) recommendationsStatus.textContent = `Slide ${index + 1} of ${recommendationCards.length}`;
+    recommendationCards.forEach((card, position) => {
+      card.setAttribute("aria-roledescription", "slide");
+      card.setAttribute("aria-label", `Slide ${position + 1} of ${recommendationCards.length}`);
+    });
+  };
   updateRecommendationNavState();
+  updateRecommendationAnnouncement();
   scrollRecommendationsToLeftEdge(recommendationsTrack);
   window.addEventListener(
     "load",
@@ -1098,6 +1123,7 @@ if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButt
   recommendationsTrack.addEventListener("scroll", updateRecommendationNavState, {
     passive: true
   });
+  recommendationsTrack.addEventListener("scroll", updateRecommendationAnnouncement, { passive: true });
   window.addEventListener("resize", updateRecommendationNavState);
 
   recommendationsPrevButton.addEventListener("click", () => {
@@ -1292,6 +1318,10 @@ function applyActiveFilter() {
     const hasMatches = filteredCards.length > 0;
     workFilterEmptyState.hidden = hasMatches;
     workFilterEmptyState.setAttribute("aria-hidden", hasMatches ? "true" : "false");
+    if (workLoadMoreButton) {
+      workLoadMoreButton.disabled = !hasMatches;
+      workLoadMoreButton.setAttribute("aria-disabled", String(!hasMatches));
+    }
   }
 
   scheduleFeaturedCardHeightUpdate();

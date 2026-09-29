@@ -28,6 +28,14 @@
   max-width: 66ch;
 }
 
+.case-study-hero-copy > :first-child {
+  padding-top: clamp(24px, 4vw, 48px);
+}
+
+.case-study-hero-copy > :last-child {
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+
 .case-study-index-copy {
   align-self: start;
   max-width: min(100%, 760px);
@@ -196,6 +204,20 @@
 .case-study-page {
   display: grid;
   gap: var(--space-42);
+}
+
+.case-study-next {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 64px 0 80px;
+  padding: 34px;
+  border-top: 6px solid var(--accent);
+  background: var(--panel);
+}
+
+.case-study-outcome {
+  padding-bottom: clamp(24px, 4vw, 48px);
 }
 
 .case-study-breadcrumb {
@@ -603,6 +625,22 @@ body.case-study-lightbox-open {
 
   .case-study-meta-item-services {
     grid-column: span 1;
+  }
+
+  .case-study-page[aria-label="Capital One patent case study"] .case-study-section-copy {
+    gap: 12px;
+    max-width: none;
+    padding-inline: 4px;
+  }
+
+  .case-study-page[aria-label="Capital One patent case study"] .case-study-section-copy h2 {
+    max-width: 18ch;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .case-study-page[aria-label="Capital One patent case study"] .case-study-rich-text {
+    line-height: 1.65;
   }
 }
 

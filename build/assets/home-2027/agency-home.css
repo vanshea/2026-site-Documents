@@ -267,3 +267,24 @@ a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible 
   .footer-wave-toggle { display:none; }
   .case-visual:hover img,.conversation-link:hover { transform:none; }
 }
+
+/* Accessible skip link and balanced copy across standard viewport widths. */
+.skip { position: fixed; top: 0; left: 0; transform: translateY(-100%); transition: transform .15s ease; }
+.skip:focus { top: 0; left: 0; transform: translateY(0); }
+p { text-wrap: pretty; }
+.theme-control label { min-height: 42px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
+.theme-control input { accent-color: var(--ink); }
+.theme-control label:has(input:checked) { background: var(--button); border-color: var(--ink); box-shadow: inset 0 -3px var(--ink); }
+.form-honeypot { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
+.consent-banner { position: fixed; z-index: 1000; inset: auto 20px 20px auto; width: min(440px, calc(100vw - 32px)); padding: 20px; border: 2px solid var(--ink, #17212b); background: var(--bg, #fff); color: var(--ink, #17212b); box-shadow: 0 12px 40px #0003; }
+.consent-text { margin: 0 0 14px; }
+.consent-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.consent-actions button { min-height: 44px; padding: 10px 16px; }
+@media (max-width: 560px) { .consent-banner { inset: auto 12px 12px; width: auto; } }
+
+/* Theme choices read as compact buttons; names appear on hover, focus, or selection. */
+.theme-control label { position: relative; justify-content: center; min-width: 44px; }
+.theme-control label span { position: absolute; opacity: 0; white-space: nowrap; transition: opacity .15s ease; pointer-events: none; }
+.theme-control label:hover span, .theme-control label:focus-within span, .theme-control label:has(input:checked) span { position: static; opacity: 1; }
+.theme-control label:has(input:checked) { min-width: auto; }

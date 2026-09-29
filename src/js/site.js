@@ -33,6 +33,12 @@
   form?.addEventListener('submit', async event => {
     event.preventDefault();
     if (!form.reportValidity()) return;
+    if (form.querySelector('[name="website"]')?.value.trim()) {
+      form.reset();
+      const status = document.querySelector('#projectInquiryStatus');
+      if (status) status.textContent = 'Thank you. Your inquiry has been sent.';
+      return;
+    }
     const button = form.querySelector('[type=submit]');
     const status = document.querySelector('#projectInquiryStatus');
     const values = Object.fromEntries(new FormData(form));

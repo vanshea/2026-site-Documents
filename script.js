@@ -844,6 +844,12 @@ if (projectInquiryForm) {
 
   projectInquiryForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const honeypot = projectInquiryForm.querySelector('[name="website"]');
+    if (honeypot?.value.trim()) {
+      projectInquiryForm.reset();
+      setProjectInquiryStatus("Your inquiry has been received.", "success");
+      return;
+    }
     window.siteAnalytics?.trackContactClick?.("form", contactLocation);
 
     const formData = new FormData(projectInquiryForm);
@@ -1029,6 +1035,7 @@ if (recommendationsTrack && recommendationsPrevButton && recommendationsNextButt
   recommendationsTrack.addEventListener("scroll", updateRecommendationNavState, {
     passive: true
   });
+  recommendationsTrack.addEventListener("scroll", updateRecommendationAnnouncement, { passive: true });
   window.addEventListener("resize", updateRecommendationNavState);
 
   recommendationsPrevButton.addEventListener("click", () => {

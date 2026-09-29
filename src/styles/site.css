@@ -315,3 +315,15 @@ dialog figure img { display: block; width: 100%; height: 70vh; object-fit: conta
   .hero-roll { transform: translateY(-100%); }
   .hero-subhead, .section-label.reveal-pending { opacity: 1; transform: none; }
 }
+
+/* Keep the skip link off-screen until keyboard focus. */
+.skip-link { position: fixed; top: 0; left: 0; transform: translateY(-100%); transition: transform .15s ease; }
+.skip-link:focus { top: 0; left: 0; transform: translateY(0); }
+/* Prefer balanced paragraph endings at common viewport widths. */
+p { text-wrap: pretty; }
+
+.consent-banner { position: fixed; z-index: 1000; inset: auto 20px 20px auto; width: min(440px, calc(100vw - 32px)); padding: 20px; border: 2px solid var(--ink, #17212b); background: var(--bg, #fff); color: var(--ink, #17212b); box-shadow: 0 12px 40px #0003; }
+.consent-text { margin: 0 0 14px; }
+.consent-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.consent-actions button { min-height: 44px; padding: 10px 16px; }
+@media (max-width: 560px) { .consent-banner { inset: auto 12px 12px; width: auto; } }

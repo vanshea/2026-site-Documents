@@ -4,11 +4,15 @@
   const themes = ['theme1', 'theme3', 'theme4', 'theme5'];
   const key = 'vsc-site-theme-v2';
   const dark = matchMedia('(prefers-color-scheme: dark)');
-  let theme = 'theme4';
+  let theme = dark.matches ? 'theme1' : 'theme4';
   try { theme = [localStorage.getItem(key), localStorage.getItem('vsc-site-theme')].find(value => themes.includes(value)) || theme; } catch {}
   const applyTheme = value => {
     theme = themes.includes(value) ? value : 'theme4';
     root.dataset.theme = theme;
+    const isDark = theme === 'theme3' || (theme === 'theme1' && dark.matches);
+    document.querySelectorAll('[data-theme-favicon]').forEach(link => {
+      link.media = link.dataset.themeFavicon === (isDark ? 'dark' : 'light') ? 'all' : 'not all';
+    });
     document.querySelectorAll('input[name="color-theme"]').forEach(input => {
       input.checked = input.value === theme;
     });
@@ -64,7 +68,7 @@
       const updateControls = () => {
         previous.disabled = current === 0;
         next.disabled = current === cards.length - 1;
-        if (status) status.textContent = `Recommendation ${current + 1} of ${cards.length}`;
+        if (status) status.textContent = `Slide ${current + 1} of ${cards.length}`;
         if (progress) progress.style.transform = `scaleX(${(current + 1) / cards.length})`;
       };
       const sync = () => {
