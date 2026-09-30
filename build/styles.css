@@ -3398,3 +3398,17 @@ main#top.home-main > .hero .lead {
 .skip:focus { top: 0; left: 0; transform: translateY(0); }
 p { text-wrap: pretty; }
 .form-honeypot { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
+/* Mobile footer theme controls: four equal buttons across the footer. */
+@media (max-width:760px) {
+  .site-footer-controls { width:100%; max-width:100%; }
+  .site-footer .theme-switcher {
+    display:grid; width:100%; max-width:100%;
+    grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px;
+  }
+  .site-footer .theme-switcher .theme-link {
+    width:100%; min-width:0; min-height:44px; padding:7px 3px;
+    font-size:clamp(.62rem,2.8vw,.82rem); line-height:1.1;
+    white-space:nowrap; overflow:visible; text-overflow:clip;
+  }
+}

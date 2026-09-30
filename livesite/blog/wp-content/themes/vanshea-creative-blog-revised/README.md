@@ -1,6 +1,6 @@
 # Van Shea Creative Blog Revised
 
-Version 2.1 of the custom Van Shea Creative WordPress theme.
+Version 2.2 of the custom Van Shea Creative WordPress theme.
 
 ## Revision highlights
 
@@ -8,7 +8,7 @@ Version 2.1 of the custom Van Shea Creative WordPress theme.
 - Preserves the approved WordPress header and responsive primary navigation.
 - Matches the primary website header width and uses the horizontal Van Shea Creative logo.
 - Replaces the previous illustrated footer with the live site's layered wave footer.
-- Uses the same accessible radio-button theme switcher as the redesigned site: Clear, High Contrast, Bold, and Wild.
+- Uses the same accessible radio-button theme switcher as the redesigned site: Clear, Contrast, Bold, and Wild.
 - Matches the redesign's DM Serif Display, DM Sans, and Open Sans typography.
 - Introduces a responsive two-column editorial index and focused long-form reading layout.
 - Adds category and estimated reading-time metadata to post cards and articles.

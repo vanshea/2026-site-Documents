@@ -275,6 +275,12 @@
   .theme-control label { padding:9px 8px; font-size:13px; }
 }
 
+
+@media (max-width:600px) {
+  .home-footer .view-controls { width:100%; max-width:none; box-sizing:border-box; justify-content:center; }
+  .home-footer .theme-control { display:grid; width:100%; max-width:none; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; box-sizing:border-box; }
+  .home-footer .theme-control label { min-width:0; width:100%; padding:8px 3px; font-size:clamp(10px,2.8vw,13px); white-space:nowrap; }
+}
 </style>
 </head>
 <body>
@@ -398,7 +404,7 @@
     <fieldset class="theme-control">
       <legend>Color theme</legend>
       <label><input type="radio" name="color-theme" value="theme1"><span>Clear</span></label>
-      <label><input type="radio" name="color-theme" value="theme3"><span>High Contrast</span></label>
+      <label><input type="radio" name="color-theme" value="theme3"><span>Contrast</span></label>
       <label><input type="radio" name="color-theme" value="theme4"><span>Bold</span></label>
       <label><input type="radio" name="color-theme" value="theme5"><span>Wild</span></label>
     </fieldset>

@@ -333,6 +333,13 @@ p { text-wrap: pretty; }
 }
 .theme-control label:has(input:focus-visible) { outline:3px solid var(--focus,#64d2ff); outline-offset:2px; }
 @media (max-width:600px) {
-  .theme-control { width:100%; gap:4px; padding:7px; }
-  .theme-control label { padding:9px 8px; font-size:13px; }
+  .home-footer .view-controls { width:100%; max-width:none; box-sizing:border-box; justify-content:center; }
+  .home-footer .theme-control {
+    display:grid; width:100%; max-width:none; gap:4px; padding:7px;
+    grid-template-columns:repeat(4,minmax(0,1fr)); box-sizing:border-box;
+  }
+  .home-footer .theme-control label {
+    width:100%; min-width:0; padding:9px 3px;
+    font-size:clamp(10px,2.8vw,13px); white-space:nowrap;
+  }
 }

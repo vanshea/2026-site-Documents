@@ -30,7 +30,7 @@ add_action( 'after_setup_theme', 'vanshea_creative_blog_setup' );
 function vanshea_creative_blog_theme_choices() {
 	return array(
 		'theme1' => __( 'Clear', 'vanshea-creative-blog' ),
-		'theme3' => __( 'High Contrast', 'vanshea-creative-blog' ),
+		'theme3' => __( 'Contrast', 'vanshea-creative-blog' ),
 		'theme4' => __( 'Bold', 'vanshea-creative-blog' ),
 		'theme5' => __( 'Wild', 'vanshea-creative-blog' ),
 	);

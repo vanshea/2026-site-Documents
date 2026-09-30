@@ -3,7 +3,7 @@ Theme Name: Van Shea Creative Blog Revised
 Theme URI: https://www.vanshea.com/
 Author: Van Shea Creative
 Description: A WordPress editorial theme aligned with the Van Shea Creative Human Agency Design site.
-Version: 2.1
+Version: 2.2
 Text Domain: vanshea-creative-blog
 */
 
@@ -265,13 +265,70 @@ label { color: var(--ink); font-family: var(--sans); font-weight: 600; }
 .footer-wave:hover .footer-wave-toggle, .footer-wave:focus-within .footer-wave-toggle { opacity: 1; pointer-events: auto; }
 .home-footer { --ink: var(--footer-ink); --muted: var(--footer-ink); padding-bottom: 10px; border-top: 0; background: var(--footer-bg); color: var(--footer-ink); }
 .footer-container { width: min(calc(100% - 10.5vw),var(--content-width)); margin-inline: auto; }
-.view-controls { display: flex; align-items: center; justify-content: flex-end; gap: 24px; padding-block: 19px; color: var(--footer-ink); }
-.theme-control { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; }
-.theme-control legend { float: left; padding: 0 8px 0 0; color: var(--footer-ink); font: 700 14px/1.4 var(--sans); }
-.theme-control label { display: inline-flex; min-height: 44px; align-items: center; gap: 5px; padding: 4px 8px; color: var(--footer-ink); font: 500 14px/1.4 var(--sans); cursor: pointer; }
-.theme-control input { width: 24px; min-width: 24px; height: 24px; min-height: 24px; margin: 0; padding: 0; accent-color: var(--footer-ink); }
-.theme-control label:has(input:checked) { background: var(--footer-selected-bg); color: var(--footer-selected-ink); box-shadow: inset 0 -3px var(--footer-selected-ink); }
-.theme-control label:has(input:checked) input { accent-color: var(--footer-selected-ink); }
+.view-controls { display: flex; align-items: center; justify-content: center; padding-block: 19px; color: var(--footer-ink); }
+.theme-control {
+  display: flex;
+  width: min(100%,760px);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 9px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,.42);
+  border-radius: 999px;
+  background: rgba(255,255,255,.17);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 8px 24px rgba(0,0,0,.2);
+  -webkit-backdrop-filter: blur(20px) saturate(185%);
+  backdrop-filter: blur(20px) saturate(185%);
+}
+.theme-control legend {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.theme-control label {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 46px;
+  padding: 9px 14px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--footer-ink);
+  font: 600 14px/1.2 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.theme-control label span { position: static; opacity: 1; white-space: nowrap; pointer-events: none; }
+.theme-control input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.theme-control label:has(input:checked) {
+  border-color: rgba(255,255,255,.58);
+  background: rgba(255,255,255,.28);
+  color: var(--footer-ink);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.52), 0 2px 9px rgba(0,0,0,.2);
+}
+.theme-control label:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 26px; color: var(--footer-ink); font-size: 14px; }
 .home-footer .footer-inner > p { margin: 0; color: var(--footer-ink); font-size: 14px; line-height: 1.5; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
@@ -315,10 +372,9 @@ label { color: var(--ink); font-family: var(--sans); font-weight: 600; }
   .hero h1, .page-title, .entry-title, .entry-header .entry-title { max-width: 100%; }
   .search-form { align-items: stretch; flex-direction: column; }
   .search-form .search-submit { width: 100%; }
-  .view-controls { justify-content: flex-start; }
-  .theme-control { width: 100%; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .theme-control legend { width: 100%; margin-bottom: 8px; grid-column: 1 / -1; }
-  .theme-control label { padding-inline: 4px; }
+  .home-footer .view-controls { width: 100%; max-width: none; padding-inline: 12px; box-sizing: border-box; justify-content: center; }
+  .home-footer .theme-control { display: grid; width: 100%; max-width: none; padding: 7px; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 4px; box-sizing: border-box; }
+  .home-footer .theme-control label { width: 100%; min-width: 0; padding: 9px 3px; font-size: clamp(10px,2.8vw,13px); white-space: nowrap; }
   .footer-wave-toggle { top: 8px; right: 14px; }
 }
 

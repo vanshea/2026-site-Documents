@@ -30,7 +30,7 @@ $theme_choices = vanshea_creative_blog_theme_choices();
 	<?php if ( get_theme_mod( 'vsc_show_theme_switcher', true ) ) : ?>
 		<div class="footer-container view-controls">
 			<fieldset class="theme-control">
-				<legend><?php esc_html_e( 'Color theme', 'vanshea-creative-blog' ); ?></legend>
+				<legend class="screen-reader-text"><?php esc_html_e( 'Choose site theme', 'vanshea-creative-blog' ); ?></legend>
 				<?php foreach ( $theme_choices as $theme_slug => $theme_label ) : ?>
 					<label>
 						<input
