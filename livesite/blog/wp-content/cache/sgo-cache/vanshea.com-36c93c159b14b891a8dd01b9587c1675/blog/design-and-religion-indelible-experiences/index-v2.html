@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en-US" data-theme="theme4">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="color-scheme" content="light dark">
+	<link rel="icon" type="image/png" sizes="32x32" href="/fav-icon/fav-icon-32X32.png" media="(prefers-color-scheme: light)">
+	<link rel="icon" type="image/png" sizes="48x48" href="/fav-icon/fav-icon-48X48-white.png" media="(prefers-color-scheme: dark)">
+	<link rel="icon" href="/fav-icon/favicon.ico" sizes="any">
+	<link rel="apple-touch-icon" sizes="180x180" href="/fav-icon/apple-touch-icon.png">
+	<link rel="manifest" href="/fav-icon/site.webmanifest">
+	<meta name="theme-color" content="#fffcf3">
+	<script>
+		(() => {
+			const themes = new Set(["theme1", "theme3", "theme4", "theme5"]);
+			const root = document.documentElement;
+			let theme = themes.has(root.dataset.theme) ? root.dataset.theme : "theme4";
+
+			try {
+				const savedTheme = ["vsc-site-theme-v2", "vsc-site-theme"]
+					.map((key) => window.localStorage.getItem(key))
+					.find((value) => themes.has(value));
+
+				if (savedTheme) {
+					theme = savedTheme;
+					window.localStorage.setItem("vsc-site-theme-v2", savedTheme);
+				}
+			} catch (error) {
+				// Keep the WordPress default when storage is unavailable.
+			}
+
+			root.dataset.theme = theme;
+			root.style.colorScheme =
+				theme === "theme3" || (theme === "theme1" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+					? "dark"
+					: "light";
+		})();
+	</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<title>Design and Religion: Indelible Experiences &#8211; Blog</title>
+<meta name='robots' content='max-image-preview:large' />
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel="alternate" type="application/rss+xml" title="Blog &raquo; Feed" href="https://vanshea.com/blog/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Blog &raquo; Comments Feed" href="https://vanshea.com/blog/comments/feed/" />
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://vanshea.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fvanshea.com%2Fblog%2Fdesign-and-religion-indelible-experiences%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://vanshea.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fvanshea.com%2Fblog%2Fdesign-and-religion-indelible-experiences%2F&#038;format=xml" />
+<style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-block-library-inline-css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}:root .has-text-align-center{text-align:center}:root .has-text-align-left{text-align:left}:root .has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{word-wrap:normal!important;border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-break:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style^=border-color],[style*=";border-color"],[style*="; border-color"]){border-style:solid}html :where([style^=border-top-color],[style*=";border-top-color"],[style*="; border-top-color"]){border-top-style:solid}html :where([style^=border-right-color],[style*=";border-right-color"],[style*="; border-right-color"]){border-right-style:solid}html :where([style^=border-bottom-color],[style*=";border-bottom-color"],[style*="; border-bottom-color"]){border-bottom-style:solid}html :where([style^=border-left-color],[style*=";border-left-color"],[style*="; border-left-color"]){border-left-style:solid}html :where([style^=border-width],[style*=";border-width"],[style*="; border-width"]){border-style:solid}html :where([style^=border-top-width],[style*=";border-top-width"],[style*="; border-top-width"]){border-top-style:solid}html :where([style^=border-right-width],[style*=";border-right-width"],[style*="; border-right-width"]){border-right-style:solid}html :where([style^=border-bottom-width],[style*=";border-bottom-width"],[style*="; border-bottom-width"]){border-bottom-style:solid}html :where([style^=border-left-width],[style*=";border-left-width"],[style*="; border-left-width"]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=/wp-includes/css/dist/block-library/common.min.css */
+</style>
+<style id="wp-block-button-inline-css">
+.wp-block-button__link{align-content:center;box-sizing:border-box;cursor:pointer;display:inline-block;height:100%;text-align:center;word-break:break-word}.wp-block-button__link.aligncenter{text-align:center}.wp-block-button__link.alignright{text-align:right}:where(.wp-block-button__link){border-radius:9999px;box-shadow:none;padding:calc(.667em + 2px) calc(1.333em + 2px);text-decoration:none}.wp-block-button[style*=text-decoration] .wp-block-button__link{text-decoration:inherit}.wp-block-buttons>.wp-block-button.has-custom-width{max-width:none}.wp-block-buttons>.wp-block-button.has-custom-width .wp-block-button__link{width:100%}.wp-block-buttons>.wp-block-button.has-custom-font-size .wp-block-button__link{font-size:inherit}.wp-block-buttons>.wp-block-button[class*=wp-block-button__width]{width:calc(var(--wp--block-button--width)*1% - var(--wp--style--block-gap, .5em)*(1 - var(--wp--block-button--width)/100))}.wp-block-buttons>.wp-block-button.wp-block-button__width-25{width:calc(25% - var(--wp--style--block-gap, .5em)*.75)}.wp-block-buttons>.wp-block-button.wp-block-button__width-50{width:calc(50% - var(--wp--style--block-gap, .5em)*.5)}.wp-block-buttons>.wp-block-button.wp-block-button__width-75{width:calc(75% - var(--wp--style--block-gap, .5em)*.25)}.wp-block-buttons>.wp-block-button.wp-block-button__width-100{flex-basis:100%;width:100%}.wp-block-buttons.is-vertical>.wp-block-button[class*=wp-block-button__width]{width:calc(var(--wp--block-button--width)*1%)}.wp-block-buttons.is-vertical>.wp-block-button.wp-block-button__width-25{width:25%}.wp-block-buttons.is-vertical>.wp-block-button.wp-block-button__width-50{width:50%}.wp-block-buttons.is-vertical>.wp-block-button.wp-block-button__width-75{width:75%}.wp-block-button.is-style-squared,.wp-block-button__link.wp-block-button.is-style-squared{border-radius:0}.wp-block-button.no-border-radius,.wp-block-button__link.no-border-radius{border-radius:0!important}:root :where(.wp-block-button .wp-block-button__link.is-style-outline),:root :where(.wp-block-button.is-style-outline>.wp-block-button__link){border:2px solid;padding:.667em 1.333em}:root :where(.wp-block-button .wp-block-button__link.is-style-outline:not(.has-text-color)),:root :where(.wp-block-button.is-style-outline>.wp-block-button__link:not(.has-text-color)){color:currentColor}:root :where(.wp-block-button .wp-block-button__link.is-style-outline:not(.has-background)),:root :where(.wp-block-button.is-style-outline>.wp-block-button__link:not(.has-background)){background-color:transparent;background-image:none}
+/*# sourceURL=https://vanshea.com/blog/wp-includes/blocks/button/style.min.css */
+</style>
+<style id="wp-block-heading-inline-css">
+h1:where(.wp-block-heading).has-background,h2:where(.wp-block-heading).has-background,h3:where(.wp-block-heading).has-background,h4:where(.wp-block-heading).has-background,h5:where(.wp-block-heading).has-background,h6:where(.wp-block-heading).has-background{padding:1.25em 2.375em}h1.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h1.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h2.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h2.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h3.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h3.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h4.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h4.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h5.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h5.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h6.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h6.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]){rotate:180deg}
+/*# sourceURL=https://vanshea.com/blog/wp-includes/blocks/heading/style.min.css */
+</style>
+<style id="wp-block-paragraph-inline-css">
+.is-small-text{font-size:.875em}.is-regular-text{font-size:1em}.is-large-text{font-size:2.25em}.is-larger-text{font-size:3em}.has-drop-cap:not(:focus):first-letter{float:left;font-size:8.4em;font-style:normal;font-weight:100;line-height:.68;margin:.05em .1em 0 0;text-transform:uppercase}body.rtl .has-drop-cap:not(:focus):first-letter{float:none;margin-left:.1em}p.has-drop-cap.has-background{overflow:hidden}:root :where(p.has-background){padding:1.25em 2.375em}:where(p.has-text-color:not(.has-link-color)) a{color:inherit}p.has-text-align-left[style*="writing-mode:vertical-lr"],p.has-text-align-right[style*="writing-mode:vertical-rl"]{rotate:180deg}
+/*# sourceURL=https://vanshea.com/blog/wp-includes/blocks/paragraph/style.min.css */
+</style>
+<style id="wp-block-buttons-inline-css">
+.wp-block-buttons{box-sizing:border-box}.wp-block-buttons.is-vertical{flex-direction:column}.wp-block-buttons.is-vertical>.wp-block-button:last-child{margin-bottom:0}.wp-block-buttons>.wp-block-button{display:inline-block;margin:0}.wp-block-buttons.is-content-justification-left{justify-content:flex-start}.wp-block-buttons.is-content-justification-left.is-vertical{align-items:flex-start}.wp-block-buttons.is-content-justification-center{justify-content:center}.wp-block-buttons.is-content-justification-center.is-vertical{align-items:center}.wp-block-buttons.is-content-justification-right{justify-content:flex-end}.wp-block-buttons.is-content-justification-right.is-vertical{align-items:flex-end}.wp-block-buttons.is-content-justification-space-between{justify-content:space-between}.wp-block-buttons.aligncenter{text-align:center}.wp-block-buttons:not(.is-content-justification-space-between,.is-content-justification-right,.is-content-justification-left,.is-content-justification-center) .wp-block-button.aligncenter{margin-left:auto;margin-right:auto;width:100%}.wp-block-buttons[style*=text-decoration] .wp-block-button,.wp-block-buttons[style*=text-decoration] .wp-block-button__link{text-decoration:inherit}.wp-block-buttons.has-custom-font-size .wp-block-button__link{font-size:inherit}.wp-block-buttons .wp-block-button__link{width:100%}.wp-block-button.aligncenter{text-align:center}
+/*# sourceURL=https://vanshea.com/blog/wp-includes/blocks/buttons/style.min.css */
+</style>
+<style id="wp-block-group-inline-css">
+.wp-block-group{box-sizing:border-box}:where(.wp-block-group.wp-block-group-is-layout-constrained){position:relative}
+/*# sourceURL=https://vanshea.com/blog/wp-includes/blocks/group/style.min.css */
+</style>
+
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel='stylesheet' id='vanshea-creative-fonts-css' href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&#038;family=DM+Serif+Display:ital@0;1&#038;family=Open+Sans:wght@400;500;600;700&#038;display=swap' media='all' />
+<link rel='stylesheet' id='vanshea-creative-blog-style-css' href='https://vanshea.com/blog/wp-content/themes/vanshea-creative-blog-revised/style.css?ver=1790706366' media='all' />
+<link rel="https://api.w.org/" href="https://vanshea.com/blog/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://vanshea.com/blog/wp-json/wp/v2/posts/3870" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://vanshea.com/blog/xmlrpc.php?rsd" />
+
+<link rel="canonical" href="https://vanshea.com/blog/design-and-religion-indelible-experiences/" />
+<link rel='shortlink' href='https://vanshea.com/blog/?p=3870' />
+<link rel="icon" href="https://vanshea.com/blog/wp-content/uploads/2026/07/cropped-new-logo-mark@2x-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://vanshea.com/blog/wp-content/uploads/2026/07/cropped-new-logo-mark@2x-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://vanshea.com/blog/wp-content/uploads/2026/07/cropped-new-logo-mark@2x-180x180.png" />
+<meta name="msapplication-TileImage" content="https://vanshea.com/blog/wp-content/uploads/2026/07/cropped-new-logo-mark@2x-270x270.png" />
+<style id="core-block-supports-inline-css">
+.wp-container-core-buttons-is-layout-f6d872f4{justify-content:center;}
+/*# sourceURL=core-block-supports-inline-css */
+</style>
+
+</head>
+<body class="wp-singular post-template-default single single-post postid-3870 single-format-standard wp-embed-responsive wp-theme-vanshea-creative-blog-revised">
+<a class="skip-link" href="#top">Skip to main content</a>
+
+<header class="site-header">
+	<div class="header-inner">
+		<a href="/" class="brand" aria-label="Van Shea Creative home">
+			<img class="brand-logo" src="https://vanshea.com/blog/wp-content/themes/vanshea-creative-blog-revised/assets/large-logo-horizontal.svg" alt="Van Shea Creative" width="215" height="61">
+		</a>
+
+		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open navigation menu">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="nav-toggle-icon" aria-hidden="true">
+				<span class="nav-toggle-bar"></span>
+				<span class="nav-toggle-bar"></span>
+				<span class="nav-toggle-bar"></span>
+			</span>
+		</button>
+
+		<nav id="siteNav" class="nav" aria-label="Primary navigation">
+			<a href="/">Home</a>
+			<a href="/work.html">Work</a>
+			<a href="/case-studies/">Case Studies</a>
+			<a href="/aidesign/">AI Design</a>
+			<a href="/experience.html">Experience</a>
+			<a href="https://vanshea.com/blog/" aria-current="page">Blog</a>
+		</nav>
+	</div>
+</header>
+
+<main id="top" class="site-main">
+
+
+<article id="post-3870" class="content-shell post-3870 post type-post status-publish format-standard has-post-thumbnail hentry category-design-2 category-religion tag-inspiration tag-love tag-mission">
+	<header class="entry-header">
+		<p class="post-kicker">
+			Design		</p>
+		<h1 class="entry-title">Design and Religion: Indelible Experiences</h1>		<p class="entry-meta">
+			<span class="posted-on">May 6, 2026</span>			<span aria-hidden="true"> · </span>
+			<span class="byline">Van Sedita</span>			<span aria-hidden="true"> · </span>
+			3 min read		</p>
+		<figure class="entry-featured-image">
+			<img width="1024" height="647" src="https://vanshea.com/blog/wp-content/uploads/2026/05/dnr_banner-100-1024x647.jpg" class="entry-featured-image-img wp-post-image" alt="" decoding="async" fetchpriority="high" srcset="https://vanshea.com/blog/wp-content/uploads/2026/05/dnr_banner-100-1024x647.jpg 1024w, https://vanshea.com/blog/wp-content/uploads/2026/05/dnr_banner-100-300x190.jpg 300w, https://vanshea.com/blog/wp-content/uploads/2026/05/dnr_banner-100-768x485.jpg 768w, https://vanshea.com/blog/wp-content/uploads/2026/05/dnr_banner-100-1536x970.jpg 1536w, https://vanshea.com/blog/wp-content/uploads/2026/05/dnr_banner-100.jpg 1901w" sizes="(max-width: 1024px) 100vw, 1024px" />		</figure>
+	</header>
+
+	<div class="entry-content">
+		
+<h2 class="wp-block-heading"><strong>We envision a world where design and religion work together to spread love, empathy, and charity faster than divisiveness, selfishness, and hate. To achieve this, we aim to bring the stories of those driving this change, both big and small, into the spotlight, allowing ideas for positive transformation to spread quickly and reach those who need them most.</strong></h2>
+
+
+
+<p class="wp-block-paragraph">That is the heart/mission/reason for the podcast.</p>
+
+
+
+<p class="wp-block-paragraph">We want to bring the stories of people driving positive change, both big and small, into the spotlight so those ideas can move quickly, reach the people who need them most, and leave a lasting mark.</p>
+
+
+
+<p class="wp-block-paragraph">For me, the show is a way to explore two industries in flux.And yes, I see religion as an industry.</p>
+
+
+
+<h3 class="wp-block-heading">Some data places it around <strong>$1.2 trillion</strong>. To put that in perspective, that is nearly six times the size of the professional design services market.</h3>
+
+
+
+<p class="wp-block-paragraph">When we talk about <strong>Design and Religion</strong>, we are talking about two of the most powerful systems we have for shaping how billions of people spend their time, money, attention, and energy.</p>
+
+
+
+<p class="wp-block-paragraph">Both create experiences people carry with them.</p>
+
+
+
+<p class="wp-block-paragraph">Can you identify with:</p>
+
+
+
+<p class="wp-block-paragraph">A beautifully designed service made you feel seen?<br>A harmful system that made you feel invisible.<br>A ritual that offered comfort for decades when repeated?</p>
+
+
+
+<p class="wp-block-paragraph">A careless institution can leave a wound that lasts just as long. That is what I mean by <strong>indelible experiences</strong>.</p>
+
+
+
+<p class="wp-block-paragraph">They are the moments that mark us. They teach us whether we belong. They teach us whether we are safe. They teach us whether we matter. They teach us whether help will arrive when we need it.</p>
+
+
+
+<p class="wp-block-paragraph">On the surface, design and religion can seem like separate worlds: one concerned with the material, the other with the eternal. But both work through human experience. Both shape memory, trust, behavior, and meaning.</p>
+
+
+
+<p class="wp-block-paragraph">Both ask deeply human questions:</p>
+
+
+
+<p class="wp-block-paragraph">How do we find true belonging? How do communities care for one another in crisis? How do institutions build trust? How do we repair what has caused harm?</p>
+
+
+
+<p class="wp-block-paragraph">What I’ve learned through this journey is that religion is as much an experience as it is a belief system. The way a person is welcomed, heard, supported, judged, or excluded leaves a lasting mark.</p>
+
+
+
+<p class="wp-block-paragraph">Design works the same way. <span style="box-sizing: border-box; margin: 0px; padding: 0px;">Every system we build teaches the people using it something about&nbsp;<em><strong>how we, the bui</strong></em></span><strong><em>lders, value them.</em></strong></p>
+
+
+
+<p class="wp-block-paragraph">I am drawn in deeply by the exploration of the human systems we inherit, the ones we question, and the ones we have a responsibility to redesign with more intentional care.</p>
+
+
+
+<p class="wp-block-paragraph">We started the show to explore that connection in a world that, lately, seems to enjoy breaking connections.</p>
+
+
+
+<div class="wp-block-group podcast-actions-section"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<div class="wp-block-buttons is-content-justification-center is-layout-flex wp-container-core-buttons-is-layout-f6d872f4 wp-block-buttons-is-layout-flex">
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.buzzsprout.com/2421376/support" target="_blank" rel="noopener noreferrer">Support the Podcast Here</a></div>
+</div>
+</div></div>
+
+
+
+<div class="wp-block-group listen-on-section"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained">
+<h4 class="wp-block-heading has-text-align-center"><strong>Listen on&#8230;</strong></h4>
+
+
+
+<div class="wp-block-buttons is-content-justification-center is-layout-flex wp-container-core-buttons-is-layout-f6d872f4 wp-block-buttons-is-layout-flex">
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://podcasts.apple.com/us/podcast/design-and-religion/id1781435852" target="_blank" rel="noopener noreferrer">Apple Podcasts</a></div>
+
+
+
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://open.spotify.com/show/14hfj3YxFDxOsRwCyacjKB" target="_blank" rel="noopener noreferrer">Spotify</a></div>
+
+
+
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.youtube.com/playlist?list=PL1w8OvCxMzVsaI55uYqB3T3p21umwyROg" target="_blank" rel="noopener noreferrer">YouTube</a></div>
+
+
+
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://music.amazon.com/podcasts/cb07cd27-7cf5-4619-8238-83a599778de2/design-and-religion" target="_blank" rel="noopener noreferrer">Amazon Music</a></div>
+
+
+
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://www.buzzsprout.com/2421376" target="_blank" rel="noopener noreferrer">Buzzsprout</a></div>
+</div>
+</div></div>
+	</div>
+
+	<footer class="entry-footer">
+		<a href="https://vanshea.com/blog/category/design-2/" rel="category tag">Design</a>, <a href="https://vanshea.com/blog/category/religion/" rel="category tag">Religion</a>		<span class="tags"> · <a href="https://vanshea.com/blog/tag/inspiration/" rel="tag">inspiration</a>, <a href="https://vanshea.com/blog/tag/love/" rel="tag">love</a>, <a href="https://vanshea.com/blog/tag/mission/" rel="tag">mission</a></span>	</footer>
+</article>
+
+	<nav class="navigation post-navigation" aria-label="Posts">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="https://vanshea.com/blog/how-to-rationalize-size-and-structure-of-a-design-team/" rel="prev">Previous: How to Rationalize the Size and Structure of a Design Team</a></div><div class="nav-next"><a href="https://vanshea.com/blog/choose-fear-or-faith/" rel="next">Next: Choose: Fear or Faith</a></div></div>
+	</nav>
+</main>
+
+
+<div class="footer-wave" data-footer-wave>
+	<svg viewBox="0 -50 1440 250" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+		<path stroke="#f36070" d="M-80 70 C150 132 330 46 550 82 S925 143 1130 92 S1420 50 1520 88 L1520 250 L-80 250 Z" />
+		<path stroke="#cfbead" d="M-80 84 C165 145 325 56 550 95 S930 153 1130 105 S1410 64 1520 100" />
+		<path stroke="#b6d800" d="M-80 98 C150 157 330 68 550 107 S930 164 1130 117 S1420 75 1520 112" />
+		<path stroke="#55b9d0" d="M-80 112 C160 170 330 81 550 120 S930 175 1130 130 S1420 89 1520 124" />
+		<path stroke="#b5a0db" d="M-80 126 C155 183 325 94 550 133 S930 187 1130 143 S1410 102 1520 138" />
+	</svg>
+	<button class="footer-wave-toggle" type="button" aria-label="Pause footer wave animation" aria-pressed="true">
+		Pause wave	</button>
+</div>
+
+<footer class="home-footer" id="siteFooter">
+			<div class="footer-container view-controls">
+			<fieldset class="theme-control">
+				<legend>Color theme</legend>
+									<label>
+						<input
+							type="radio"
+							name="color-theme"
+							value="theme1"
+													>
+						<span>Clear</span>
+					</label>
+									<label>
+						<input
+							type="radio"
+							name="color-theme"
+							value="theme3"
+													>
+						<span>High Contrast</span>
+					</label>
+									<label>
+						<input
+							type="radio"
+							name="color-theme"
+							value="theme4"
+							 checked='checked'						>
+						<span>Bold</span>
+					</label>
+									<label>
+						<input
+							type="radio"
+							name="color-theme"
+							value="theme5"
+													>
+						<span>Wild</span>
+					</label>
+							</fieldset>
+		</div>
+		<div class="footer-container footer-inner">
+		<p>&copy; <span id="year">2026</span> Van Shea Sedita · Van Shea Creative · Human Agency Design</p>
+		<nav class="footer-links" aria-label="Footer navigation">
+			<a href="https://www.vanshea.com/experience.html">Experience</a>
+			<a href="https://www.vanshea.com/work.html">Work</a>
+			<a href="https://vanshea.com/blog/">Blog</a>
+			<a href="https://www.linkedin.com/in/vanshea/" target="_blank" rel="noopener noreferrer">
+				LinkedIn<span class="screen-reader-text"> (opens in a new tab)</span>
+			</a>
+		</nav>
+	</div>
+</footer>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/blog/*"},{"not":{"href_matches":["/blog/wp-*.php","/blog/wp-admin/*","/blog/wp-content/uploads/*","/blog/wp-content/*","/blog/wp-content/plugins/*","/blog/wp-content/themes/vanshea-creative-blog-revised/*","/blog/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="siteground-optimizer-lazy-sizes-js-js" src="https://vanshea.com/blog/wp-content/plugins/sg-cachepress/assets/js/lazysizes.min.js?ver=7.8.3"></script>
+<script id="vanshea-creative-blog-script-js" src="https://vanshea.com/blog/wp-content/themes/vanshea-creative-blog-revised/assets/theme.js?ver=1790706366"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"https://vanshea.com/blog/wp-includes/js/wp-emoji-release.min.js?ver=7.1.2"}}
+</script>
+<script type="module">
+/*! This file is auto-generated */
+var e="script#wp-emoji-settings",t=document.querySelector(e);if(!(t instanceof HTMLScriptElement))throw new Error("Element missing: "+e);const r=JSON.parse(t.text),s=(window._wpemojiSettings=r,"wpEmojiSettingsSupports"),o=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(s,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const r=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===r[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,r){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!r(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,r){let a;const s=(a="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),o=(s.textBaseline="top",s.font="600 32px Arial",{});return e.forEach(e=>{o[e]=t(s,e,n,r)}),o}function a(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}r.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(s));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(o),u.toString(),c.toString(),p.toString()].join(",")+"));",r=new Blob([e],{type:"text/javascript"});const a=new Worker(URL.createObjectURL(r),{name:"wpTestEmojiSupports"});return void(a.onmessage=e=>{i(n=e.data),a.terminate(),t(n)})}catch(e){}i(n=f(o,u,c,p))}t(n)}).then(e=>{for(const n in e)r.supports[n]=e[n],r.supports.everything=r.supports.everything&&r.supports[n],"flag"!==n&&(r.supports.everythingExceptFlag=r.supports.everythingExceptFlag&&r.supports[n]);var t;r.supports.everythingExceptFlag=r.supports.everythingExceptFlag&&!r.supports.flag,r.supports.everything||((t=r.source||{}).concatemoji?a(t.concatemoji):t.wpemoji&&t.twemoji&&(a(t.twemoji),a(t.wpemoji)))});
+//# sourceURL=https://vanshea.com/blog/wp-includes/js/wp-emoji-loader.min.js
+</script>
+</body>
+</html>

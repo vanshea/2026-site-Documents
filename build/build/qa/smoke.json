@@ -1,0 +1,16 @@
+{
+  "homeFaqCount": 10,
+  "themePersisted": true,
+  "menuOpened": true,
+  "menuClosedAndFocusReturned": true,
+  "smallTargets": [],
+  "formValidation": {
+    "invalid": 3,
+    "status": "Please complete all required fields."
+  },
+  "workDialogOpened": true,
+  "workDialogClosedFocusReturned": true,
+  "caseDialogOpened": true,
+  "caseDialogClosedFocusReturned": true,
+  "deepLink": true
+}

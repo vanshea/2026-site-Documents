@@ -1,0 +1,16 @@
+{
+  "name": "siteground/siteground-dashboard-notifications",
+  "description": "SiteGround Dashboard Notifications - Fetches per-site important notifications from SGAPI via Avalon",
+  "type": "library",
+  "version": "1.0.0",
+  "require": {
+    "php": ">=7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "SiteGround_Dashboard\\": "src/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

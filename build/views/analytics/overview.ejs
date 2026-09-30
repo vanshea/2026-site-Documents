@@ -1,0 +1,45 @@
+<%- include('../partials/dashboard_head', { title: 'Overview' }) %>
+<%- include('../partials/dashboard_nav', { activeTab, range, rangeQuery, exportReport, currentPath }) %>
+
+<main class="space-y-4">
+  <section class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <% const cards = [
+      { key: 'users', label: 'Users (approx unique)', value: metrics.users.current, previous: metrics.users.previous, suffix: '', delta: metrics.users.deltaPercent, anomaly: metrics.users.anomaly },
+      { key: 'sessions', label: 'Sessions', value: metrics.sessions.current, previous: metrics.sessions.previous, suffix: '', delta: metrics.sessions.deltaPercent, anomaly: metrics.sessions.anomaly },
+      { key: 'pageviews', label: 'Pageviews', value: metrics.pageviews.current, previous: metrics.pageviews.previous, suffix: '', delta: metrics.pageviews.deltaPercent, anomaly: metrics.pageviews.anomaly },
+      { key: 'engagement_rate', label: 'Engagement Rate', value: metrics.engagementRate.current.toFixed(2), previous: metrics.engagementRate.previous.toFixed(2), suffix: '%', delta: metrics.engagementRate.deltaPercent, anomaly: metrics.engagementRate.anomaly },
+      { key: 'avg_engagement', label: 'Avg Engagement Time', value: metrics.avgEngagementSeconds.current.toFixed(1), previous: metrics.avgEngagementSeconds.previous.toFixed(1), suffix: 's', delta: metrics.avgEngagementSeconds.deltaPercent, anomaly: metrics.avgEngagementSeconds.anomaly },
+      { key: 'conversions', label: 'Conversions (Resume + Contact + Form)', value: metrics.conversions.current, previous: metrics.conversions.previous, suffix: '', delta: metrics.conversions.deltaPercent, anomaly: metrics.conversions.anomaly }
+    ]; %>
+
+    <% cards.forEach((card) => { %>
+      <article class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+        <p class="text-xs uppercase tracking-wide text-slate-400"><%= card.label %></p>
+        <p class="mt-2 text-2xl font-semibold text-slate-100"><%= card.value %><%= card.suffix %></p>
+        <p class="mt-2 text-xs text-slate-400">Previous period: <%= card.previous %><%= card.suffix %></p>
+        <div class="mt-2 flex items-center justify-between text-xs">
+          <span class="<%= card.delta >= 0 ? 'text-emerald-300' : 'text-rose-300' %>">
+            <%= card.delta >= 0 ? '+' : '' %><%= Number(card.delta || 0).toFixed(1) %>%
+          </span>
+          <% if (card.anomaly === 'spike') { %>
+            <span class="rounded-full border border-emerald-500/60 bg-emerald-500/20 px-2 py-0.5 text-emerald-200">Spike</span>
+          <% } else if (card.anomaly === 'drop') { %>
+            <span class="rounded-full border border-rose-500/60 bg-rose-500/20 px-2 py-0.5 text-rose-200">Drop</span>
+          <% } else { %>
+            <span class="rounded-full border border-slate-700 px-2 py-0.5 text-slate-400">Stable</span>
+          <% } %>
+        </div>
+      </article>
+    <% }); %>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Period Comparison</h2>
+    <p class="mt-1 text-sm text-slate-400">
+      Current range (<%= range.startDate %> → <%= range.endDate %>) vs previous range
+      (<%= range.previousStartDate %> → <%= range.previousEndDate %>).
+    </p>
+  </section>
+</main>
+
+<%- include('../partials/dashboard_footer') %>

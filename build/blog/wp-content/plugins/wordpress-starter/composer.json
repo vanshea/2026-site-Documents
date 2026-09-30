@@ -1,0 +1,33 @@
+{
+  "name": "siteground/wordpress-starter",
+  "type": "wordpress-plugin",
+  "require": {
+    "composer/installers": "~1.0",
+    "siteground/siteground-helper": "master@dev",
+    "siteground/siteground-dashboard-notifications": "dev-main",
+    "yahnis-elsts/plugin-update-checker": "4.11",
+    "charles-rumley/php-po-to-json": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {"SiteGround_Central\\": "core/"}
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@gitlab.siteground.com:wordpress/siteground-dashboard-notifications.git"
+    },
+    {
+      "type": "vcs",
+      "url":  "git@gitlab.siteground.com:wordpress/siteground-i18n.git"
+    },
+    {
+      "type": "vcs",
+      "url":  "git@gitlab.siteground.com:wordpress/siteground-helper.git"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  }
+}

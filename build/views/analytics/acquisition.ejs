@@ -1,0 +1,106 @@
+<%- include('../partials/dashboard_head', { title: 'Acquisition' }) %>
+<%- include('../partials/dashboard_nav', { activeTab, range, rangeQuery, exportReport, currentPath }) %>
+
+<main class="grid gap-4 lg:grid-cols-2">
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Source / Medium (Session)</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-4">Source / Medium</th>
+            <th class="py-1">Sessions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!acquisition.sessionSourceMedium.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="2">No data in selected range.</td></tr>
+          <% } %>
+          <% acquisition.sessionSourceMedium.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-4"><%= row.dimension %></td>
+              <td class="py-2"><%= row.sessions %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Source / Medium (First Touch)</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-4">Source / Medium</th>
+            <th class="py-1">Sessions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!acquisition.firstTouchSourceMedium.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="2">No data in selected range.</td></tr>
+          <% } %>
+          <% acquisition.firstTouchSourceMedium.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-4"><%= row.dimension %></td>
+              <td class="py-2"><%= row.sessions %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Campaign (Session)</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-4">Campaign</th>
+            <th class="py-1">Sessions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!acquisition.sessionCampaigns.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="2">No campaign values in selected range.</td></tr>
+          <% } %>
+          <% acquisition.sessionCampaigns.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-4"><%= row.dimension %></td>
+              <td class="py-2"><%= row.sessions %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+    <h2 class="text-base font-semibold">Campaign (First Touch)</h2>
+    <div class="mt-2 overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr>
+            <th class="py-1 pr-4">Campaign</th>
+            <th class="py-1">Sessions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!acquisition.firstTouchCampaigns.length) { %>
+            <tr><td class="py-2 text-slate-500" colspan="2">No campaign values in selected range.</td></tr>
+          <% } %>
+          <% acquisition.firstTouchCampaigns.forEach((row) => { %>
+            <tr class="border-t border-slate-800">
+              <td class="py-2 pr-4"><%= row.dimension %></td>
+              <td class="py-2"><%= row.sessions %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<%- include('../partials/dashboard_footer') %>
