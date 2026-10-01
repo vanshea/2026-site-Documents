@@ -261,13 +261,7 @@ function vanshea_creative_blog_post_image( $size = 'large', $class = '' ) {
 	return false;
 }
 
-function vanshea_creative_blog_maybe_set_missing_featured_images() {
-	if ( ! current_user_can( 'manage_options' ) || empty( $_GET['vsc_set_featured_images'] ) ) {
-		return;
-	}
-
-	check_admin_referer( 'vsc_set_featured_images' );
-
+function vanshea_creative_blog_repair_missing_featured_images() {
 	$updated = 0;
 	$checked = 0;
 	$query   = new WP_Query(
@@ -276,16 +270,14 @@ function vanshea_creative_blog_maybe_set_missing_featured_images() {
 			'post_status'    => 'any',
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
-			'meta_query'     => array(
-				array(
-					'key'     => '_thumbnail_id',
-					'compare' => 'NOT EXISTS',
-				),
-			),
 		)
 	);
 
 	foreach ( $query->posts as $post_id ) {
+		if ( has_post_thumbnail( $post_id ) ) {
+			continue;
+		}
+
 		$checked++;
 		$attachment_id = vanshea_creative_blog_get_attached_image_id( $post_id );
 		if ( ! $attachment_id ) {
@@ -298,21 +290,37 @@ function vanshea_creative_blog_maybe_set_missing_featured_images() {
 	}
 
 	$mapped_result = vanshea_creative_blog_set_featured_images_from_map();
-	$updated      += $mapped_result['updated'];
-	$checked      += $mapped_result['checked'];
+
+	return array(
+		'updated' => $updated + $mapped_result['updated'],
+		'checked' => $checked + $mapped_result['checked'],
+	);
+}
+
+/**
+ * Run the repair as a dedicated admin action and save a durable result.
+ */
+function vanshea_creative_blog_handle_featured_image_repair() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to repair featured images.', 'vanshea-creative-blog' ) );
+	}
+
+	check_admin_referer( 'vsc_repair_featured_images' );
+
+	$result                 = vanshea_creative_blog_repair_missing_featured_images();
+	$result['completed_at'] = time();
+	update_option( 'vsc_featured_image_repair_result', $result, false );
 
 	wp_safe_redirect(
 		add_query_arg(
-			array(
-				'vsc_featured_images_updated' => $updated,
-				'vsc_featured_images_checked' => $checked,
-			),
-			admin_url( 'themes.php' )
+			'vsc_featured_image_repair',
+			'complete',
+			admin_url( 'edit.php' )
 		)
 	);
 	exit;
 }
-add_action( 'admin_init', 'vanshea_creative_blog_maybe_set_missing_featured_images' );
+add_action( 'admin_post_vsc_repair_featured_images', 'vanshea_creative_blog_handle_featured_image_repair' );
 
 function vanshea_creative_blog_set_featured_images_from_map() {
 	$map_file = get_template_directory() . '/data/featured-image-map.php';
@@ -446,6 +454,8 @@ function vanshea_creative_blog_find_attachment_by_relative_path( $relative_path 
 }
 
 function vanshea_creative_blog_find_upload_file( $relative_path ) {
+	static $file_index = null;
+
 	$uploads       = wp_get_upload_dir();
 	$relative_path = ltrim( $relative_path, '/' );
 	$exact_path    = trailingslashit( $uploads['basedir'] ) . $relative_path;
@@ -462,13 +472,33 @@ function vanshea_creative_blog_find_upload_file( $relative_path ) {
 	$original_name = preg_replace( '/-\d+x\d+(?=\.[^.]+$)/', '', $basename );
 	$candidates    = array_unique( array_filter( array( $basename, $original_name ) ) );
 
-	foreach ( new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $uploads['basedir'], FilesystemIterator::SKIP_DOTS ) ) as $file ) {
-		if ( ! $file->isFile() ) {
-			continue;
-		}
+	if ( null === $file_index ) {
+		$file_index = array();
 
-		if ( in_array( $file->getBasename(), $candidates, true ) ) {
-			return $file->getPathname();
+		try {
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator( $uploads['basedir'], FilesystemIterator::SKIP_DOTS )
+			);
+
+			foreach ( $iterator as $file ) {
+				if ( ! $file->isFile() ) {
+					continue;
+				}
+
+				$file_basename = strtolower( $file->getBasename() );
+				if ( ! isset( $file_index[ $file_basename ] ) ) {
+					$file_index[ $file_basename ] = $file->getPathname();
+				}
+			}
+		} catch ( UnexpectedValueException $exception ) {
+			$file_index = array();
+		}
+	}
+
+	foreach ( $candidates as $candidate ) {
+		$candidate = strtolower( $candidate );
+		if ( isset( $file_index[ $candidate ] ) && is_readable( $file_index[ $candidate ] ) ) {
+			return $file_index[ $candidate ];
 		}
 	}
 
@@ -536,6 +566,10 @@ function vanshea_creative_blog_sideload_attachment_from_url( $url, $post_id ) {
 
 function vanshea_creative_blog_find_or_create_attachment_from_url( $url, $post_id ) {
 	$relative_path = vanshea_creative_blog_upload_relative_path_from_url( $url );
+	if ( ! $relative_path ) {
+		$url_path      = wp_parse_url( $url, PHP_URL_PATH );
+		$relative_path = $url_path ? wp_basename( rawurldecode( $url_path ) ) : '';
+	}
 
 	if ( $relative_path ) {
 		$attachment_id = vanshea_creative_blog_find_attachment_by_relative_path( $relative_path );
@@ -549,7 +583,13 @@ function vanshea_creative_blog_find_or_create_attachment_from_url( $url, $post_i
 		}
 	}
 
-	return vanshea_creative_blog_sideload_attachment_from_url( $url, $post_id );
+	$allow_remote_sideload = apply_filters( 'vanshea_creative_blog_allow_remote_featured_image_sideload', false, $url, $post_id );
+
+	if ( $allow_remote_sideload ) {
+		return vanshea_creative_blog_sideload_attachment_from_url( $url, $post_id );
+	}
+
+	return 0;
 }
 
 function vanshea_creative_blog_featured_image_admin_notice() {
@@ -557,29 +597,47 @@ function vanshea_creative_blog_featured_image_admin_notice() {
 		return;
 	}
 
-	if ( isset( $_GET['vsc_featured_images_updated'] ) ) {
+	$screen = get_current_screen();
+	if ( ! $screen || ! in_array( $screen->base, array( 'edit', 'themes' ), true ) ) {
+		return;
+	}
+
+	if ( 'edit' === $screen->base && 'post' !== $screen->post_type ) {
+		return;
+	}
+
+	$result_status = isset( $_GET['vsc_featured_image_repair'] ) ? sanitize_key( wp_unslash( $_GET['vsc_featured_image_repair'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$last_result   = get_option( 'vsc_featured_image_repair_result', array() );
+
+	if ( 'complete' === $result_status && is_array( $last_result ) ) {
+		$updated = isset( $last_result['updated'] ) ? absint( $last_result['updated'] ) : 0;
+		$checked = isset( $last_result['checked'] ) ? absint( $last_result['checked'] ) : 0;
 		printf(
 			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 			esc_html(
 				sprintf(
 					/* translators: 1: number of updated posts, 2: number of checked posts. */
-					__( 'Van Shea Creative Blog set featured images on %1$s posts/pages after checking %2$s candidates.', 'vanshea-creative-blog' ),
-					number_format_i18n( (int) $_GET['vsc_featured_images_updated'] ),
-					number_format_i18n( (int) $_GET['vsc_featured_images_checked'] )
+					__( 'Featured image repair completed: %1$s images assigned after checking %2$s candidates. Unmatched posts need a manual featured image selection.', 'vanshea-creative-blog' ),
+					number_format_i18n( $updated ),
+					number_format_i18n( $checked )
 				)
 			)
 		);
 		return;
 	}
 
+	if ( is_array( $last_result ) && ! empty( $last_result['completed_at'] ) ) {
+		return;
+	}
+
 	$url = wp_nonce_url(
-		add_query_arg( 'vsc_set_featured_images', '1', admin_url( 'themes.php' ) ),
-		'vsc_set_featured_images'
+		add_query_arg( 'action', 'vsc_repair_featured_images', admin_url( 'admin-post.php' ) ),
+		'vsc_repair_featured_images'
 	);
 
 	printf(
 		'<div class="notice notice-info"><p>%1$s <a class="button button-primary" href="%2$s">%3$s</a></p></div>',
-		esc_html__( 'Imported posts may have missing featured images. This repair checks attached media, the original export map, existing upload files, and old image URLs.', 'vanshea-creative-blog' ),
+		esc_html__( 'Imported posts may have missing featured images. This repair checks attached media, the original export map, and existing upload files.', 'vanshea-creative-blog' ),
 		esc_url( $url ),
 		esc_html__( 'Repair featured images', 'vanshea-creative-blog' )
 	);

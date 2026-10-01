@@ -1,6 +1,6 @@
 # Van Shea Creative Blog Revised
 
-Version 2.2 of the custom Van Shea Creative WordPress theme.
+Version 2.2.1 of the custom Van Shea Creative WordPress theme.
 
 ## Revision highlights
 
