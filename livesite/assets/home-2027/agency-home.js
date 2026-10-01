@@ -31,6 +31,23 @@
     const syncHeader = () => header?.classList.toggle('is-scrolled', scrollY > 24);
     addEventListener('scroll', syncHeader, { passive: true });
     syncHeader();
+    const introTarget = document.getElementById('human-agency');
+    document.querySelectorAll('a[href="#human-agency"]').forEach(link => {
+      link.addEventListener('click', event => {
+        if (!introTarget) return;
+        event.preventDefault();
+        const headerHeight = header?.getBoundingClientRect().height || 0;
+        const targetTop = window.scrollY + introTarget.getBoundingClientRect().top;
+        introTarget.focus({ preventScroll: true });
+        if (window.location.hash !== '#human-agency') {
+          window.history.pushState(null, '', '#human-agency');
+        }
+        window.scrollTo({
+          top: Math.max(0, targetTop - headerHeight - 18),
+          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+        });
+      });
+    });
     document.querySelector('.theme-control')?.addEventListener('change', event => {
       if (event.target.matches('input[name="color-theme"],select[name="theme"]')) {
         applyTheme(event.target.value);
