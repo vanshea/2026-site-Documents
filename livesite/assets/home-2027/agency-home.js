@@ -56,12 +56,13 @@
     });
     const menu = document.querySelector('.menu-toggle');
     const nav = document.querySelector('.home-nav');
-    const closeMenu = () => { nav?.classList.remove('is-open'); menu?.setAttribute('aria-expanded', 'false'); if (menu) menu.textContent = 'Menu'; };
+    const closeMenu = () => { nav?.classList.remove('is-open'); menu?.setAttribute('aria-expanded', 'false'); menu?.setAttribute('aria-label', 'Open menu'); if (menu) menu.textContent = 'Menu'; };
     menu?.addEventListener('click', () => {
       const open = menu.getAttribute('aria-expanded') !== 'true';
       nav.classList.toggle('is-open', open);
       menu.setAttribute('aria-expanded', String(open));
       menu.textContent = open ? 'Close' : 'Menu';
+      menu.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     });
     nav?.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
     document.addEventListener('keydown', event => {
